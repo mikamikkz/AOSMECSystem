@@ -1,0 +1,36 @@
+{
+  "name": "aosmecsystem",
+  "version": "1.0.0",
+  "description": "aosmec hotel reservation system prototype",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikamikkz/AOSMECSystem.git"
+  },
+  "keywords": [
+    "hotel",
+    "reservation",
+    "system",
+    "IM2",
+    "nodejs",
+    "ejs"
+  ],
+  "author": "Vin Myca Sagarino, Jennen Isabelle Montejo, Carlos Julian Chiongbian",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikamikkz/AOSMECSystem/issues"
+  },
+  "homepage": "https://github.com/mikamikkz/AOSMECSystem#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "mysql": "^2.18.1"
+  }
+}
