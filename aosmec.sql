@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 12, 2021 at 03:02 PM
+-- Generation Time: Jan 13, 2021 at 03:27 PM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -31,7 +31,9 @@ CREATE TABLE `account` (
   `id` int(255) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `fname` varchar(255) NOT NULL,
+  `mname` varchar(255) NOT NULL,
+  `lname` varchar(255) NOT NULL,
   `birthdate` date NOT NULL,
   `gender` varchar(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
@@ -96,13 +98,14 @@ CREATE TABLE `checkin` (
 --
 
 CREATE TABLE `guest` (
-  `id` int(11) NOT NULL,
-  `checkInId` int(11) NOT NULL,
-  `name` int(11) NOT NULL,
-  `address` int(11) NOT NULL,
-  `govId` int(11) NOT NULL,
-  `govIdType` int(11) NOT NULL,
-  `phoneNo` int(11) NOT NULL,
+  `id` int(255) NOT NULL,
+  `checkInId` int(255) NOT NULL,
+  `fname` varchar(255) NOT NULL,
+  `lname` varchar(255) NOT NULL,
+  `address` varchar(255) NOT NULL,
+  `govId` int(255) NOT NULL,
+  `govIdType` varchar(255) NOT NULL,
+  `phoneNo` int(20) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -135,7 +138,8 @@ CREATE TABLE `reservation` (
 
 CREATE TABLE `reservee` (
   `id` int(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `fname` varchar(255) NOT NULL,
+  `lname` varchar(255) NOT NULL,
   `gender` varchar(255) NOT NULL,
   `country` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
@@ -288,7 +292,7 @@ ALTER TABLE `checkin`
 -- AUTO_INCREMENT for table `guest`
 --
 ALTER TABLE `guest`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `reservation`
