@@ -187,9 +187,6 @@
 
     <v-main class="ma-5">
     </v-main>
-    <v-footer class="py-3">
-            <span class="ml-auto overline">XXX 2021</span>
-        </v-footer>
   </v-app>
 </template>
 

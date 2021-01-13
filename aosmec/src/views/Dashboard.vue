@@ -2,8 +2,7 @@
   <div class="dashboard">
     <v-card>
       <v-card-text>
-        The navigation drawer will appear from the bottom on smaller size
-        screens.
+        abcdefg
       </v-card-text>
     </v-card>
   </div>
