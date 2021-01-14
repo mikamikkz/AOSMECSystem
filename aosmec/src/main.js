@@ -28,6 +28,7 @@ const router = new VueRouter({
 });
 
 new Vue({
+  el: '#app',
   vuetify,
   Axios,
   render: h => h(App),
