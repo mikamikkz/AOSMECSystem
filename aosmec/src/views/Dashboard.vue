@@ -1,9 +1,25 @@
 <template>
   <div class="dashboard">
     <v-container class="mt-10">
+
+      <v-card
+        outlined
+        shaped
+        tile
+        color="green darken-4"
+        class="mb-10"
+        width="200px"
+      >
+        <v-card-text class="pa-3">
+          <p class="font-weight-medium mb-0" style="color: white">
+            Date: <span></span>
+          </p>
+        </v-card-text>
+      </v-card>
+
       <v-row>
         <v-col lg="4" cols="sm" class="pb-2">
-          <v-card class="bordered" height="182px">
+          <v-card class="bordered" height="167px">
               <div class="col pa-3 py-4 green--text">
                 <h4 class="text-truncate text-uppercase">Daily Sales</h4>
                 <h1>53</h1>
@@ -19,7 +35,7 @@
             <v-card-text>
               <v-carousel
                 cycle
-                height="100"
+                height="80"
                 interval="2000"
                 hide-delimiter-background
                 show-arrows-on-hover
@@ -48,38 +64,8 @@
         </v-col>
       </v-row>
 
-      <!-- <v-card
-            outlined
-            shaped
-            tile
-            color="green lighten-1"
-            class="mt-6 mb-2"
-            width="200px"
-            height="100px"
-          >
-            <v-card-text class="pa-3">
-              <h2 class="font-weight-medium mb-0" style="color: blue-grey">
-                Daily Sales: <span></span>
-              </h2>
-            </v-card-text>
-          </v-card> -->
-
-      <v-card
-        outlined
-        shaped
-        tile
-        color="green darken-4"
-        class="mt-6 mb-2"
-        width="200px"
-      >
-        <v-card-text class="pa-3">
-          <p class="font-weight-medium mb-0" style="color: white">
-            Date: <span></span>
-          </p>
-        </v-card-text>
-      </v-card>
-
       <v-data-table
+        class="mt-10"
         dense
         :headers="headers"
         :items="guests"
