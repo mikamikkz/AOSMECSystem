@@ -6,17 +6,17 @@
           <v-card elevation="4" light tag="section">
             <v-card-title>
               <v-layout align-center justify-space-between>
-                <h3 class="font-weight-medium text-uppercase">Login</h3>
+                <h3 class="font-weight-medium text-uppercase">Register</h3>
                 <v-spacer></v-spacer>
                 <h3 class="font-weight-medium text-uppercase">Aosmec</h3>
                 <!-- <v-flex>
-                  <v-img :alt="platformName" class="ml-3" contain height="48px" position="center right" src=""></v-img>
+                  <v-img :alt="platformName" class="ml-3" contain height="48px" position="center right" src="https://www.mobygames.com/images/i/12/25/1435075.png"></v-img>
                 </v-flex> -->
               </v-layout>
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text>
-              <p>Sign in with your username and password:</p>
+              <p>Create an account:</p>
               <v-form>
                 <v-text-field
                   outline
@@ -36,15 +36,8 @@
             <v-divider></v-divider>
             <v-card-actions :class="{ 'pa-3': $vuetify.breakpoint.smAndUp }">
               <v-spacer></v-spacer>
-              <v-btn
-                to="/register"
-                color="secondary"
-                :large="$vuetify.breakpoint.smAndUp"
-              >
-                Register
-              </v-btn>
-              <v-btn to="/dashboard" color="success" :large="$vuetify.breakpoint.smAndUp">
-                Login
+              <v-btn to="/login" color="success" :large="$vuetify.breakpoint.smAndUp">
+                Sign Up
               </v-btn>
             </v-card-actions>
           </v-card>
