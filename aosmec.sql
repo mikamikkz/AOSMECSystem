@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2021 at 03:27 PM
+-- Generation Time: Jan 14, 2021 at 10:48 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -138,8 +138,7 @@ CREATE TABLE `reservation` (
 
 CREATE TABLE `reservee` (
   `id` int(255) NOT NULL,
-  `fname` varchar(255) NOT NULL,
-  `lname` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `gender` varchar(255) NOT NULL,
   `country` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,

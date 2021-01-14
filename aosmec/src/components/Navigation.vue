@@ -6,7 +6,8 @@
       width="260"
       app
     >
-      <v-list-item>
+    <v-card flat class="not-rounded" color="#13b150">
+      <v-list-item class="pb-1">
         <v-list-item-content class="mt-2 ml-2">
           <v-list-item-title style="font-size: 20px" class="title white--text">
             AOSMEC Square
@@ -14,7 +15,7 @@
           <v-list-item-subtitle style="color: #e3fff6">Booking System</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
-
+    </v-card>
       <v-divider></v-divider>
 
       <v-list dense nav>
@@ -72,7 +73,7 @@
           <v-list-group color="white">
             <template v-slot:activator>
               <v-list-item to="/room-mgmt" color="white">
-                <v-list-item-icon class="ma-0 mt-2 mr-2 pl-2 pr-2">
+                <v-list-item-icon class="ma-0 mt-2 mr-2 ml-0 pr-2">
                   <v-icon small style="color: #e3fff6">mdi-bed</v-icon>
                 </v-list-item-icon>
                 <v-list-item-content style="color: #e3fff6; font-size: 14px">
@@ -187,5 +188,8 @@ a {
 }
 >>>.v-list-item__icon.v-list-group__header__append-icon{
   margin-left: 0px !important;
+}
+.not-rounded{
+  border-radius: 0px !important;
 }
 </style>
