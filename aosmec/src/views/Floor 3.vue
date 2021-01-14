@@ -2,7 +2,7 @@
   <div class="dashboard">
     <v-container class="mt-10">
         <h3 class="font-weight-medium mb-5" style="color: blue-grey">
-            Rooms on Floor 1
+            Rooms on Floor 3
           </h3>
       <v-data-table
         dense
@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: "Floor 1",
+  name: "Floor 3",
   components: {},
   data() {
     return {
@@ -48,45 +48,21 @@ export default {
       ],
       rooms: [
         {
-          roomNo: "107",
+          roomNo: "307",
           name: "Kim Taehyung",
           roomType: "double",
           status: "xxx"
         },
         {
-          roomNo: "102",
+          roomNo: "302",
           name: "Kim Taehyung",
           roomType: "double",
           status: "xxx"
         },
         {
-          roomNo: "112",
-          name: "Kim Taehyung",
-          roomType: "single",
-          status: "xxx"
-        },
-        {
-          roomNo: "114",
-          name: "Kim Taehyung",
-          roomType: "single",
-          status: "xxx"
-        },
-        {
-          roomNo: "105",
+          roomNo: "303",
           name: "Kim Taehyung",
           roomType: "double",
-          status: "xxx"
-        },
-        {
-          roomNo: "106",
-          name: "Kim Taehyung",
-          roomType: "double",
-          status: "xxx"
-        },
-        {
-          roomNo: "109",
-          name: "Kim Taehyung",
-          roomType: "family room",
           status: "xxx"
         }
       ],
