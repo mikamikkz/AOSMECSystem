@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <Navigation/>
+    <Navigation></Navigation>
     <v-main>
       <router-view></router-view>
     </v-main>
@@ -8,15 +8,15 @@
 </template>
 
 <script>
-// @ or . is an alias to /src
-import Navigation from '@/components/Navigation.vue'
+import Navigation from "./components/Navigation.vue";
 
 export default {
-  name: 'Home',
+  name: "App",
   components: {
-    Navigation
-  }
-}
+    Navigation,
+  },
+  data: () => ({}),
+};
 </script>
 
 <style>
