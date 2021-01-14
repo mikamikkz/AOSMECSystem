@@ -8,7 +8,7 @@
   >
     <v-list-item>
       <v-list-item-content class="mt-2 ml-2">
-        <v-list-item-title style="font-size: 20px" class="title white--text">
+        <v-list-item-title style="font-size: 20px" class="title green--text">
           AOSMEC Square
         </v-list-item-title>
         <v-list-item-subtitle style="color: #e3fff6"
