@@ -6,7 +6,7 @@
         outlined
         shaped
         tile
-        color="green darken-4"
+        color="green"
         class="mb-10"
         width="200px"
       >
