@@ -73,7 +73,7 @@
               <v-list-item to="/room-mgmt/all" color="black">
                 <v-list-item-icon class="ma-0 ml-2 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"
-                    >mdi-calendar-clock</v-icon
+                    >mdi-bed</v-icon
                   >
                 </v-list-item-icon>
                 <v-list-item-content style="color: #e3fff6; font-size: 15px;">
