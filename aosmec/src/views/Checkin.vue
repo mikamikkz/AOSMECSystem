@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-card class="mx-10 mt-5">
+    <v-card class="mx-7 mt-5">
       <v-card-title class="white--text" style="background: #13b150"
         >Check In Details</v-card-title
       >
     </v-card>
-    <v-row class="mx-8 mt-5 pa-0">
+    <v-row class="mx-4 mt-5 pa-0">
       <v-col lg="5" md="5" sm="12" d-flex>
         <v-card>
           <v-card-title class="green--text">Reservation Details</v-card-title>
@@ -42,12 +42,24 @@
                 </v-col>
               </v-row>
               <v-row>
-                <v-col class="pa-0">
+                <v-col class="pa-0" lg="8" md="8" xs="12">
                   <v-select
                     :items="roomType"
                     v-model="input.roomType"
                     label="Room Type"
                     prepend-icon="mdi-door"
+                    item-text="text"
+                    item-value="value"
+                    outlined
+                    dense
+                    color="green"
+                  ></v-select>
+                </v-col>
+                <v-col class="pa-0 pl-3" lg="4" md="4" xs="12">
+                  <v-select
+                    :items="roomNo"
+                    v-model="input.roomNo"
+                    label="Room No"
                     item-text="text"
                     item-value="value"
                     outlined
@@ -61,6 +73,7 @@
                   <v-text-field
                     v-model="input.noOfDays"
                     label="Number of Days"
+                    type="number"
                     prepend-icon="mdi-calendar-edit"
                     outlined
                     dense
@@ -165,17 +178,17 @@
               </v-row>
               <v-row>
                 <v-col class="pa-0" xl="5" md="5" xs="12">
-                  <v-select
-                    :items="noOfHeads"
+                  <v-text-field
                     v-model="input.noOfHeads"
-                    item-text="text"
-                    item-value="value"
+                    type="number"
                     label="No of Head"
-                    prepend-icon="mdi-account-multiple"
                     outlined
                     dense
                     color="green"
-                  ></v-select>
+                    prepend-icon="mdi-account-multiple"
+                    v-on:change="changeNoOfGuestForm(input.noOfHeads)"
+                  >
+                  </v-text-field>
                 </v-col>
                 <v-spacer></v-spacer>
                 <v-col class="pa-0" xl="2">
@@ -191,15 +204,74 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col lg="7" md="7" sm="12" d-flex>
+      <v-col lg="4" md="4" sm="12" d-flex>
+        <v-card>
+          <v-card-title class="green--text">Additional Service</v-card-title>
+          <v-card-text>
+            <v-simple-table fixed-header>
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="ma-0 pa-0"></th>
+                    <th class="text-left pl-1">Name</th>
+                    <th class="text-left">Rate</th>
+                    <th class="text-left">Qty</th>
+                    <th class="text-left">Paid</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="service in guestServices" :key="service.name">
+                    <td class="pa-0 ma-0">
+                      <v-btn icon small v-if="service.add" class="pt-0 mt-0">
+                        <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
+                      </v-btn>
+                    </td>
+                    <td class="pl-1">{{ service.name }}</td>
+                    <td>{{ service.rate }}</td>
+                    <td>{{ service.quantity }}</td>
+                    <td>
+                      <v-btn icon small v-if="!service.add">
+                        <v-icon color="green lighten-3"
+                          >mdi-checkbox-marked</v-icon
+                        >
+                      </v-btn>
+                      <v-checkbox
+                        success
+                        v-model="service.status"
+                        v-if="service.add"
+                        class="pa-0 ml-1"
+                      ></v-checkbox>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col lg="3" md="3" sm="12" d-flex>
+        <v-card>
+          <v-card-title class="green--text">Payment Details</v-card-title>
+          <v-card-text class="mt-3"> </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row class="mx-4 mt-5 pa-0">
+      <v-col
+        lg="6"
+        md="6"
+        sm="12"
+        d-flex
+        v-for="guest in noOfGuestForm"
+        :key="guest"
+      >
         <GuestForm></GuestForm>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
 <script>
-import GuestForm from "../components/GuestForm"
+import GuestForm from "../components/GuestForm";
 export default {
   components: { GuestForm },
   name: "CheckIn",
@@ -208,11 +280,37 @@ export default {
       input: {
         fname: "",
         lname: "",
+        noOfHeads: "1",
         checkInDate: new Date().toISOString().substr(0, 10),
         checkOutDate: "",
       },
+      noOfGuestForm: 1,
       reservee: [],
       roomType: [],
+      roomNo: [],
+      guestServices: [
+        {
+          add: false,
+          name: "Room Rate",
+          rate: "14700",
+          quantity: "1",
+          status: true,
+        },
+        {
+          add: false,
+          name: "Extra Bed",
+          rate: "50",
+          quantity: "1",
+          status: true,
+        },
+        {
+          add: true,
+          name: "Airport Shuttle",
+          rate: "1500",
+          quantity: "2",
+          status: false,
+        },
+      ],
       reservationType: [
         { text: "Booking.com", value: "Booking.com" },
         { text: "Agoda", value: "Agoda" },
@@ -220,17 +318,15 @@ export default {
         { text: "AirBnB", value: "AirBnB" },
         { text: "Expedia", value: "Expedia" },
       ],
-      noOfHeads: [
-        { text: "1", value: "1" },
-        { text: "2", value: "2" },
-        { text: "3", value: "3" },
-        { text: "4", value: "4" },
-        { text: "5", value: "5" },
-      ],
       checkIn: false,
       checkOut: false,
-      date: '',
+      date: "",
     };
+  },
+  methods: {
+    changeNoOfGuestForm: function (noOfHeads) {
+      this.noOfGuestForm = parseInt(noOfHeads, 10);
+    },
   },
 };
 </script>
