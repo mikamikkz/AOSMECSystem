@@ -246,6 +246,26 @@
                 </tbody>
               </template>
             </v-simple-table>
+            <v-row class="mt-2">
+              <v-col lg="1" md="1" sm="12" d-flex class="mr-1">
+                <v-btn icon small class="mt-2">
+                  <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
+                </v-btn>
+              </v-col>
+              <v-col lg="7" md="" sm="12" d-flex class="pr-1">
+                <v-select
+                  dense
+                  outlined
+                ></v-select>
+              </v-col>
+              <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
+                <v-text-field
+                  dense
+                  outlined
+                  type="number"
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
       </v-col>
