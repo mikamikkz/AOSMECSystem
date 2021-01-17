@@ -222,7 +222,7 @@
                 <tbody>
                   <tr v-for="service in guestServices" :key="service.name">
                     <td class="pa-0 ma-0">
-                      <v-btn icon small v-if="service.add" class="pt-0 mt-0">
+                      <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
                         <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
                       </v-btn>
                     </td>
@@ -248,18 +248,25 @@
             </v-simple-table>
             <v-row class="mt-2">
               <v-col lg="1" md="1" sm="12" d-flex class="mr-1">
-                <v-btn icon small class="mt-2">
+                <v-btn icon small class="mt-2" v-on:click="addToList(addToService)">
                   <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
                 </v-btn>
               </v-col>
               <v-col lg="7" md="" sm="12" d-flex class="pr-1">
                 <v-select
+                  :items="services"
+                  v-model="addToService.name"
+                  label="Service Name"
+                  item-text="text"
+                  item-value="value"
                   dense
                   outlined
                 ></v-select>
               </v-col>
               <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
                 <v-text-field
+                  v-model="addToService.qty"
+                  label="Qty"
                   dense
                   outlined
                   type="number"
@@ -308,6 +315,14 @@ export default {
       reservee: [],
       roomType: [],
       roomNo: [],
+      services: [
+        { text: "Sample", value: "Sample" },
+        { text: "Sample2", value: "Sample2" },
+      ],
+      addToService: {
+        name: "",
+        qty: "",
+      },
       guestServices: [
         {
           add: false,
@@ -347,6 +362,21 @@ export default {
     changeNoOfGuestForm: function (noOfHeads) {
       this.noOfGuestForm = parseInt(noOfHeads, 10);
     },
+    addToList: function(input) {
+      console.log(input);
+      var addData = {
+        add: true,
+        name: input.name,
+        rate: "",
+        quantity: input.qty,
+        status: false,
+      }
+      this.guestServices.push(addData);
+    },
+    removeFromList: function(input) {
+      var index = this.guestServices.indexOf(input.name);
+      this.guestServices.splice(index, 1);
+    }
   },
 };
 </script>
