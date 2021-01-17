@@ -1,33 +1,45 @@
 <template>
   <v-container>
-    <div class="my-6">
+    <v-card class="mt-5">
+      <v-card-title class="white--text py-3" style="background: #13b150">
+        <v-row>
+          <v-col cols="8"> Reservation </v-col>
+          <v-spacer></v-spacer>
+          <v-col>
+            <v-btn rounded> Add Reservation </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-title>
+    </v-card>
+    <v-card class="my-6">
       <v-text-field
         v-model="search"
         label="Search Name of Reservee"
-        class="mx-4"
         prepend-inner-icon="mdi-magnify"
+        color="green"
         outlined
         dense
         hide-details
       ></v-text-field>
-    </div>
-    <template>
-      <v-data-table
-        :headers="reservationHeaders"
-        :items="reservations"
-        :single-expand="true"
-        :expanded.sync="expanded"
-        item-key="name"
-        show-expand
-        :search="search"
-        :custom-filter="filter"
-        class="elevation-1"
-        :footer-props="{
-          itemsPerPageText: 'Rerservation Per Page',
-          itemsPerPageOptions: [10, 30, 50, -1]
-        }"
-      >
-         <template v-slot:item.controls="props">
+    </v-card>
+    <v-card>
+      <template>
+        <v-data-table
+          :headers="reservationHeaders"
+          :items="reservations"
+          :single-expand="true"
+          :expanded.sync="expanded"
+          item-key="name"
+          show-expand
+          :search="search"
+          :custom-filter="filter"
+          class="elevation-1"
+          :footer-props="{
+            itemsPerPageText: 'Rerservation Per Page',
+            itemsPerPageOptions: [10, 30, 50, -1],
+          }"
+        >
+          <template v-slot:item.controls="props">
             <v-btn
               color="amber darken-2"
               small
@@ -48,19 +60,23 @@
             </v-btn>
             <slot name="serviceDialog"></slot>
           </template>
-          <template v-slot:expanded-item="{ headers, item }" class="test elevation-0">
+          <template
+            v-slot:expanded-item="{ headers, item }"
+            class="test elevation-0"
+          >
             <td :colspan="headers.length">More info about {{ item.name }}</td>
           </template>
-      </v-data-table>
-    </template>
+        </v-data-table>
+      </template>
+    </v-card>
   </v-container>
 </template>
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f5faf1;
+  background: #f1faf1;
 }
->>> .v-data-table thead span{
+>>> .v-data-table thead span {
   font-weight: bolder;
   font-size: 13px;
 }
@@ -75,14 +91,50 @@ export default {
       expanded: [],
       search: "",
       reservationHeaders: [
-        { text: "Reserved Date", align: "start", value: "name", class: "teal--text darken-4 title"},
-        { text: "Check In Date", value: "carbs", class: "teal--text darken-4 title" },
-        { text: "Reservee Name", value: "calories", class: "teal--text darken-4 title" },
-        { text: "Reserve Type", value: "fat", class: "teal--text darken-4 title" },
-        { text: "No of Days", value: "protein", class: "teal--text darken-4 title" },
-        { text: "Confirmation No", value: "iron", class: "teal--text darken-4 title" },
-        { text: "Action", value: "controls", sortable: false, align: "end", class: "teal--text darken-4 title" },
-        { text: "", value: "data-table-expand", align: "start", class: "teal--text darken-4 title" },
+        {
+          text: "Reserved Date",
+          align: "start",
+          value: "name",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Check In Date",
+          value: "carbs",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Reservee Name",
+          value: "calories",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Reserve Type",
+          value: "fat",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "No of Days",
+          value: "protein",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Confirmation No",
+          value: "iron",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "",
+          value: "controls",
+          sortable: false,
+          align: "end",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "",
+          value: "data-table-expand",
+          align: "start",
+          class: "green--text darken-4 title",
+        },
       ],
       reservations: [
         {
