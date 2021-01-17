@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <Navigation></Navigation>
-    <v-main>
+    <v-main style="background: #f9fcfb">
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -20,6 +20,9 @@ export default {
 </script>
 
 <style>
+.v-main{
+  background: #f9fcfb;
+}
 </style>
 
 
