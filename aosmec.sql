@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2021 at 10:48 AM
+-- Generation Time: Jan 17, 2021 at 11:00 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -51,6 +51,7 @@ CREATE TABLE `bill` (
   `id` int(255) NOT NULL,
   `roomId` int(255) NOT NULL,
   `status` varchar(255) NOT NULL,
+  `keyDeposit` tinyint(1) NOT NULL,
   `total` int(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date NOT NULL
@@ -59,10 +60,10 @@ CREATE TABLE `bill` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `billdetail`
+-- Table structure for table `bill_detail`
 --
 
-CREATE TABLE `billdetail` (
+CREATE TABLE `bill_detail` (
   `billId` int(255) NOT NULL,
   `serviceId` int(255) NOT NULL,
   `quantity` int(3) NOT NULL,
@@ -102,10 +103,13 @@ CREATE TABLE `guest` (
   `checkInId` int(255) NOT NULL,
   `fname` varchar(255) NOT NULL,
   `lname` varchar(255) NOT NULL,
+  `gender` varchar(255) NOT NULL,
+  `country` varchar(255) NOT NULL,
+  `nationality` varchar(255) NOT NULL,
   `address` varchar(255) NOT NULL,
-  `govId` int(255) NOT NULL,
-  `govIdType` varchar(255) NOT NULL,
-  `phoneNo` int(20) NOT NULL,
+  `validId` int(255) NOT NULL,
+  `validIdType` varchar(255) NOT NULL,
+  `phoneNo` int(20) DEFAULT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -149,6 +153,18 @@ CREATE TABLE `reservee` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `reserve_room`
+--
+
+CREATE TABLE `reserve_room` (
+  `id` int(11) NOT NULL,
+  `reservationId` int(11) NOT NULL,
+  `roomType` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `room`
 --
 
@@ -163,10 +179,10 @@ CREATE TABLE `room` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `roomtype`
+-- Table structure for table `room_type`
 --
 
-CREATE TABLE `roomtype` (
+CREATE TABLE `room_type` (
   `id` int(255) NOT NULL,
   `name` int(255) NOT NULL,
   `rate` int(255) NOT NULL,
@@ -210,9 +226,9 @@ ALTER TABLE `bill`
   ADD KEY `roomFk` (`roomId`);
 
 --
--- Indexes for table `billdetail`
+-- Indexes for table `bill_detail`
 --
-ALTER TABLE `billdetail`
+ALTER TABLE `bill_detail`
   ADD PRIMARY KEY (`billId`,`serviceId`),
   ADD KEY `serviceId` (`serviceId`);
 
@@ -247,6 +263,12 @@ ALTER TABLE `reservee`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `reserve_room`
+--
+ALTER TABLE `reserve_room`
+  ADD KEY `reservationId` (`reservationId`);
+
+--
 -- Indexes for table `room`
 --
 ALTER TABLE `room`
@@ -254,9 +276,9 @@ ALTER TABLE `room`
   ADD KEY `roomTypeFk` (`roomTypeId`);
 
 --
--- Indexes for table `roomtype`
+-- Indexes for table `room_type`
 --
-ALTER TABLE `roomtype`
+ALTER TABLE `room_type`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -312,9 +334,9 @@ ALTER TABLE `room`
   MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `roomtype`
+-- AUTO_INCREMENT for table `room_type`
 --
-ALTER TABLE `roomtype`
+ALTER TABLE `room_type`
   MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
 
 --
@@ -334,11 +356,11 @@ ALTER TABLE `bill`
   ADD CONSTRAINT `bill_ibfk_1` FOREIGN KEY (`roomId`) REFERENCES `room` (`id`);
 
 --
--- Constraints for table `billdetail`
+-- Constraints for table `bill_detail`
 --
-ALTER TABLE `billdetail`
-  ADD CONSTRAINT `billdetail_ibfk_1` FOREIGN KEY (`billId`) REFERENCES `bill` (`id`),
-  ADD CONSTRAINT `billdetail_ibfk_2` FOREIGN KEY (`serviceId`) REFERENCES `service` (`id`);
+ALTER TABLE `bill_detail`
+  ADD CONSTRAINT `bill_detail_ibfk_1` FOREIGN KEY (`billId`) REFERENCES `bill` (`id`),
+  ADD CONSTRAINT `bill_detail_ibfk_2` FOREIGN KEY (`serviceId`) REFERENCES `service` (`id`);
 
 --
 -- Constraints for table `checkin`
@@ -362,10 +384,16 @@ ALTER TABLE `reservation`
   ADD CONSTRAINT `subFk` FOREIGN KEY (`reserveeId`) REFERENCES `reservee` (`id`);
 
 --
+-- Constraints for table `reserve_room`
+--
+ALTER TABLE `reserve_room`
+  ADD CONSTRAINT `reserve_room_ibfk_1` FOREIGN KEY (`reservationId`) REFERENCES `reservation` (`id`);
+
+--
 -- Constraints for table `room`
 --
 ALTER TABLE `room`
-  ADD CONSTRAINT `room_ibfk_1` FOREIGN KEY (`roomTypeId`) REFERENCES `roomtype` (`id`);
+  ADD CONSTRAINT `room_ibfk_1` FOREIGN KEY (`roomTypeId`) REFERENCES `room_type` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

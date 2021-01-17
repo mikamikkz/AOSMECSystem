@@ -47,7 +47,7 @@
                     :items="roomType"
                     v-model="input.roomType"
                     label="Room Type"
-                    prepend-icon="mdi-door"
+                    prepend-icon="mdi-bed"
                     item-text="text"
                     item-value="value"
                     outlined
@@ -263,9 +263,9 @@
       </v-col>
       <v-col lg="3" md="3" sm="12" d-flex>
         <v-card>
-          <v-card-title class="green--text">Payment Details</v-card-title>
-          <v-card-text class="mt-3">
-            <v-simple-table fixed-header height="300px">
+          <v-card-title class="mb-0 pb-0 green--text">Payment Details</v-card-title>
+          <v-card-text>
+            <v-simple-table fixed-header height="305px">
               <template v-slot:default>
                 <thead>
                   <tr>
