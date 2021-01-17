@@ -190,15 +190,6 @@
                   >
                   </v-text-field>
                 </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0" xl="2">
-                  <v-checkbox
-                    class="mt-1"
-                    v-model="input.keyDeposit"
-                    color="green"
-                    label="Key Deposit"
-                  ></v-checkbox>
-                </v-col>
               </v-row>
             </v-form>
           </v-card-text>
@@ -206,9 +197,9 @@
       </v-col>
       <v-col lg="4" md="4" sm="12" d-flex>
         <v-card>
-          <v-card-title class="green--text">Additional Service</v-card-title>
-          <v-card-text>
-            <v-simple-table fixed-header>
+          <v-card-title class="mb-0 pb-0 green--text">Additional Service</v-card-title>
+          <v-card-text class="mt-0 pt-0">
+            <v-simple-table fixed-header height="270px">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -235,12 +226,6 @@
                           >mdi-checkbox-marked</v-icon
                         >
                       </v-btn>
-                      <v-checkbox
-                        success
-                        v-model="service.status"
-                        v-if="service.add"
-                        class="pa-0 ml-1"
-                      ></v-checkbox>
                     </td>
                   </tr>
                 </tbody>
@@ -279,7 +264,116 @@
       <v-col lg="3" md="3" sm="12" d-flex>
         <v-card>
           <v-card-title class="green--text">Payment Details</v-card-title>
-          <v-card-text class="mt-3"> </v-card-text>
+          <v-card-text class="mt-3">
+            <v-simple-table fixed-header height="300px">
+              <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left pl-1">Name</th>
+                    <th class="text-left">Total</th>
+                    <th class="text-left">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in guestBillDetails" :key="item.name">
+                    <td class="pl-1">{{ item.name }}</td>
+                    <td>{{ item.total }}</td>
+                    <td class="pa-0">
+                      <v-chip small outlined color="green" v-if="item.status == 'Paid'">
+                        {{ item.status }}
+                      </v-chip>
+                      <v-chip small v-else color="yellow darken-1">
+                        {{ item.status }}
+                      </v-chip>
+                    </td>
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+              <v-card-actions class="d-flex justify-center">
+                  <v-btn color="success" v-on:click="checkInModal(guest)">Check In</v-btn>
+              </v-card-actions>
+          </v-card-text>
+          <v-dialog v-model="checkInDialog" persistent width="450">
+            <v-card>
+              <v-card-title>
+              </v-card-title>
+              <v-card-text>
+                <v-chip color="light-green white--text font-weight-bold" style="font-size: 16px">
+                  Total Bill Details
+                </v-chip>
+                <v-card outlined class="pa-2 mt-3">
+                  <v-row class="pl-5">
+                    <v-col cols="5">
+                      <p class="subtitle-2 ma-0">Room Number:</p>
+                    </v-col>
+                    <v-col cols="7" class="py-2">
+                      {{ guestBill.roomNo }}
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-5">
+                    <v-col cols="5">
+                      <p class="subtitle-2 ma-0">Total:</p>
+                    </v-col>
+                    <v-col cols="7" class="py-2">
+                      Php {{ guestBill.total}}.00
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-5">
+                    <v-col cols="5">
+                      <p class="subtitle-2 ma-0">Balance:</p>
+                    </v-col>
+                    <v-col cols="7" class="py-2">
+                      Php {{ guestBill.balance}}.00
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-5">
+                    <v-col cols="5">
+                      <p class="subtitle-2 ma-0">Key Deposit:</p>
+                    </v-col>
+                    <v-col cols="7" class="ma-0 py-2">
+                      <v-checkbox
+                        color="success"
+                        class="ma-0 pa-0"
+                        label="Php 200.00"
+                        v-on:click="addKeyDeposit()"
+                        v-model="guestBill.keyDeposit"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col class="px-8 pb-0 mb-0">
+                      <v-text-field
+                      label="Amount Received"
+                      color="green"
+                      outlined
+                      dense
+                      type="number"
+                      prefix="Php"
+                      v-model="guestBill.received"
+                      prepend-icon="mdi-cash"
+                    ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-card>
+              </v-card-text>
+              <v-card-actions class="d-flex justify-center pb-6">
+                <v-btn
+                  class="px-5"
+                  v-on:click="checkInDialog = false"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  color="light-green white--text"
+                  class="px-5"
+                  v-on:click="checkInDialog = false"
+                >
+                  Check In
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-card>
       </v-col>
     </v-row>
@@ -323,6 +417,7 @@ export default {
         name: "",
         qty: "",
       },
+      guest: [],
       guestServices: [
         {
           add: false,
@@ -346,6 +441,40 @@ export default {
           status: false,
         },
       ],
+      guestBillDetails: [
+        {
+          name: "Sample",
+          total: "210",
+          status: "Paid"
+        },
+        {
+          name: "Sample2",
+          total: "210",
+          status: "Pending"
+        },
+        {
+          name: "Sample3",
+          total: "210",
+          status: "Pending"
+        },
+        {
+          name: "Sample4",
+          total: "210",
+          status: "Pending"
+        },
+        {
+          name: "Sample5",
+          total: "210",
+          status: "Pending"
+        },
+      ],
+      guestBill: {
+        roomNo: "101",
+        total: "1000",
+        balance: "900",
+        received: "0",
+
+      },
       reservationType: [
         { text: "Booking.com", value: "Booking.com" },
         { text: "Agoda", value: "Agoda" },
@@ -355,6 +484,7 @@ export default {
       ],
       checkIn: false,
       checkOut: false,
+      checkInDialog: false,
       date: "",
     };
   },
@@ -376,6 +506,17 @@ export default {
     removeFromList: function(input) {
       var index = this.guestServices.indexOf(input.name);
       this.guestServices.splice(index, 1);
+    },
+    checkInModal: function(input) {
+      this.checkInDialog = true;
+      console.log(input);
+    },
+    addKeyDeposit: function() {
+      if(this.guestBill.keyDeposit){
+        this.guestBill.balance = parseInt(this.guestBill.balance) + 200;
+      } else {
+        this.guestBill.balance = parseInt(this.guestBill.balance) - 200;
+      }
     }
   },
 };
