@@ -325,23 +325,118 @@
             >
               <v-icon small>mdi-pencil</v-icon>
             </v-btn>
-            <slot name="editDialog"></slot>
+            <v-btn
+              color="deep-orange lighten-1"
+              small
+              class="ml-1 white--text"
+              v-on:click="cancelReservationBtn(props.item)"
+              elevation="0"
+            >
+              <v-icon small>mdi-cancel</v-icon>
+            </v-btn>
             <v-btn
               color="red"
               small
-              class="ml-3 white--text"
+              class="ml-1 white--text"
               v-on:click="deleteReservationBtn(props.item)"
               elevation="0"
             >
               <v-icon small>mdi-delete-outline</v-icon>
             </v-btn>
-            <slot name="serviceDialog"></slot>
           </template>
           <template
             v-slot:expanded-item="{ headers, item }"
             class="test elevation-0"
           >
-            <td :colspan="headers.length">More info about {{ item.name }}</td>
+            <td :colspan="headers.length">
+              <v-row class="mt-2 mb-3">
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservation Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Id </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reservationId }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Type </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reservationType }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Confirmation Number </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.confirmationNo }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Days </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfDays }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Check In Date </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.checkIn }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Check Out Date </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.checkOut }} </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Room Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Head </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfHeads }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Room Type</v-col>
+                    <v-col cols="8" class="py-2">: {{ item.roomType }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Room </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfRoom }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Additional Service </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.serviceName }} </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservee Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Id </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeId }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Name </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeName }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Gender</v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeGender }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Country </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeCountry }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Email </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeEmail }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Phone No </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveePhone }} </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </td>
           </template>
         </v-data-table>
       </template>
@@ -621,12 +716,32 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="deleteReservationDialog" persistent width="450">
+      <v-card>
+        <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Reservation</v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this reservation? This action cannot be undone and you will be unable to recover any data
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center pb-6">
+          <v-btn class="px-5" v-on:click="deleteReservationDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="red lighten-1 white--text"
+            class="px-7"
+            v-on:click="deleteReservationDialog = false"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f1faf1;
+  background: #f8f8f8;
 }
 >>> .v-data-table thead span {
   font-weight: bolder;
@@ -747,6 +862,10 @@ export default {
     },
     editReservationBtn: function(reservation){
       this.editReservationDialog = true;
+      console.log(reservation);
+    },
+    deleteReservationBtn: function(reservation){
+      this.deleteReservationDialog = true;
       console.log(reservation);
     }
   },
