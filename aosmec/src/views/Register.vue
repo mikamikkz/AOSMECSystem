@@ -6,12 +6,18 @@
           <v-card elevation="4" light tag="section">
             <v-card-title>
               <v-layout align-center justify-space-between>
-                <h3 class="font-weight-medium text-uppercase">Register</h3>
-                <v-spacer></v-spacer>
-                <h3 class="font-weight-medium text-uppercase">Aosmec</h3>
-                <!-- <v-flex>
-                  <v-img :alt="platformName" class="ml-3" contain height="48px" position="center right" src="https://www.mobygames.com/images/i/12/25/1435075.png"></v-img>
-                </v-flex> -->
+                    <h3 class="font-weight-medium text-uppercase">Register</h3>
+                    <v-spacer></v-spacer>
+                    <v-flex>
+                      <v-img
+                        :alt="platformName"
+                        contain
+                        height="100px"
+                        width="200px"
+                        src="../../public/logo.png"
+                        style="float: right;"
+                      ></v-img>
+                    </v-flex>
               </v-layout>
             </v-card-title>
             <v-divider></v-divider>
