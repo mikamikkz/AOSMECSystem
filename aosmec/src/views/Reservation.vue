@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="mt-5">
+    <v-card class="mt-3">
       <v-card-title class="white--text py-3" style="background: #13b150">
         <v-row>
           <v-col cols="8"> Reservation </v-col>
