@@ -45,7 +45,7 @@
                 </v-card-title>
 
                 <v-card-text class="mt-3">
-                  Details
+                  {{item.guestDetails}}
                 </v-card-text>
 
                 <v-divider></v-divider>
@@ -81,9 +81,9 @@
           </v-col>
           </v-row>
         </template>
-
-        <template v-slot:item.checkout="{ item }">
-          <v-btn color="success" @click="checkout(item)" class="ma-3">Check Out</v-btn>
+        
+        <template v-slot:item.checkout="{item}">
+          <v-btn color="success" v-on:click="checkOut(item.length)" class="ma-3">Check Out</v-btn>
         </template>
       </v-data-table>
     </v-container>
@@ -137,48 +137,66 @@ export default {
         {
           roomNo: "107",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "102",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
-        },
-        {
-          roomNo: "112",
-          name: "Kim Taehyung",
-          roomType: "single",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "114",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "single",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "105",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
-        },
-        {
-          roomNo: "106",
-          name: "Kim Taehyung",
-          roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "109",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "family room",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
-      ],
+      ]
     };
   },
+  methods: {
+    checkOut: function(input) {
+       this.rooms.splice(input, 1);
+    }
+  }
 };
 </script>
 

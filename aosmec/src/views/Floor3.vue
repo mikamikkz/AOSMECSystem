@@ -41,7 +41,7 @@
                 </v-card-title>
 
                 <v-card-text class="mt-3">
-                  Details
+                  {{item.guestDetails}}
                 </v-card-text>
 
                 <v-divider></v-divider>
@@ -78,8 +78,11 @@
           </v-row>
         </template>
 
-        <template v-slot:item.checkout="{ item }">
-          <v-btn color="success" @click="checkout(item)" class="ma-3">Check Out</v-btn>
+        <!-- <template v-slot:item.checkout="{item}">
+          <v-btn color="success" v-on:click="checkOut(item.length)" class="ma-3">Check Out</v-btn>
+        </template> -->
+        <template v-slot:item.checkout="{item}">
+          <v-btn color="success" v-on:click="checkOut(item)" class="ma-3">Check Out</v-btn>
         </template>
       </v-data-table>
     </v-container>
@@ -134,24 +137,45 @@ export default {
         {
           roomNo: "307",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "302",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "303",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
       ],
     };
   },
+  methods: {
+    checkOut: function(input) {
+      var index = this.rooms.indexOf(input.roomNo);
+      this.rooms.splice(index, 1);
+    }
+  }
 };
 </script>
 

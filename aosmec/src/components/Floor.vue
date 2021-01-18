@@ -29,7 +29,7 @@
                   color="success"
                   dark
                   v-bind="attrs"
-                  v-on="on"
+                  v-on="guestDetails"
                 >
                   {{ item.name }}
                 </v-btn>
@@ -88,7 +88,7 @@
 
 <script>
 export default {
-  name: "Floor 3",
+  name: "Floor-child",
   components: {},
   data() {
     return {
