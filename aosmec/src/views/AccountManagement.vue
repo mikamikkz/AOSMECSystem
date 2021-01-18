@@ -1,27 +1,25 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="room_mgmt"
+    :items="acc_mgmt"
     class="elevation-1"
   >
     <template v-slot:top>
-      <v-toolbar 
-        style="background: #13b150"
+      <v-toolbar style="background: #13b150"
         flat
       >
         <v-toolbar-title 
-          class="white--text py-3"
-          color="light-green white--text font-weight-bold"
-          style="font-size: 16px"
-        >Manage Rooms</v-toolbar-title>
-        
+        class="white--text py-3"
+        color="light-green white--text font-weight-bold"
+        style="font-size: 16px"
+        >Manage Accounts</v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
           vertical
         ></v-divider>
         <v-spacer></v-spacer>
-        <v-dialog 
+        <v-dialog
           v-model="dialog"
           max-width="500px"
         >
@@ -34,7 +32,7 @@
               v-bind="attrs"
               v-on="on"
             >
-              Add Room
+              Add Account
             </v-btn>
           </template>
           <v-card>
@@ -51,8 +49,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.roomname"
-                      label="Room Name"
+                      v-model="editedItem.id"
+                      label="ID Number"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -61,8 +59,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.no_of_rooms"
-                      label="No. of Rooms"
+                      v-model="editedItem.username"
+                      label="Username"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -71,8 +69,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.no_of_adults"
-                      label="No. of Adults"
+                      v-model="editedItem.password"
+                      label="Password"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -81,8 +79,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.additional_head_rate"
-                      label="Additional Head Rate"
+                      v-model="editedItem.name"
+                      label="Name"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -91,8 +89,18 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.unit_price"
-                      label="Unit Price"
+                      v-model="editedItem.birthday"
+                      label="Birthday"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                  <v-text-field
+                      v-model="editedItem.gender"
+                      label="Gender"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -164,32 +172,35 @@
       dialogDelete: false,
       headers: [
         {
-          text: 'Room Name',
+          text: 'ID Number',
           align: 'start',
           sortable: false,
-          value: 'roomname',
+          value: 'id',
         },
-        { text: 'No. of Rooms', value: 'no_of_rooms', sortable: false},
-        { text: 'No. of Adults', value: 'no_of_adults' },
-        { text: 'Additional Head Rate', value: 'additional_head_rate' },
-        { text: 'Unit Price', value: 'unit_price' },
+        { text: 'Username', value: 'username', sortable: false },
+        { text: 'Password', value: 'password' },
+        { text: 'Name', value: 'name' },
+        { text: 'Birthday', value: 'birthday' },
+        { text: 'Gender', value: 'gender' },
         { text: 'Actions', value: 'actions'},
       ],
-      room_mgmt: [],
+      acc_mgmt: [],
       editedIndex: -1,
       editedItem: {
-        roomname: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0,
-        unit_price: 0,
+        id: '',
+        username: '',
+        password: '',
+        name: 0,
+        birthday: 0,
+        gender: '',
       },
       defaultItem: {
-        roomname: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0,
-        unit_price: 0,
+        id: '',
+        username: '',
+        password: '',
+        name: 0,
+        birthday: 0,
+        gender: '',
       },
     }),
 
@@ -214,31 +225,32 @@
 
     methods: {                   
       initialize () {
-        this.room_mgmt = [
+        this.acc_mgmt = [
           {
-            roomname: 'Single',
-            no_of_rooms: 2,
-            no_of_adults: 2,
-            additional_head_rate: 100,
-            unit_price: 3500,
+            id: '11111111',
+            username: 'chris000',
+            password: 'cisco',
+            name: 'Chris Martin',
+            birthday: '',
+            gender: '',
           },
         ]
       },
 
       editItem (item) {
-        this.editedIndex = this.room_mgmt.indexOf(item)
+        this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.room_mgmt.indexOf(item)
+        this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.room_mgmt.splice(this.editedIndex, 1)
+        this.acc_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -260,9 +272,9 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
+          Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
         } else {
-          this.room_mgmt.push(this.editedItem)
+          this.acc_mgmt.push(this.editedItem)
         }
         this.close()
       },

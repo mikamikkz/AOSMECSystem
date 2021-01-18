@@ -1,27 +1,26 @@
 <template>
   <v-data-table
     :headers="headers"
-    :items="room_mgmt"
+    :items="service_mgmt"
+    
     class="elevation-1"
   >
     <template v-slot:top>
-      <v-toolbar 
-        style="background: #13b150"
+      <v-toolbar style="background: #13b150"
         flat
       >
         <v-toolbar-title 
           class="white--text py-3"
           color="light-green white--text font-weight-bold"
           style="font-size: 16px"
-        >Manage Rooms</v-toolbar-title>
-        
+        >Manage Services</v-toolbar-title>
         <v-divider
           class="mx-4"
           inset
           vertical
         ></v-divider>
         <v-spacer></v-spacer>
-        <v-dialog 
+        <v-dialog
           v-model="dialog"
           max-width="500px"
         >
@@ -34,7 +33,7 @@
               v-bind="attrs"
               v-on="on"
             >
-              Add Room
+              Add Service
             </v-btn>
           </template>
           <v-card>
@@ -51,8 +50,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.roomname"
-                      label="Room Name"
+                      v-model="editedItem.id"
+                      label="ID Number"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -61,8 +60,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.no_of_rooms"
-                      label="No. of Rooms"
+                      v-model="editedItem.name"
+                      label="Service"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -71,8 +70,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.no_of_adults"
-                      label="No. of Adults"
+                      v-model="editedItem.rate"
+                      label="Service Rate"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -81,8 +80,8 @@
                     md="4"
                   >
                     <v-text-field
-                      v-model="editedItem.additional_head_rate"
-                      label="Additional Head Rate"
+                      v-model="editedItem.pricing"
+                      label="Pricing"
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -90,10 +89,6 @@
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
-                      v-model="editedItem.unit_price"
-                      label="Unit Price"
-                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-container>
@@ -164,32 +159,29 @@
       dialogDelete: false,
       headers: [
         {
-          text: 'Room Name',
+          text: 'ID Number',
           align: 'start',
           sortable: false,
-          value: 'roomname',
+          value: 'id',
         },
-        { text: 'No. of Rooms', value: 'no_of_rooms', sortable: false},
-        { text: 'No. of Adults', value: 'no_of_adults' },
-        { text: 'Additional Head Rate', value: 'additional_head_rate' },
-        { text: 'Unit Price', value: 'unit_price' },
-        { text: 'Actions', value: 'actions'},
+        { text: 'Service Name', value: 'name', sortable: false },
+        { text: 'Service Rate', value: 'rate' },
+        { text: 'Pricing', value: 'pricing' },
+        { text: 'Actions', value: 'actions', sortable: false },
       ],
-      room_mgmt: [],
+      service_mgmt: [],
       editedIndex: -1,
       editedItem: {
-        roomname: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0,
-        unit_price: 0,
+        id: '',
+        name: '',
+        rate: 0,
+        pricing: 0,
       },
       defaultItem: {
-        roomname: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0,
-        unit_price: 0,
+        id: '',
+        name: '',
+        rate: 0,
+        pricing: 0,
       },
     }),
 
@@ -214,31 +206,30 @@
 
     methods: {                   
       initialize () {
-        this.room_mgmt = [
+        this.service_mgmt = [
           {
-            roomname: 'Single',
-            no_of_rooms: 2,
-            no_of_adults: 2,
-            additional_head_rate: 100,
-            unit_price: 3500,
+            id: '12345678',
+            name: 'Cleaning',
+            rate: 0,
+            pricing: 0,
           },
         ]
       },
 
       editItem (item) {
-        this.editedIndex = this.room_mgmt.indexOf(item)
+        this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
       },
 
       deleteItem (item) {
-        this.editedIndex = this.room_mgmt.indexOf(item)
+        this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
-        this.room_mgmt.splice(this.editedIndex, 1)
+        this.service_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
       },
 
@@ -260,9 +251,9 @@
 
       save () {
         if (this.editedIndex > -1) {
-          Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
+          Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
         } else {
-          this.room_mgmt.push(this.editedItem)
+          this.service_mgmt.push(this.editedItem)
         }
         this.close()
       },
