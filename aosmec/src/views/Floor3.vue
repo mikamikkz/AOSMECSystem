@@ -78,9 +78,6 @@
           </v-row>
         </template>
 
-        <!-- <template v-slot:item.checkout="{item}">
-          <v-btn color="success" v-on:click="checkOut(item.length)" class="ma-3">Check Out</v-btn>
-        </template> -->
         <template v-slot:item.checkout="{item}">
           <v-btn color="success" v-on:click="checkOut(item)" class="ma-3">Check Out</v-btn>
         </template>
@@ -168,12 +165,13 @@ export default {
           ]
         },
       ],
+      index: -1,
     };
   },
   methods: {
-    checkOut: function(input) {
-      var index = this.rooms.indexOf(input.roomNo);
-      this.rooms.splice(index, 1);
+    checkOut: function(item) {
+      this.index = this.rooms.indexOf(item)
+      this.rooms.splice(this.index, 1)
     }
   }
 };

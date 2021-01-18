@@ -83,7 +83,7 @@
         </template>
         
         <template v-slot:item.checkout="{item}">
-          <v-btn color="success" v-on:click="checkOut(item.length)" class="ma-3">Check Out</v-btn>
+          <v-btn color="success" v-on:click="checkOut(item)" class="ma-3">Check Out</v-btn>
         </template>
       </v-data-table>
     </v-container>
@@ -189,12 +189,14 @@ export default {
             {text: "out of order"}
           ]
         },
-      ]
+      ],
+      index: -1,
     };
   },
   methods: {
-    checkOut: function(input) {
-       this.rooms.splice(input, 1);
+    checkOut: function(item) {
+      this.index = this.rooms.indexOf(item)
+      this.rooms.splice(this.index, 1)
     }
   }
 };
