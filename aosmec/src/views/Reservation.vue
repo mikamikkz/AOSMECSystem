@@ -325,17 +325,24 @@
             >
               <v-icon small>mdi-pencil</v-icon>
             </v-btn>
-            <slot name="editDialog"></slot>
+            <v-btn
+              color="deep-orange lighten-1"
+              small
+              class="ml-1 white--text"
+              v-on:click="cancelReservationBtn(props.item)"
+              elevation="0"
+            >
+              <v-icon small>mdi-cancel</v-icon>
+            </v-btn>
             <v-btn
               color="red"
               small
-              class="ml-3 white--text"
+              class="ml-1 white--text"
               v-on:click="deleteReservationBtn(props.item)"
               elevation="0"
             >
               <v-icon small>mdi-delete-outline</v-icon>
             </v-btn>
-            <slot name="serviceDialog"></slot>
           </template>
           <template
             v-slot:expanded-item="{ headers, item }"
@@ -621,12 +628,32 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="deleteReservationDialog" persistent width="450">
+      <v-card>
+        <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Reservation</v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this reservation? This action cannot be undone and you will be unable to recover any data
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center pb-6">
+          <v-btn class="px-5" v-on:click="deleteReservationDialog = false">
+            Cancel
+          </v-btn>
+          <v-btn
+            color="red lighten-1 white--text"
+            class="px-7"
+            v-on:click="deleteReservationDialog = false"
+          >
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f1faf1;
+  background: #f3f7f3;
 }
 >>> .v-data-table thead span {
   font-weight: bolder;
@@ -747,6 +774,10 @@ export default {
     },
     editReservationBtn: function(reservation){
       this.editReservationDialog = true;
+      console.log(reservation);
+    },
+    deleteReservationBtn: function(reservation){
+      this.deleteReservationDialog = true;
       console.log(reservation);
     }
   },
