@@ -10,7 +10,6 @@
                     <v-spacer></v-spacer>
                     <v-flex>
                       <v-img
-                        :alt="platformName"
                         contain
                         height="100px"
                         width="200px"
@@ -58,7 +57,10 @@ export default {
   name: "Login",
   components: {},
   data() {
-    return {};
+    return {
+      username: "",
+      password: ""
+    };
   },
 };
 </script>

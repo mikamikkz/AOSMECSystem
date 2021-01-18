@@ -25,7 +25,6 @@
         <template v-slot:item.name="{ item }"> 
           <div class="text-center">
             <v-dialog
-              v-model="dialog"
               width="500"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -47,19 +46,6 @@
                 <v-card-text class="mt-3">
                   {{item.guestDetails}}
                 </v-card-text>
-
-                <v-divider></v-divider>
-
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="success"
-                    text
-                    @click="dialog = false"
-                  >
-                    Done
-                  </v-btn>
-                </v-card-actions>
               </v-card>
             </v-dialog>
           </div>
@@ -92,10 +78,11 @@
 
 <script>
 export default {
-  name: "Floor 1",
+  name: "Floor-1",
   components: {},
   data() {
     return {
+      index: -1,
       headers: [
         {
           text: "Room No.",
@@ -189,8 +176,7 @@ export default {
             {text: "out of order"}
           ]
         },
-      ],
-      index: -1,
+      ]
     };
   },
   methods: {

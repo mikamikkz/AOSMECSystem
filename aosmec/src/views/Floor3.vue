@@ -20,8 +20,11 @@
       >
         <template v-slot:item.name="{ item }"> 
           <div class="text-center">
-            <v-dialog
+            <!-- <v-dialog
               v-model="dialog"
+              width="500"
+            > -->
+            <v-dialog
               width="500"
             >
               <template v-slot:activator="{ on, attrs }">
@@ -44,7 +47,7 @@
                   {{item.guestDetails}}
                 </v-card-text>
 
-                <v-divider></v-divider>
+                <!-- <v-divider></v-divider>
 
                 <v-card-actions>
                   <v-spacer></v-spacer>
@@ -55,7 +58,7 @@
                   >
                     Done
                   </v-btn>
-                </v-card-actions>
+                </v-card-actions> -->
               </v-card>
             </v-dialog>
           </div>
@@ -88,11 +91,12 @@
 
 <script>
 export default {
-  name: "Floor 3",
+  name: "Floor-3",
   components: {},
   data() {
     return {
-      dialog: false,
+      // dialog: false,
+      index: -1,
       headers: [
         {
           text: "Room No.",
@@ -164,8 +168,7 @@ export default {
             {text: "out of order"}
           ]
         },
-      ],
-      index: -1,
+      ]
     };
   },
   methods: {
