@@ -348,7 +348,95 @@
             v-slot:expanded-item="{ headers, item }"
             class="test elevation-0"
           >
-            <td :colspan="headers.length">More info about {{ item.name }}</td>
+            <td :colspan="headers.length">
+              <v-row class="mt-2 mb-3">
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservation Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Id </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reservationId }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Type </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reservationType }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Confirmation Number </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.confirmationNo }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Days </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfDays }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Check In Date </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.checkIn }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Check Out Date </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.checkOut }} </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Room Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Head </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfHeads }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Room Type</v-col>
+                    <v-col cols="8" class="py-2">: {{ item.roomType }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> No of Room </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.noOfRoom }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Additional Service </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.serviceName }} </v-col>
+                  </v-row>
+                </v-col>
+                <v-col cols="4">
+                  <v-row>
+                    <v-col cols="12">
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservee Details</v-card>
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Id </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeId }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Name </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeName }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Gender</v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeGender }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Country </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeCountry }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Email </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveeEmail }} </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Phone No </v-col>
+                    <v-col cols="8" class="py-2">: {{ item.reserveePhone }} </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </td>
           </template>
         </v-data-table>
       </template>
@@ -653,7 +741,7 @@
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f3f7f3;
+  background: #f8f8f8;
 }
 >>> .v-data-table thead span {
   font-weight: bolder;
