@@ -31,14 +31,6 @@
                   {{ props.item.guestDetails }}
                 </v-card-text>
 
-                <v-divider></v-divider>
-
-                <!-- <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="success" text @click="dialog = false">
-                    Done
-                  </v-btn>
-                </v-card-actions> -->
               </v-card>
             </v-dialog>
           </td>
@@ -56,21 +48,16 @@
           <!-- <template v-slot:item.checkout="{item}"> -->
           <!-- <v-btn color="success" v-on:click="checkOutDetails(item)" class="ma-3">Check Out</v-btn> -->
 
-          
-
           <v-dialog
-            v-model="checkOutDialog[props.item.checkOutDialog]"
+            v-model="checkOutDialog[props.item.checkOut]"
             persistent
             width="450"
           >
-            <template v-slot:activator="{ on }">
-            <!-- <template v-slot:activator="{ on, attrs }"> -->
-              <v-btn color="success" v-on:click="checkOutDetails(props.item)" v-on="on" class="ma-3">Check Out</v-btn>
+            <!-- <template v-slot:activator="{ on }"> -->
+            <!-- <template v-slot:activator="{ on, attrs }">
+              <v-btn color="success" v-on:click="checkOutDetails(props.item)" v-bind="attrs" v-on="on" class="ma-3">Check Out</v-btn> -->
               <!-- <v-btn color="success" v-on:click="checkOutDetails(props.item)" v-bind="attrs" v-on="on" class="ma-3">Check Out</v-btn> -->
-              <!-- <v-btn color="success" dark v-bind="attrs" v-on="on">
-                Check Out
-              </v-btn> -->
-            </template>
+            <!-- </template> -->
 
             <v-card>
               <v-card-title class="headline grey lighten-2">
@@ -86,7 +73,6 @@
                       color="success"
                       class="mt-1 mb-0 pa-0"
                       label="Php 200.00"
-                      v-on:click="addKeyDeposit()"
                     ></v-checkbox>
                   </v-col>
                 </v-row>
@@ -242,6 +228,7 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
+          checkOut: true
         },
         {
           roomNo: "101",
@@ -253,6 +240,7 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
+          checkOut: true
         },
         {
           roomNo: "102",
@@ -264,6 +252,7 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
+          checkOut: true
         },
         {
           roomNo: "103",
@@ -275,6 +264,7 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
+          checkOut: true
         },
         {
           roomNo: "104",
@@ -286,6 +276,7 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
+          checkOut: true
         },
       ],
     };
