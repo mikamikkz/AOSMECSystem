@@ -219,14 +219,7 @@
         mdi-delete
       </v-icon>
     </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="green"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
+    
   </v-data-table>
 </template>
 
