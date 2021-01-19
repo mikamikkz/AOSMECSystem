@@ -1,18 +1,10 @@
 <template>
   <div class="dashboard">
     <v-container class="mt-10">
-
-      <v-card
-        outlined
-        shaped
-        tile
-        color="green"
-        class="mb-10"
-        width="200px"
-      >
+      <v-card outlined shaped tile color="green" class="mb-10" width="200px">
         <v-card-text class="pa-3">
           <p class="font-weight-medium mb-0" style="color: white">
-            Date: <span></span>
+            Date: <span>{{ date }}</span>
           </p>
         </v-card-text>
       </v-card>
@@ -20,18 +12,18 @@
       <v-row>
         <v-col lg="4" cols="sm" class="pb-2">
           <v-card class="bordered" height="167px">
-              <div class="col pa-3 py-4 green--text">
-                <h4 class="text-truncate text-uppercase">Daily Sales</h4>
-                <h1>53</h1>
-              </div>
+            <div class="col pa-3 py-4 green--text">
+              <h4 class="text-truncate text-uppercase">Daily Sales</h4>
+              <h1>53</h1>
+            </div>
           </v-card>
         </v-col>
 
         <v-col cols="12" md="6" class="pb-2">
           <v-card class="dark bordered">
             <div class="col pa-3 py-4 green--text">
-                <h4 class="text-truncate text-uppercase">Reservation Type</h4>
-              </div>
+              <h4 class="text-truncate text-uppercase">Reservation Type</h4>
+            </div>
             <v-card-text>
               <v-carousel
                 cycle
@@ -64,8 +56,20 @@
         </v-col>
       </v-row>
 
+      <v-toolbar class="ml-0 mb-0 mt-10" flat color="grey lighten-2">
+        <v-toolbar-title>
+          <h5 class="font-weight-medium pa-0 ma-0 pt-3" style="color: green">
+            <v-icon x-large left color="success" style="margin-bottom: 12px"
+              >mdi-account-group</v-icon
+            >
+            Guests arriving today
+          </h5>
+        </v-toolbar-title>
+        <v-spacer></v-spacer>
+      </v-toolbar>
+
       <v-data-table
-        class="mt-10"
+        class="mt-4"
         dense
         :headers="headers"
         :items="guests"
@@ -81,6 +85,7 @@ export default {
   components: {},
   data() {
     return {
+      date: "",
       headers: [
         {
           text: "Confirmation No.",
@@ -202,6 +207,19 @@ export default {
         },
       ],
     };
+  },
+  methods: {
+    date_function: function () {
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, "0");
+      var mm = String(today.getMonth() + 1).padStart(2, "0"); //January is 0!
+      var yyyy = today.getFullYear();
+
+      this.date = mm + "/" + dd + "/" + yyyy;
+    },
+  },
+  mounted() {
+    this.date_function();
   },
 };
 </script>

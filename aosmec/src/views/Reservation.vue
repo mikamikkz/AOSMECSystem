@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="mt-5">
+    <v-card class="mt-3">
       <v-card-title class="white--text py-3" style="background: #13b150">
         <v-row>
           <v-col cols="8"> Reservation </v-col>
@@ -270,6 +270,25 @@
                   <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
+              <v-row  v-for="service in noOfServiceForm" :key="service">
+                <v-col class="pa-0" lg="7" md="7" xs="12">
+                  <v-select
+                    :items="services"
+                    v-model="addReservationDetails.service"
+                    label="Service"
+                    prepend-icon="mdi-hand-heart-outline"
+                    item-text="text"
+                    item-value="value"
+                    outlined
+                    dense
+                    color="green"
+                  ></v-select>
+                </v-col>
+                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                </v-col>
+              </v-row>
           </v-card>
             </v-col>
           </v-row>
@@ -400,7 +419,7 @@
                     <v-col cols="8" class="py-2">: {{ item.noOfRoom }} </v-col>
                   </v-row>
                   <v-row class="pl-3">
-                    <v-col cols="4" class="py-2"> Additional Service </v-col>
+                    <v-col cols="4" class="py-2"> Service </v-col>
                     <v-col cols="8" class="py-2">: {{ item.serviceName }} </v-col>
                   </v-row>
                 </v-col>
@@ -698,6 +717,25 @@
                   <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
+              <v-row  v-for="service in noOfServiceForm" :key="service">
+                <v-col class="pa-0" lg="7" md="7" xs="12">
+                  <v-select
+                    :items="services"
+                    v-model="addReservationDetails.service"
+                    label="Service"
+                    prepend-icon="mdi-hand-heart-outline"
+                    item-text="text"
+                    item-value="value"
+                    outlined
+                    dense
+                    color="green"
+                  ></v-select>
+                </v-col>
+                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                </v-col>
+              </v-row>
           </v-card>
             </v-col>
           </v-row>
@@ -774,6 +812,7 @@ export default {
       checkOut: "",
       roomType: [],
       noOfRoomForm: 1,
+      noOfServiceForm: 1,
       reservationHeaders: [
         {
           text: "Reserved Date",
@@ -858,6 +897,14 @@ export default {
     removeNoOfRoomForm: function () {
       if(this.noOfRoomForm > 1){
         this.noOfRoomForm = parseInt(this.noOfRoomForm, 10) - 1;
+      }
+    },
+     addNoOfServiceForm: function () {
+      this.noOfServiceForm = parseInt(this.noOfServiceForm, 10) + 1;
+    },
+    removeNoOfServiceForm: function () {
+      if(this.noOfServiceForm > 1){
+        this.noOfServiceForm = parseInt(this.noOfServiceForm, 10) - 1;
       }
     },
     editReservationBtn: function(reservation){

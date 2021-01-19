@@ -24,6 +24,9 @@
               v-model="dialog"
               width="500"
             >
+            <!-- <v-dialog
+              width="500"
+            > -->
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   color="success"
@@ -41,7 +44,7 @@
                 </v-card-title>
 
                 <v-card-text class="mt-3">
-                  Details
+                  {{item.guestDetails}}
                 </v-card-text>
 
                 <v-divider></v-divider>
@@ -78,8 +81,57 @@
           </v-row>
         </template>
 
-        <template v-slot:item.checkout="{ item }">
-          <v-btn color="success" @click="checkout(item)" class="ma-3">Check Out</v-btn>
+        <template v-slot:item.checkout="{item}">
+          <v-btn color="success" v-on:click="checkOutDetails(item)" class="ma-3">Check Out</v-btn>
+
+          <v-dialog v-model="checkOutDialog" persistent width="450">
+            <v-card>
+              <v-card-title class="headline grey lighten-2">
+                 Checking Out Details
+              </v-card-title>
+              <v-card-text class="mt-3">
+                 <p>Key Deposit: </p>
+                 <p>Pending Balance: </p>
+                 <p>Room Situation: </p>
+                 <v-row>
+                   <v-col cols="11">
+                    <v-text-field
+                        v-model="roomSituation"
+                        color="green"
+                      >
+                        <template v-slot:label>
+                          <div>
+                            state the changes in the room <small>(optional)</small>
+                          </div>
+                        </template>
+                      </v-text-field>
+                   </v-col>
+                   <v-col cols="1" class="pa-0 mt-7" >
+                      <v-btn icon small v-on:click="addToList(addToService)">
+                        <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
+                      </v-btn>
+                    </v-col>
+                  </v-row>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions class="d-flex justify-center pb-6">
+                <v-btn
+                  class="px-5"
+                  v-on:click="checkOutDialog = false"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  color="red white--text"
+                  class="px-5"
+                  v-on:click="checkOut()"
+                >
+                  Check Out
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
         </template>
       </v-data-table>
     </v-container>
@@ -88,11 +140,14 @@
 
 <script>
 export default {
-  name: "Floor 3",
+  name: "Floor-3",
   components: {},
   data() {
     return {
       dialog: false,
+      checkOutDialog: false,
+      roomSituation: "",
+      index: -1,
       headers: [
         {
           text: "Room No.",
@@ -134,24 +189,49 @@ export default {
         {
           roomNo: "307",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "302",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
         {
           roomNo: "303",
           name: "Kim Taehyung",
+          guestDetails: "blahblah",
           roomType: "double",
-          status: "xxx",
+          status: [
+            {text: "clean"},
+            {text: "dirty"},
+            {text: "out of order"}
+          ]
         },
-      ],
+      ]
     };
   },
+  methods: {
+    checkOutDetails: function(item) {
+      this.checkOutDialog = true;
+      this.index = this.rooms.indexOf(item)
+    },
+    checkOut: function() {
+      this.checkOutDialog = false
+      this.rooms.splice(this.index, 1)
+    }
+  }
 };
 </script>
 

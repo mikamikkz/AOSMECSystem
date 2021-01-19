@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-card class="mx-7 mt-5">
-      <v-card-title class="white--text" style="background: #13b150"
+    <v-card class="mt-3">
+      <v-card-title class="white--text py-3" style="background: #13b150"
         >Check In Details</v-card-title
       >
     </v-card>
-    <v-row class="mx-4 mt-5 pa-0">
+    <v-row class=" mt-5 pa-0">
       <v-col lg="5" md="5" sm="12" d-flex>
         <v-card>
           <v-card-title class="green--text">Reservation Details</v-card-title>
@@ -377,7 +377,7 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row class="mx-4 mt-5 pa-0">
+    <v-row class="mt-5 pa-0">
       <v-col
         lg="6"
         md="6"
