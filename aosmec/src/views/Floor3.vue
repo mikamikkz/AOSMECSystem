@@ -90,8 +90,20 @@
                  Checking Out Details
               </v-card-title>
               <v-card-text class="mt-3">
-                 <p>Key Deposit: </p>
-                 <p>Pending Balance: </p>
+                 <v-row class="mt-2">
+                    <v-col cols="5">
+                      <p>Key Deposit:</p>
+                    </v-col>
+                    <v-col cols="7" class="ma-0 py-2">
+                      <v-checkbox
+                        color="success"
+                        class="mt-1 mb-0 pa-0"
+                        label="Php 200.00"
+                        v-on:click="addKeyDeposit()"
+                      ></v-checkbox>
+                    </v-col>
+                  </v-row>
+                 <p>Pending Balance: <span class="ml-10 pl-7">Php 00.00</span></p>
                  <p>Room Situation: </p>
                  <v-row>
                    <v-col cols="11">
