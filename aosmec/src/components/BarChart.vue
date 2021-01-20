@@ -8,7 +8,7 @@ export default {
   },
   props: {
     label: {
-      type: String,
+      type: Array,
     },
     chartData: {
       type: Array,
@@ -17,28 +17,26 @@ export default {
       type: Object,
     },
     backgroundColor: {
-      type: String,
-    },
-    borderColor: {
-      type: String,
-    },
-    borderWidth: {
-      type: String,
+      type: Array,
     },
   },
   mounted() {
     const dates = this.chartData.map((d) => d.date);
-    const totals = this.chartData.map((d) => d.total).reverse();
+    const totalCheckIn = this.chartData.map((d) => d.totalCheckIn);
+    const totalCheckOut = this.chartData.map((d) => d.totalCheckout);
     this.renderChart(
       {
         labels: dates,
         datasets: [
           {
-            label: this.label,
-            data: totals,
-            backgroundColor: this.backgroundColor,
-            borderColor: this.borderColor,
-            borderWidth: this.borderWidth,
+            label: this.label[0],
+            data: totalCheckIn,
+            backgroundColor: this.backgroundColor[0],
+          },
+          {
+            label: this.label[1],
+            data: totalCheckOut,
+            backgroundColor: this.backgroundColor[1],
           },
         ],
       },
