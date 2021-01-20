@@ -53,14 +53,14 @@
             </v-row>
             <v-row>
               <v-col class="pa-0 pr-2">
-                <CountrySelect></CountrySelect>
+                <CountrySelect v-model="addReservationDetails.country"></CountrySelect>
               </v-col>
             </v-row>
             <v-row>
               <v-col class="pa-0 pr-2">
                 <v-text-field
                   label="Email"
-                  v-model="addReservationDetails.name"
+                  v-model="addReservationDetails.email"
                   color="green"
                   dense
                   prepend-icon="mdi-email"
@@ -72,7 +72,7 @@
               <v-col class="pa-0 pr-2">
                 <v-text-field
                   label="Phone Number"
-                  v-model="addReservationDetails.name"
+                  v-model="addReservationDetails.phone"
                   color="green"
                   dense
                   prepend-icon="mdi-phone"
@@ -300,7 +300,7 @@
           <v-btn
             color="light-green white--text"
             class="px-5"
-            v-on:click="addReservationDialog = false"
+            v-on:click="addReservation(addReservationDetails)"
           >
             Reserve
           </v-btn>
@@ -925,6 +925,10 @@ export default {
     deleteReservationBtn: function(reservation){
       this.deleteReservationDialog = true;
       console.log(reservation);
+    },
+    addReservation: function(input){
+      this.addReservationDialog = false;
+      console.log(input);
     }
   },
 };
