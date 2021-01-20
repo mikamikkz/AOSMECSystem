@@ -30,7 +30,6 @@
                 <v-card-text class="mt-3">
                   {{ props.item.guestDetails }}
                 </v-card-text>
-
               </v-card>
             </v-dialog>
           </td>
@@ -45,126 +44,60 @@
         </template>
 
         <template v-slot:item.checkout="props">
-          <!-- <template v-slot:item.checkout="{item}"> -->
-          <!-- <v-btn color="success" v-on:click="checkOutDetails(item)" class="ma-3">Check Out</v-btn> -->
-
-          <v-dialog
-            v-model="checkOutDialog[props.item.checkOut]"
-            persistent
-            width="450"
-          >
-            <!-- <template v-slot:activator="{ on }"> -->
-            <!-- <template v-slot:activator="{ on, attrs }">
-              <v-btn color="success" v-on:click="checkOutDetails(props.item)" v-bind="attrs" v-on="on" class="ma-3">Check Out</v-btn> -->
-              <!-- <v-btn color="success" v-on:click="checkOutDetails(props.item)" v-bind="attrs" v-on="on" class="ma-3">Check Out</v-btn> -->
-            <!-- </template> -->
-
-            <v-card>
-              <v-card-title class="headline grey lighten-2">
-                Checking Out Details
-              </v-card-title>
-              <v-card-text class="mt-3">
-                <v-row class="mt-2">
-                  <v-col cols="5">
-                    <p>Key Deposit:</p>
-                  </v-col>
-                  <v-col cols="7" class="ma-0 py-2">
-                    <v-checkbox
-                      color="success"
-                      class="mt-1 mb-0 pa-0"
-                      label="Php 200.00"
-                    ></v-checkbox>
-                  </v-col>
-                </v-row>
-                <p>
-                  Pending Balance: <span class="ml-10 pl-7">Php 00.00</span>
-                </p>
-                <p>Room Situation:</p>
-                <v-row>
-                  <v-col cols="11">
-                    <v-text-field v-model="roomSituation" color="green">
-                      <template v-slot:label>
-                        <div>
-                          state the changes in the room
-                          <small>(optional)</small>
-                        </div>
-                      </template>
-                    </v-text-field>
-                  </v-col>
-                  <v-col cols="1" class="pa-0 mt-7">
-                    <v-btn icon small v-on:click="addToList(addToService)">
-                      <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-              <v-divider></v-divider>
-              <v-card-actions class="d-flex justify-center pb-6">
-                <!-- <v-btn class="px-5" v-on:click="checkOutDialog = false"> -->
-                <!-- <v-btn class="px-5" v-on:click="checkOutClose()">
-                  Cancel
-                </v-btn> -->
-                <v-btn
-                  color="red white--text"
-                  class="px-5"
-                  v-on:click="checkOut()"
-                >
-                  Check Out
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-
-          <!-- <v-dialog v-model="checkOutDialog[props.item.checkOutDialog]" persistent width="450"> -->
-          <!-- <v-dialog v-model="checkOutDialog" persistent width="450"> -->
-          <!-- <v-card>
-              <v-card-title class="headline grey lighten-2">
-                 Checking Out Details
-              </v-card-title>
-              <v-card-text class="mt-3">
-                 <p>Key Deposit: </p>
-                 <p>Pending Balance: </p>
-                 <p>Room Situation: </p>
-                 <v-row>
-                   <v-col cols="11">
-                    <v-text-field
-                        v-model="roomSituation"
-                        color="green"
-                      >
-                        <template v-slot:label>
-                          <div>
-                            state the changes in the room <small>(optional)</small>
-                          </div>
-                        </template>
-                      </v-text-field>
-                   </v-col>
-                   <v-col cols="1" class="pa-0 mt-7" >
-                      <v-btn icon small v-on:click="addToList(addToService)">
-                        <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-              </v-card-text>
-              <v-divider></v-divider>
-              <v-card-actions class="d-flex justify-center pb-6">
-                <v-btn
-                  class="px-5"
-                  v-on:click="checkOutDialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="red white--text"
-                  class="px-5"
-                  v-on:click="checkOut()"
-                >
-                  Check Out
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog> -->
+          <v-btn class="mx-2" color="success" @click="showDialog(props.item)">
+            <v-icon dark>mdi-account-arrow-left-outline</v-icon>
+            <span class="ml-1 mr-1"> Check Out </span>
+          </v-btn>
         </template>
       </v-data-table>
+
+      <v-dialog v-model="show" width="450">
+        <v-card>
+          <v-card-title class="headline grey lighten-2">
+            Checking Out Details
+          </v-card-title>
+          <v-card-text class="mt-3">
+            <v-row class="mt-2">
+              <v-col cols="5">
+                <p>Key Deposit:</p>
+              </v-col>
+              <v-col cols="7" class="ma-0 py-2">
+                <v-checkbox
+                  color="success"
+                  class="mt-1 mb-0 pa-0"
+                  label="Php 200.00"
+                ></v-checkbox>
+              </v-col>
+            </v-row>
+            <p>Pending Balance: <span class="ml-10 pl-7">Php 00.00</span></p>
+            <p>Room Situation:</p>
+            <v-row>
+              <v-col cols="11">
+                <v-text-field v-model="roomSituation" color="green">
+                  <template v-slot:label>
+                    <div>
+                      state the changes in the room
+                      <small>(optional)</small>
+                    </div>
+                  </template>
+                </v-text-field>
+              </v-col>
+              <v-col cols="1" class="pa-0 mt-7">
+                <v-btn icon small v-on:click="addToList(addToService)">
+                  <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
+                </v-btn>
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions class="d-flex justify-center pb-6">
+            <v-btn class="px-5" v-on:click="checkOutClose()"> Cancel </v-btn>
+            <v-btn color="red white--text" class="px-5" v-on:click="checkOut()">
+              Check Out
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
@@ -175,6 +108,9 @@ export default {
   components: {},
   data() {
     return {
+      show: false,
+      currentDialogItem: {},
+
       dialog: {},
       checkOutDialog: {},
       roomSituation: "",
@@ -228,7 +164,6 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
-          checkOut: true
         },
         {
           roomNo: "101",
@@ -240,7 +175,6 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
-          checkOut: true
         },
         {
           roomNo: "102",
@@ -252,7 +186,6 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
-          checkOut: true
         },
         {
           roomNo: "103",
@@ -264,7 +197,6 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
-          checkOut: true
         },
         {
           roomNo: "104",
@@ -276,23 +208,27 @@ export default {
             { text: "dirty" },
             { text: "out of order" },
           ],
-          checkOut: true
         },
       ],
     };
   },
   methods: {
-    checkOutDetails: function (item) {
-      this.checkOutDialog = true;
-      this.index = this.rooms.indexOf(item);
-    },
     checkOut: function () {
-      this.checkOutDialog = false;
+      // this.checkOutDialog = false;
+      this.show = false;
+      let item = this.currentDialogItem
+      this.index = this.rooms.indexOf(item);
+      this.currentDialogItem = {};
       this.rooms.splice(this.index, 1);
     },
-    checkOutClose: function() {
-      this.checkOutDialog = false;
-    }
+    checkOutClose: function () {
+      // this.checkOutDialog = false;
+      this.show = false;
+    },
+    showDialog(item) {
+      this.show = true;
+      this.currentDialogItem = item;
+    },
   },
 };
 </script>
