@@ -2,12 +2,18 @@
   <v-data-table
     :headers="headers"
     :items="acc_mgmt"
+    
     class="elevation-1"
   >
     <template v-slot:top>
       <v-toolbar style="background: #13b150"
         flat
       >
+
+<!-- TEST -->
+
+        
+      <!-- TEST -->
         <v-toolbar-title 
         class="white--text py-3"
         color="light-green white--text font-weight-bold"
@@ -71,6 +77,7 @@
                     <v-text-field
                       v-model="editedItem.password"
                       label="Password"
+                      
                     ></v-text-field>
                   </v-col>
                   <v-col
@@ -78,30 +85,85 @@
                     sm="6"
                     md="4"
                   >
-                    <v-text-field
-                      v-model="editedItem.name"
-                      label="Name"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
-                    <v-text-field
-                      v-model="editedItem.birthday"
-                      label="Birthday"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="6"
-                    md="4"
-                  >
+                  
                   <v-text-field
-                      v-model="editedItem.gender"
-                      label="Gender"
+                      v-model="editedItem.lname"
+                      label="Last Name"
                     ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+
+                  <v-text-field
+                      v-model="editedItem.fname"
+                      label="First Name"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  > 
+
+                  <v-text-field
+                      v-model="editedItem.mname"
+                      label="Middle Name"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+
+                  <v-menu
+                    ref="menu"
+                    v-model="editedItem.menu"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                  >
+  
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                      v-model="editedItem.date"
+                      label="Birthday"
+                      prepend-icon="mdi-calendar"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                    ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      ref="picker"
+                      v-model="editedItem.date"
+                      :max="new Date().toISOString().substr(0, 10)"
+                      min="1950-01-01"
+                    ></v-date-picker>
+                     
+                    </v-menu>
+                  </v-col>
+                  <v-col
+                    cols="12"
+                    sm="6"
+                    md="4"
+                  >
+                  
+                  <v-select
+                    v-bind:items="gender"
+                    v-model="editedItem.gender"
+                    item-text="text"
+                    item-value="value"
+                    label="Gender"
+                    outlined
+                    dense
+                    color="green"
+                ></v-select>
+                    
                   </v-col>
                 </v-row>
               </v-container>
@@ -110,14 +172,14 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn
-                color="blue darken-1"
+                color="green darken-1"
                 text
                 @click="close"
               >
                 Cancel
               </v-btn>
               <v-btn
-                color="blue darken-1"
+                color="green darken-1"
                 text
                 @click="save"
               >
@@ -128,11 +190,12 @@
         </v-dialog>
         <v-dialog v-model="dialogDelete" max-width="500px">
           <v-card>
-            <v-card-title class="headline">Are you sure you want to delete this item?</v-card-title>
+            <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Account</v-card-title>
+            <v-card-text>Are you sure you want to delete this account? This action cannot be undone and you will be unable to recover any data</v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
+              <v-btn color="green darken-1" text @click="closeDelete">Cancel</v-btn>
+              <v-btn color="green darken-1" text @click="deleteItemConfirm">OK</v-btn>
               <v-spacer></v-spacer>
             </v-card-actions>
           </v-card>
@@ -143,31 +206,30 @@
       <v-icon
         small
         class="mr-2"
+        color="green"
         @click="editItem(item)"
       >
         mdi-pencil
       </v-icon>
       <v-icon
         small
+        color="green"
         @click="deleteItem(item)"
       >
         mdi-delete
       </v-icon>
     </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
+    
   </v-data-table>
 </template>
 
 <script>
   export default {
     data: () => ({
+      
+      date: null,
+      menu: false,
+
       dialog: false,
       dialogDelete: false,
       headers: [
@@ -177,40 +239,56 @@
           sortable: false,
           value: 'id',
         },
-        { text: 'Username', value: 'username', sortable: false },
+        { text: 'Username', value: 'username', },
         { text: 'Password', value: 'password' },
-        { text: 'Name', value: 'name' },
-        { text: 'Birthday', value: 'birthday' },
+        { text: 'Last Name', value: 'lname' },
+        { text: 'First Name', value: 'fname' },
+        { text: 'Middle Name', value: 'mname' },
+        { text: 'Birthday', value: 'date' },
         { text: 'Gender', value: 'gender' },
         { text: 'Actions', value: 'actions'},
       ],
       acc_mgmt: [],
+      gender: [
+        { text: "Male", value: "Male" },
+        { text: "Female", value: "Female" },
+        { text: "Other", value: "Other" },
+      ],
       editedIndex: -1,
       editedItem: {
         id: '',
         username: '',
         password: '',
-        name: 0,
-        birthday: 0,
+        lname: '',
+        fname: '',
+        mname: '',
+        birthday: 'date',
         gender: '',
       },
       defaultItem: {
         id: '',
         username: '',
         password: '',
-        name: 0,
-        birthday: 0,
-        gender: '',
+        lname: '',
+        fname: '',
+        mname: '',
+        birthday: 'date',
+        gender: 'gender',
       },
     }),
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'New Account' : 'Edit Account'
       },
     },
 
     watch: {
+
+      menu (val) {
+        val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
+      },
+
       dialog (val) {
         val || this.close()
       },
@@ -228,10 +306,12 @@
         this.acc_mgmt = [
           {
             id: '11111111',
-            username: 'chris000',
+            username: 'messi10',
             password: 'cisco',
-            name: 'Chris Martin',
-            birthday: '',
+            lname: 'Messi',
+            fname: 'Lionel',
+            mname: 'H',
+            birthday: 'date',
             gender: '',
           },
         ]
@@ -270,14 +350,15 @@
         })
       },
 
-      save () {
+      save (date) {
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
         } else {
           this.acc_mgmt.push(this.editedItem)
         }
+        this.$refs.menu.save(date)
         this.close()
       },
-    },
+    }
   }
 </script>
