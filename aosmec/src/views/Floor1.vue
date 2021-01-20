@@ -110,9 +110,7 @@ export default {
     return {
       show: false,
       currentDialogItem: {},
-
       dialog: {},
-      checkOutDialog: {},
       roomSituation: "",
       index: -1,
       closeDialog: false,
@@ -214,7 +212,6 @@ export default {
   },
   methods: {
     checkOut: function () {
-      // this.checkOutDialog = false;
       this.show = false;
       let item = this.currentDialogItem
       this.index = this.rooms.indexOf(item);
@@ -222,7 +219,6 @@ export default {
       this.rooms.splice(this.index, 1);
     },
     checkOutClose: function () {
-      // this.checkOutDialog = false;
       this.show = false;
     },
     showDialog(item) {
