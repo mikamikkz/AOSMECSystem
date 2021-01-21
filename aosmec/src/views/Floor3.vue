@@ -35,20 +35,12 @@
           </td>
         </template>
 
+        
         <template v-slot:item.status="{ item }">
           <v-row align="center" justify="center" class="ma-2">
-          <v-col
-            class="d-flex"
-            cols="12"
-            sm="6"
-          >
-            <v-select
-              :items="item.status"
-              label="Status"
-              dense
-            >
-            </v-select>
-          </v-col>
+            <v-col class="d-flex" cols="12" sm="6">
+              <v-select v-model="statusSelected" :items="item.status" label="Status" dense> </v-select>
+            </v-col>
           </v-row>
         </template>
 
@@ -123,6 +115,7 @@ export default {
       roomSituation: "",
       index: -1,
       closeDialog: false,
+      statusSelected: '',
       headers: [
         {
           text: "Room No.",
@@ -198,6 +191,9 @@ export default {
     };
   },
   methods: {
+    statusDefault: function() {
+      this.statusSelected = "clean"
+    },
     checkOut: function () {
       this.show = false;
       let item = this.currentDialogItem
@@ -212,6 +208,9 @@ export default {
       this.show = true;
       this.currentDialogItem = item;
     }
+  },
+  beforeMount(){
+    this.statusDefault()
   }
 };
 </script>

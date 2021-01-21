@@ -38,7 +38,7 @@
         <template v-slot:item.status="{ item }">
           <v-row align="center" justify="center" class="ma-2">
             <v-col class="d-flex" cols="12" sm="6">
-              <v-select :items="item.status" label="Status" dense> </v-select>
+              <v-select v-model="statusSelected" :items="item.status" label="Status" dense> </v-select>
             </v-col>
           </v-row>
         </template>
@@ -70,7 +70,24 @@
               </v-col>
             </v-row>
             <p>Pending Balance: <span class="ml-10 pl-7">Php 00.00</span></p>
+
             <p>Room Situation:</p>
+            <v-simple-table fixed-header height="100px">
+              <template v-slot:default>
+                <tbody>
+                  <!-- <tr v-for="situation in checkOutDetails.roomSituations" :key="situation.text"> -->
+                  <tr v-for="situation in roomSituations" :key="situation.text">
+                    <td class="pa-0 ma-0">
+                      <!-- <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
+                        <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
+                      </v-btn> -->
+                    </td>
+                    <td>{{ situation.text }}</td>
+                    <!-- <td class="pl-1">{{ situation.text }}</td> -->
+                  </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
             <v-row>
               <v-col cols="11">
                 <v-text-field v-model="roomSituation" color="green">
@@ -83,11 +100,12 @@
                 </v-text-field>
               </v-col>
               <v-col cols="1" class="pa-0 mt-7">
-                <v-btn icon small v-on:click="addToList(addToService)">
+                <v-btn icon small v-on:click="addToList(roomSituation)">
                   <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
                 </v-btn>
               </v-col>
             </v-row>
+
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions class="d-flex justify-center pb-6">
@@ -98,6 +116,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+
     </v-container>
   </div>
 </template>
@@ -114,6 +133,7 @@ export default {
       roomSituation: "",
       index: -1,
       closeDialog: false,
+      statusSelected: '',
       headers: [
         {
           text: "Room No.",
@@ -208,9 +228,18 @@ export default {
           ],
         },
       ],
+      checkOutDetails: [ { roomSituations: [ {}, ] } ],
+      roomSituations: [
+        {
+          
+        }
+      ],
     };
   },
   methods: {
+    statusDefault: function() {
+      this.statusSelected = "clean"
+    },
     checkOut: function () {
       this.show = false;
       let item = this.currentDialogItem
@@ -225,7 +254,24 @@ export default {
       this.show = true;
       this.currentDialogItem = item;
     },
+    // room situation list
+    addToList(input) {
+      console.log(this.currentDialogItem);
+      // console.log(input);
+      var addData = {
+        add: true,
+        roomNo: this.currentDialogItem.roomNo,
+        text: input,
+        status: false,
+      }
+      // console.log(addData)
+      this.roomSituations.push(addData);
+      // console.log('Hi')
+    }
   },
+  beforeMount(){
+    this.statusDefault()
+  }
 };
 </script>
 
