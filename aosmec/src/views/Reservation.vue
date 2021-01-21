@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card class="mt-3">
+    <v-card class="mt-3 mx-1">
       <v-card-title class="white--text py-3" style="background: #13b150">
         <v-row>
           <v-col cols="8"> Reservation </v-col>
@@ -15,281 +15,310 @@
     </v-card>
     <v-dialog v-model="addReservationDialog" persistent width="1100">
       <v-card>
-        <v-card-title class="green white--text" fixed-header> Add Reservation</v-card-title>
+        <v-card-title class="green white--text" fixed-header>
+          Add Reservation</v-card-title
+        >
         <v-card-text class="mt-5">
           <v-row>
             <v-col cols="6">
-          <v-chip
-            color="light-green white--text font-weight-bold"
-            style="font-size: 16px"
-          >
-            Reservee Details
-          </v-chip>
-          <v-card outlined class="mt-3 px-7 py-3">
-            <v-row class="mt-1">
-              <v-col cols="8" class="pa-0 pr-2">
-                <v-text-field
-                  label="Name"
-                  v-model="addReservationDetails.name"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-account"
-                  outlined
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4" class="pa-0 pr-2">
-                <v-select
-                  v-bind:items="gender"
-                  v-model="addReservationDetails.gender"
-                  item-text="text"
-                  item-value="value"
-                  label="Gender"
-                  prepend-icon="mdi-gender-male-female"
-                  outlined
-                  dense
-                  color="green"
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <CountrySelect v-model="addReservationDetails.country"></CountrySelect>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <v-text-field
-                  label="Email"
-                  v-model="addReservationDetails.email"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-email"
-                  outlined
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <v-text-field
-                  label="Phone Number"
-                  v-model="addReservationDetails.phone"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-phone"
-                  outlined
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-card>
+              <v-chip
+                color="light-green white--text font-weight-bold"
+                style="font-size: 16px"
+              >
+                Reservee Details
+              </v-chip>
+              <v-card outlined class="mt-3 px-7 py-3">
+                <v-row class="mt-1">
+                  <v-col cols="8" class="pa-0 pr-2">
+                    <v-text-field
+                      label="Name"
+                      v-model="addReservationDetails.name"
+                      color="green"
+                      dense
+                      prepend-icon="mdi-account"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="4" class="pa-0 pr-2">
+                    <v-select
+                      v-bind:items="gender"
+                      v-model="addReservationDetails.gender"
+                      item-text="text"
+                      item-value="value"
+                      label="Gender"
+                      prepend-icon="mdi-gender-male-female"
+                      outlined
+                      dense
+                      color="green"
+                    ></v-select>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0 pr-2">
+                    <CountrySelect
+                      v-model="addReservationDetails.country"
+                    ></CountrySelect>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0 pr-2">
+                    <v-text-field
+                      label="Email"
+                      v-model="addReservationDetails.email"
+                      color="green"
+                      dense
+                      prepend-icon="mdi-email"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0 pr-2">
+                    <v-text-field
+                      label="Phone Number"
+                      v-model="addReservationDetails.phone"
+                      color="green"
+                      dense
+                      prepend-icon="mdi-phone"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card>
             </v-col>
             <v-col cols="6">
-          <v-chip
-            color="light-green white--text font-weight-bold"
-            style="font-size: 16px"
-          >
-            Reservation Details
-          </v-chip>
-          <v-card outlined class="mt-3 px-7 py-3">
-            <v-row class="mt-1">
-                <v-col class="pa-0" lg="5" md="5" xs="12">
-                  <v-select
-                    :items="roomType"
-                    v-model="addReservationDetails.roomType"
-                    label="Reservation Type"
-                    prepend-icon="mdi-room-service-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0 pl-3" lg="7" md="7" xs="12" >
-                  <v-text-field
-                    v-model="addReservationDetails.confirmationNo"
-                    type="number"
-                    label="Confirmation No"
-                    outlined
-                    dense
-                    color="green"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-            <v-row>
-                <v-col class="pa-0" lg="6" md="6" xs="12">
-                  <v-menu
-                    ref="checkIn"
-                    v-model="checkIn"
-                    :close-on-content-click="false"
-                    :return-value.sync="date"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
+              <v-chip
+                color="light-green white--text font-weight-bold"
+                style="font-size: 16px"
+              >
+                Reservation Details
+              </v-chip>
+              <v-card outlined class="mt-3 px-7 py-3">
+                <v-row class="mt-1">
+                  <v-col class="pa-0" lg="5" md="5" xs="12">
+                    <v-select
+                      :items="reservationTypes"
+                      v-model="addReservationDetails.reservationType"
+                      label="Reservation Type"
+                      prepend-icon="mdi-room-service-outline"
+                      item-text="text"
+                      item-value="value"
+                      outlined
+                      dense
+                      color="green"
+                    ></v-select>
+                  </v-col>
+                  <v-spacer></v-spacer>
+                  <v-col class="pa-0 pl-3" lg="7" md="7" xs="12">
+                    <v-text-field
+                      v-model="addReservationDetails.reservationFee"
+                      type="number"
+                      label="Reservation Fee"
+                      outlined
+                      dense
+                      color="green"
+                      v-if="addReservationDetails.reservationType == 'Walk In'"
+                    >
+                    </v-text-field>
+                    <v-text-field
+                      v-model="addReservationDetails.confirmationNo"
+                      type="number"
+                      label="Confirmation No"
+                      outlined
+                      dense
+                      color="green"
+                      v-else
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0" lg="6" md="6" xs="12">
+                    <v-menu
+                      ref="checkIn"
+                      v-model="checkIn"
+                      :close-on-content-click="false"
+                      :return-value.sync="date"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="addReservationDetails.checkInDate"
+                          label="Check In Date"
+                          prepend-icon="mdi-calendar"
+                          readonly
+                          outlined
+                          dense
+                          v-bind="attrs"
+                          v-on="on"
+                          color="green"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
                         v-model="addReservationDetails.checkInDate"
-                        label="Check In Date"
-                        prepend-icon="mdi-calendar"
-                        readonly
-                        outlined
-                        dense
-                        v-bind="attrs"
-                        v-on="on"
+                        no-title
+                        scrollable
                         color="green"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="addReservationDetails.checkInDate"
-                      no-title
-                      scrollable
-                      color="green"
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          text
+                          color="green darken-2"
+                          v-on:click="checkIn = false"
+                        >
+                          Cancel
+                        </v-btn>
+                        <v-btn
+                          text
+                          color="green darken-2"
+                          v-on:click="$refs.checkIn.save(date)"
+                        >
+                          OK
+                        </v-btn>
+                      </v-date-picker>
+                    </v-menu>
+                  </v-col>
+                  <v-col class="pa-0 pl-3" lg="6" md="6" xs="12">
+                    <v-menu
+                      ref="checkOut"
+                      v-model="checkOut"
+                      :close-on-content-click="false"
+                      :return-value.sync="date"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="auto"
                     >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="checkIn = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="$refs.checkIn.save(date)"
-                      >
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-menu>
-                </v-col>
-                <v-col class="pa-0 pl-3" lg="6" md="6" xs="12">
-                  <v-menu
-                    ref="checkOut"
-                    v-model="checkOut"
-                    :close-on-content-click="false"
-                    :return-value.sync="date"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                          v-model="addReservationDetails.checkOutDate"
+                          label="Check Out Date"
+                          readonly
+                          outlined
+                          dense
+                          v-bind="attrs"
+                          v-on="on"
+                          color="green"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker
                         v-model="addReservationDetails.checkOutDate"
-                        label="Check Out Date"
-                        readonly
-                        outlined
-                        dense
-                        v-bind="attrs"
-                        v-on="on"
+                        no-title
+                        scrollable
                         color="green"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="addReservationDetails.checkOutDate"
-                      no-title
-                      scrollable
+                      >
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          text
+                          color="green darken-2"
+                          v-on:click="checkOut = false"
+                        >
+                          Cancel
+                        </v-btn>
+                        <v-btn
+                          text
+                          color="green darken-2"
+                          v-on:click="$refs.checkOut.save(date)"
+                        >
+                          OK
+                        </v-btn>
+                      </v-date-picker>
+                    </v-menu>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0" xl="5" md="5" xs="12">
+                    <v-text-field
+                      v-model="addReservationDetails.noOfDays"
+                      type="number"
+                      label="No of Days"
+                      outlined
+                      dense
                       color="green"
+                      prepend-icon="mdi-calendar-edit"
                     >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="checkOut = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="$refs.checkOut.save(date)"
-                      >
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col class="pa-0" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="addReservationDetails.noOfDays"
-                    type="number"
-                    label="No of Days"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-calendar-edit"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0" xl="6" md="6" xs="12">
-                  <v-text-field
-                    v-model="addReservationDetails.noOfHeads"
-                    type="number"
-                    label="No of Head"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-account-multiple"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row  v-for="(room, i) in noOfAddRoomForm" :key="i">
-                <v-col class="pa-0" lg="5" md="5" xs="12">
-                  <v-select
-                    :items="roomType"
-                    v-model="addReservationDetails.roomType"
-                    label="Room Type"
-                    prepend-icon="mdi-bed-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="addReservationDetails.noOfRooms"
-                    type="number"
-                    label="No of Room"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-door"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfAddRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfAddRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-              <v-row  v-for="(service, i) in noOfAddServiceForm" :key="i">
-                <v-col class="pa-0" lg="7" md="7" xs="12">
-                  <v-select
-                    :items="services"
-                    v-model="addReservationDetails.service"
-                    label="Service"
-                    prepend-icon="mdi-hand-heart-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfAddServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfAddServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-          </v-card>
+                    </v-text-field>
+                  </v-col>
+                  <v-spacer></v-spacer>
+                  <v-col class="pa-0" xl="6" md="6" xs="12">
+                    <v-text-field
+                      v-model="addReservationDetails.noOfHeads"
+                      type="number"
+                      label="No of Head"
+                      outlined
+                      dense
+                      color="green"
+                      prepend-icon="mdi-account-multiple"
+                    >
+                    </v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row v-for="(roomDetail, index) in addReservationDetails.roomDetails" :key="index">
+                  <v-col class="pa-0" lg="5" md="5" xs="12">
+                    <v-select
+                      :items="roomTypes"
+                      v-model="roomDetail.type"
+                      label="Room Type"
+                      prepend-icon="mdi-bed-outline"
+                      item-text="text"
+                      item-value="value"
+                      outlined
+                      dense
+                      color="green"
+                    ></v-select>
+                  </v-col>
+                  <v-col class="pa-0 pl-3" xl="5" md="5" xs="12">
+                    <v-text-field
+                      v-model="roomDetail.number"
+                      type="number"
+                      label="No of Room"
+                      outlined
+                      dense
+                      color="green"
+                      prepend-icon="mdi-door"
+                    >
+                    </v-text-field>
+                  </v-col>
+                  <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
+                    <v-btn
+                      icon
+                      small
+                      color="success"
+                      elevation="0"
+                      class="mt-2"
+                      v-if="index == 0"
+                      v-on:click="addNoOfAddRoomForm()"
+                      ><v-icon color="green">mdi-plus-circle</v-icon></v-btn
+                    >
+                    <v-btn
+                      icon
+                      small
+                      elevation="0"
+                      class="mt-2"
+                      v-if="index >= 0"
+                      v-on:click="removeNoOfAddRoomForm(index)"
+                      ><v-icon color="red">mdi-minus-circle</v-icon></v-btn
+                    >
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col class="pa-0" lg="7" md="7" xs="12">
+                    <v-select
+                      :items="services"
+                      v-model="addReservationDetails.service"
+                      multiple
+                      label="Service"
+                      prepend-icon="mdi-hand-heart-outline"
+                      item-text="text"
+                      item-value="value"
+                      outlined
+                      dense
+                      color="green"
+                    ></v-select>
+                  </v-col>
+                </v-row>
+              </v-card>
             </v-col>
           </v-row>
         </v-card-text>
@@ -307,7 +336,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-card class="my-6">
+    <v-card class="my-6 mx-1">
       <v-text-field
         v-model="search"
         label="Search Name of Reservee"
@@ -318,7 +347,7 @@
         hide-details
       ></v-text-field>
     </v-card>
-    <v-card>
+    <v-card class="mx-1">
       <template>
         <v-data-table
           :headers="reservationHeaders"
@@ -372,20 +401,28 @@
                 <v-col cols="4">
                   <v-row>
                     <v-col cols="12">
-                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservation Details</v-card>
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3"
+                        >Reservation Details</v-card
+                      >
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Id </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reservationId }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reservationId }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Type </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reservationType }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reservationType }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Confirmation Number </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.confirmationNo }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.confirmationNo }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> No of Days </v-col>
@@ -403,7 +440,9 @@
                 <v-col cols="4">
                   <v-row>
                     <v-col cols="12">
-                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Room Details</v-card>
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3"
+                        >Room Details</v-card
+                      >
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
@@ -420,38 +459,54 @@
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Service </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.serviceName }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.serviceName }}
+                    </v-col>
                   </v-row>
                 </v-col>
                 <v-col cols="4">
                   <v-row>
                     <v-col cols="12">
-                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3">Reservee Details</v-card>
+                      <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3"
+                        >Reservee Details</v-card
+                      >
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Id </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveeId }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveeId }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Name </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveeName }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveeName }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Gender</v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveeGender }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveeGender }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Country </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveeCountry }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveeCountry }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Email </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveeEmail }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveeEmail }}
+                    </v-col>
                   </v-row>
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Phone No </v-col>
-                    <v-col cols="8" class="py-2">: {{ item.reserveePhone }} </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reserveePhone }}
+                    </v-col>
                   </v-row>
                 </v-col>
               </v-row>
@@ -462,284 +517,10 @@
     </v-card>
     <v-dialog v-model="editReservationDialog" persistent width="1100">
       <v-card>
-        <v-card-title class="green white--text" fixed-header>Edit Reservation</v-card-title>
-        <v-card-text class="mt-5">
-          <v-row>
-            <v-col cols="6">
-          <v-chip
-            color="light-green white--text font-weight-bold"
-            style="font-size: 16px"
-          >
-            Reservee Details
-          </v-chip>
-          <v-card outlined class="mt-3 px-7 py-3">
-            <v-row class="mt-1">
-              <v-col cols="8" class="pa-0 pr-2">
-                <v-text-field
-                  label="Name"
-                  v-model="editReservationDetails.name"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-account"
-                  outlined
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4" class="pa-0 pr-2">
-                <v-select
-                  v-bind:items="gender"
-                  v-model="editReservationDetails.gender"
-                  item-text="text"
-                  item-value="value"
-                  label="Gender"
-                  prepend-icon="mdi-gender-male-female"
-                  outlined
-                  dense
-                  color="green"
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <CountrySelect></CountrySelect>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <v-text-field
-                  label="Email"
-                  v-model="editReservationDetails.name"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-email"
-                  outlined
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2">
-                <v-text-field
-                  label="Phone Number"
-                  v-model="editReservationDetails.name"
-                  color="green"
-                  dense
-                  prepend-icon="mdi-phone"
-                  outlined
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-card>
-            </v-col>
-            <v-col cols="6">
-          <v-chip
-            color="light-green white--text font-weight-bold"
-            style="font-size: 16px"
-          >
-            Reservation Details
-          </v-chip>
-          <v-card outlined class="mt-3 px-7 py-3">
-            <v-row class="mt-1">
-                <v-col class="pa-0" lg="5" md="5" xs="12">
-                  <v-select
-                    v-bind:items="roomType"
-                    v-model="editReservationDetails.roomType"
-                    label="Reservation Type"
-                    prepend-icon="mdi-room-service-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0 pl-3" lg="7" md="7" xs="12" >
-                  <v-text-field
-                    v-model="editReservationDetails.confirmationNo"
-                    type="number"
-                    label="Confirmation No"
-                    outlined
-                    dense
-                    color="green"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-            <v-row>
-                <v-col class="pa-0" lg="6" md="6" xs="12">
-                  <v-menu
-                    ref="checkIn"
-                    v-model="checkIn"
-                    :close-on-content-click="false"
-                    :return-value.sync="date"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="editReservationDetails.checkInDate"
-                        label="Check In Date"
-                        prepend-icon="mdi-calendar"
-                        readonly
-                        outlined
-                        dense
-                        v-bind="attrs"
-                        v-on="on"
-                        color="green"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="editReservationDetails.checkInDate"
-                      no-title
-                      scrollable
-                      color="green"
-                    >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="checkIn = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="$refs.checkIn.save(date)"
-                      >
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-menu>
-                </v-col>
-                <v-col class="pa-0 pl-3" lg="6" md="6" xs="12">
-                  <v-menu
-                    ref="checkOut"
-                    v-model="checkOut"
-                    :close-on-content-click="false"
-                    :return-value.sync="date"
-                    transition="scale-transition"
-                    offset-y
-                    min-width="auto"
-                  >
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="editReservationDetails.checkOutDate"
-                        label="Check Out Date"
-                        readonly
-                        outlined
-                        dense
-                        v-bind="attrs"
-                        v-on="on"
-                        color="green"
-                      ></v-text-field>
-                    </template>
-                    <v-date-picker
-                      v-model="editReservationDetails.checkOutDate"
-                      no-title
-                      scrollable
-                      color="green"
-                    >
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="checkOut = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="$refs.checkOut.save(date)"
-                      >
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col class="pa-0" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfDays"
-                    type="number"
-                    label="No of Days"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-calendar-edit"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0" xl="6" md="6" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfHeads"
-                    type="number"
-                    label="No of Head"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-account-multiple"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row  v-for="(room, i) in noOfEditRoomForm" :key="i">
-                <v-col class="pa-0" lg="5" md="5" xs="12">
-                  <v-select
-                    :items="roomType"
-                    v-model="editReservationDetails.roomType"
-                    label="Room Type"
-                    prepend-icon="mdi-bed-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfRooms"
-                    type="number"
-                    label="No of Room"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-door"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfEditRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfEditRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-              <v-row  v-for="(service, i) in noOfEditServiceForm" :key="i">
-                <v-col class="pa-0" lg="7" md="7" xs="12">
-                  <v-select
-                    :items="services"
-                    v-model="addReservationDetails.service"
-                    label="Service"
-                    prepend-icon="mdi-hand-heart-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfEditServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfEditServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-          </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
+        <v-card-title class="green white--text" fixed-header
+          >Edit Reservation</v-card-title
+        >
+
         <v-card-actions class="d-flex justify-center pb-6">
           <v-btn class="px-5" v-on:click="editReservationDialog = false">
             Cancel
@@ -756,9 +537,13 @@
     </v-dialog>
     <v-dialog v-model="deleteReservationDialog" persistent width="450">
       <v-card>
-        <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Reservation</v-card-title>
+        <v-card-title fixed-header
+          ><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon
+          >Delete Reservation</v-card-title
+        >
         <v-card-text>
-          Are you sure you want to delete this reservation? This action cannot be undone and you will be unable to recover any data
+          Are you sure you want to delete this reservation? This action cannot
+          be undone and you will be unable to recover any data
         </v-card-text>
         <v-card-actions class="d-flex justify-center pb-6">
           <v-btn class="px-5" v-on:click="deleteReservationDialog = false">
@@ -805,17 +590,43 @@ export default {
         { text: "Female", value: "Female" },
         { text: "Other", value: "Other" },
       ],
-      addReservationDetails: [],
+      roomDetails: [
+        { type: "", number: "" },
+      ],
+      addReservationDetails: { 
+          name: "",
+          gender: "",
+          country: "",
+          email: "",
+          phone: "",
+          reservationType: "",
+          confirmationNo: "",
+          checkInDate: "",
+          checkOutDate: "",
+          noOfDays: "",
+          noOfHeads: "",
+          roomDetails: [
+            { type: "", number: "" },
+          ],
+          service: [],
+      },
       editReservationDetails: [],
       date: "",
       checkIn: "",
       checkOut: "",
-      roomType: [],
-      noOfAddRoomForm: 1,
-      noOfAddServiceForm: 1,
-      noOfEditRoomForm: 1,
-      noOfEditServiceForm: 1,
-      services: [],
+      roomTypes: [],
+      reservationTypes: [
+        { text: "Booking.com", value: "Booking.com" },
+        { text: "Agoda", value: "Agoda" },
+        { text: "Walk In", value: "Walk In" },
+        { text: "Expedia", value: "Expedia" },
+        { text: "Airbnb", value: "Airbnb" },
+      ],
+      services: [
+        { text: "Sample", value: "Sample" },
+        { text: "Sample2", value: "Sample2" },
+        { text: "Sample3", value: "Sample3" },
+      ],
       reservationHeaders: [
         {
           text: "Reserved Date",
@@ -895,41 +706,53 @@ export default {
       );
     },
     addNoOfAddRoomForm: function () {
-      this.noOfAddRoomForm = parseInt(this.noOfAddRoomForm, 10) + 1;
+      this.addReservationDetails.roomDetails.push({
+        type: "",
+        number: ""
+      })
     },
-    removeNoOfAddRoomForm: function () {
-      if(this.noOfAddRoomForm > 1){
-        this.noOfAddRoomForm = parseInt(this.noOfAddRoomForm, 10) - 1;
+    removeNoOfAddRoomForm: function (index) {
+      if(this.addReservationDetails.roomDetails.length > 1){
+        this.addReservationDetails.roomDetails.splice(index, 1)
       }
     },
     addNoOfEditRoomForm: function () {
       this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) + 1;
     },
     removeNoOfEditRoomForm: function () {
-      if(this.noOfEditRoomForm > 1){
+      if (this.noOfEditRoomForm > 1) {
         this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) - 1;
       }
     },
-    addNoOfServiceForm: function () {
-      this.noOfServiceForm = parseInt(this.noOfServiceForm, 10) + 1;
-    },
-    removeNoOfServiceForm: function () {
-      if(this.noOfServiceForm > 1){
-        this.noOfServiceForm = parseInt(this.noOfServiceForm, 10) - 1;
-      }
-    },
-    editReservationBtn: function(reservation){
+    editReservationBtn: function (reservation) {
       this.editReservationDialog = true;
       console.log(reservation);
     },
-    deleteReservationBtn: function(reservation){
+    deleteReservationBtn: function (reservation) {
       this.deleteReservationDialog = true;
       console.log(reservation);
     },
-    addReservation: function(input){
+    addReservation: function (input) {
       this.addReservationDialog = false;
       console.log(input);
-    }
+      this.addReservationDetails = {
+          name: "",
+          gender: "",
+          country: "",
+          email: "",
+          phone: "",
+          reservationType: "",
+          confirmationNo: "",
+          checkInDate: "",
+          checkOutDate: "",
+          noOfDays: "",
+          noOfHeads: "",
+          roomDetails: [
+            { type: "", number: "" },
+          ],
+          service: [],
+      }
+    },
   },
 };
 </script>
