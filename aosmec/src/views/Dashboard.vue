@@ -20,34 +20,34 @@
         </v-col>
 
         <v-col cols="12" md="6" class="pb-2">
-          <v-card class="dark bordered">
+          <v-card class="dark bordered" height="167px">
             <div class="col pa-3 py-4 green--text">
               <h4 class="text-truncate text-uppercase">Room Status</h4>
             </div>
-            <v-card-text class="green--text">
-              <v-row>
-                <v-col>
+            <v-card-text class="green--text pa-0">
+              <v-row class="roomStatusRow">
+                <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-sparkles</v-icon>
                   <span class="roomStatusData">Clean: <span>53</span></span>
                 </v-col>
-                <v-col>
+                <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-account-multiple-check</v-icon>
                   <span class="roomStatusData">Occupied: <span>53</span></span>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col>
+              <v-row class="roomStatusRow">
+                <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-broom</v-icon>
                   <span class="roomStatusData">Dirty: <span>53</span></span>
                   
                 </v-col>
-                <v-col>
+                <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-account-remove</v-icon>
                   <span class="roomStatusData">Vacant: <span>53</span></span>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col>
+              <v-row class="roomStatusRow">
+                <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-tools</v-icon>
                   <span class="roomStatusData">Out-of-Order: <span>53</span></span>
                 </v-col>
@@ -282,5 +282,12 @@ export default {
 }
 .roomStatusData {
   font-size: large;
+}
+.roomStatusRow {
+  margin: 0;
+}
+.roomStatusCol {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 </style>
