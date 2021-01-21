@@ -82,7 +82,8 @@
                         <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
                       </v-btn> -->
                     </td>
-                    <td class="pl-1">{{ situation.text }}</td>
+                    <td>{{ situation.text }}</td>
+                    <!-- <td class="pl-1">{{ situation.text }}</td> -->
                   </tr>
                 </tbody>
               </template>
