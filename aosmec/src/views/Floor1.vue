@@ -38,7 +38,13 @@
         <template v-slot:item.status="{ item }">
           <v-row align="center" justify="center" class="ma-2">
             <v-col class="d-flex" cols="12" sm="6">
-              <v-select v-model="statusSelected" :items="item.status" label="Status" dense> </v-select>
+              <v-select
+                v-model="statusSelected"
+                :items="item.status"
+                label="Status"
+                dense
+              >
+              </v-select>
             </v-col>
           </v-row>
         </template>
@@ -51,7 +57,7 @@
         </template>
       </v-data-table>
 
-      <v-dialog v-model="show" width="450">
+      <v-dialog v-model="show" width="500">
         <v-card>
           <v-card-title class="headline grey lighten-2">
             Checking Out Details
@@ -59,7 +65,7 @@
           <v-card-text class="mt-3">
             <v-row class="mt-2">
               <v-col cols="5">
-                <p>Key Deposit:</p>
+                <p class="ml-1">Key Deposit:</p>
               </v-col>
               <v-col cols="7" class="ma-0 py-2">
                 <v-checkbox
@@ -69,43 +75,30 @@
                 ></v-checkbox>
               </v-col>
             </v-row>
-            <p>Pending Balance: <span class="ml-10 pl-7">Php 00.00</span></p>
 
-            <p>Room Situation:</p>
-            <v-simple-table fixed-header height="100px">
+            <v-simple-table dense class="elevation-1 pa-2 mb-3">
               <template v-slot:default>
+                <thead>
+                  <tr>
+                    <th class="text-left pa-0 pl-10">Payment Details</th>
+                    <th class="text-left pl-0 pr-0">Amount</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  <!-- <tr v-for="situation in checkOutDetails.roomSituations" :key="situation.text"> -->
-                  <tr v-for="situation in roomSituations" :key="situation.text">
-                    <td class="pa-0 ma-0">
-                      <!-- <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
-                        <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
-                      </v-btn> -->
-                    </td>
-                    <td>{{ situation.text }}</td>
-                    <!-- <td class="pl-1">{{ situation.text }}</td> -->
+                  <!-- <tr v-for="item in guests" :key="item.name"> -->
+                  <tr>
+                    <!-- <td v-if="item.checkOutDate == today()">{{ item.name }}</td>
+                    <td v-if="item.checkOutDate == today()">
+                      {{ item.roomNo }}
+                    </td> -->
+                    <td class="pa-0"></td>
+                    <td class="pr-1 pl-0">Php </td>
                   </tr>
                 </tbody>
               </template>
             </v-simple-table>
-            <v-row>
-              <v-col cols="11">
-                <v-text-field v-model="roomSituation" color="green">
-                  <template v-slot:label>
-                    <div>
-                      state the changes in the room
-                      <small>(optional)</small>
-                    </div>
-                  </template>
-                </v-text-field>
-              </v-col>
-              <v-col cols="1" class="pa-0 mt-7">
-                <v-btn icon small v-on:click="addToList(roomSituation)">
-                  <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
-                </v-btn>
-              </v-col>
-            </v-row>
 
+            <p>Pending Balance: <span class="ml-10 pl-7">Php 00.00</span></p>
           </v-card-text>
           <v-divider></v-divider>
           <v-card-actions class="d-flex justify-center pb-6">
@@ -116,7 +109,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
     </v-container>
   </div>
 </template>
@@ -133,7 +125,7 @@ export default {
       roomSituation: "",
       index: -1,
       closeDialog: false,
-      statusSelected: '',
+      statusSelected: "",
       headers: [
         {
           text: "Room No.",
@@ -228,21 +220,17 @@ export default {
           ],
         },
       ],
-      checkOutDetails: [ { roomSituations: [ {}, ] } ],
-      roomSituations: [
-        {
-          
-        }
-      ],
+      checkOutDetails: [{ roomSituations: [{}] }],
+      roomSituations: [{}],
     };
   },
   methods: {
-    statusDefault: function() {
-      this.statusSelected = "clean"
+    statusDefault: function () {
+      this.statusSelected = "clean";
     },
     checkOut: function () {
       this.show = false;
-      let item = this.currentDialogItem
+      let item = this.currentDialogItem;
       this.index = this.rooms.indexOf(item);
       this.currentDialogItem = {};
       this.rooms.splice(this.index, 1);
@@ -263,15 +251,15 @@ export default {
         roomNo: this.currentDialogItem.roomNo,
         text: input,
         status: false,
-      }
+      };
       // console.log(addData)
       this.roomSituations.push(addData);
       // console.log('Hi')
-    }
+    },
   },
-  beforeMount(){
-    this.statusDefault()
-  }
+  beforeMount() {
+    this.statusDefault();
+  },
 };
 </script>
 
