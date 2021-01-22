@@ -239,7 +239,7 @@
                   </v-text-field>
                 </v-col>
               </v-row>
-              <v-row  v-for="(room, i) in noOfAddRoomForm" :key="i">
+              <v-row  v-for="room in noOfRoomForm" :key="room">
                 <v-col class="pa-0" lg="5" md="5" xs="12">
                   <v-select
                     :items="roomType"
@@ -266,11 +266,11 @@
                   </v-text-field>
                 </v-col>
                 <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfAddRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfAddRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
-              <v-row  v-for="(service, i) in noOfAddServiceForm" :key="i">
+              <v-row  v-for="service in noOfServiceForm" :key="service">
                 <v-col class="pa-0" lg="7" md="7" xs="12">
                   <v-select
                     :items="services"
@@ -285,8 +285,8 @@
                   ></v-select>
                 </v-col>
                 <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfAddServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfAddServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
           </v-card>
@@ -686,7 +686,7 @@
                   </v-text-field>
                 </v-col>
               </v-row>
-              <v-row  v-for="(room, i) in noOfEditRoomForm" :key="i">
+              <v-row  v-for="room in noOfRoomForm" :key="room">
                 <v-col class="pa-0" lg="5" md="5" xs="12">
                   <v-select
                     :items="roomType"
@@ -713,11 +713,11 @@
                   </v-text-field>
                 </v-col>
                 <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfEditRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfEditRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
-              <v-row  v-for="(service, i) in noOfEditServiceForm" :key="i">
+              <v-row  v-for="service in noOfServiceForm" :key="service">
                 <v-col class="pa-0" lg="7" md="7" xs="12">
                   <v-select
                     :items="services"
@@ -732,8 +732,8 @@
                   ></v-select>
                 </v-col>
                 <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfEditServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfEditServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
+                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
                 </v-col>
               </v-row>
           </v-card>
@@ -811,11 +811,8 @@ export default {
       checkIn: "",
       checkOut: "",
       roomType: [],
-      noOfAddRoomForm: 1,
-      noOfAddServiceForm: 1,
-      noOfEditRoomForm: 1,
-      noOfEditServiceForm: 1,
-      services: [],
+      noOfRoomForm: 1,
+      noOfServiceForm: 1,
       reservationHeaders: [
         {
           text: "Reserved Date",
@@ -894,23 +891,15 @@ export default {
           .indexOf(search.toLocaleUpperCase()) !== -1
       );
     },
-    addNoOfAddRoomForm: function () {
-      this.noOfAddRoomForm = parseInt(this.noOfAddRoomForm, 10) + 1;
+    addNoOfRoomForm: function () {
+      this.noOfRoomForm = parseInt(this.noOfRoomForm, 10) + 1;
     },
-    removeNoOfAddRoomForm: function () {
-      if(this.noOfAddRoomForm > 1){
-        this.noOfAddRoomForm = parseInt(this.noOfAddRoomForm, 10) - 1;
+    removeNoOfRoomForm: function () {
+      if(this.noOfRoomForm > 1){
+        this.noOfRoomForm = parseInt(this.noOfRoomForm, 10) - 1;
       }
     },
-    addNoOfEditRoomForm: function () {
-      this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) + 1;
-    },
-    removeNoOfEditRoomForm: function () {
-      if(this.noOfEditRoomForm > 1){
-        this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) - 1;
-      }
-    },
-    addNoOfServiceForm: function () {
+     addNoOfServiceForm: function () {
       this.noOfServiceForm = parseInt(this.noOfServiceForm, 10) + 1;
     },
     removeNoOfServiceForm: function () {

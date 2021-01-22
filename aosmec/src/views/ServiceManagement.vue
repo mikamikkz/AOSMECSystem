@@ -53,18 +53,25 @@
                         v-model="editedItem.id"
                         label="ID Number"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
-                    <v-col
+                   <v-col
                       cols="12"
                       sm="6"
                       md="4"
                     >
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Service"
-                        outlined
-                      ></v-text-field>
+                    
+                    <v-select
+                      v-bind:items="service_name"
+                      v-model="editedItem.service_name"
+                      item-text="text"
+                      item-value="value"
+                      label="Service"
+                      outlined
+                      color="green"
+                  ></v-select>
+                      
                     </v-col>
                     <v-col
                       cols="12"
@@ -75,6 +82,7 @@
                         v-model="editedItem.rate"
                         label="Service Rate"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -86,6 +94,7 @@
                         v-model="editedItem.pricing"
                         label="Pricing"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -165,12 +174,16 @@
           sortable: false,
           value: 'id',
         },
-        { text: 'Service Name', value: 'name', sortable: false },
+        { text: 'Service Name', value: 'service_name', sortable: false },
         { text: 'Service Rate', value: 'rate' },
         { text: 'Pricing', value: 'pricing' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       service_mgmt: [],
+      service_name: [
+        { text: "Airport Shuttle", value: "Airport Shuttle" },
+        { text: "Extra Bed", value: "Extra Bed" },
+      ],
       editedIndex: -1,
       editedItem: {
         id: '',
@@ -210,7 +223,7 @@
         this.service_mgmt = [
           {
             id: '12345678',
-            name: 'Cleaning',
+            service_name: 'Extra Bed',
             rate: 0,
             pricing: 0,
           },

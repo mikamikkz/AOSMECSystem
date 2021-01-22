@@ -51,13 +51,13 @@
                       sm="6"
                       md="4"
                     >
-                      <v-select
+                      <v-select 
                       v-bind:items="room_types"
                       v-model="editedItem.room_types"
                       item-text="text"
                       item-value="value"
                       label="Room Type"
-                      outlined
+                      outlined                      
                       color="green"
                   ></v-select>
                     </v-col>
@@ -70,6 +70,7 @@
                         v-model="editedItem.no_of_rooms"
                         label="No. of Rooms"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -81,6 +82,7 @@
                         v-model="editedItem.no_of_adults"
                         label="No. of Adults"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -92,6 +94,7 @@
                         v-model="editedItem.additional_head_rate"
                         label="Additional Head Rate"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -103,6 +106,7 @@
                         v-model="editedItem.unit_price"
                         label="Unit Price"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -122,7 +126,6 @@
                   color="green darken-1"
                   text
                   @click="save"
-                  
                 >
                   Save
                 </v-btn>
@@ -176,14 +179,12 @@
   font-size: 13px;
 }
 
-
 </style>
-
-
 
 <script>
   export default {
     data: () => ({
+      
       dialog: false,
       dialogDelete: false,
       headers: [
@@ -205,6 +206,7 @@
       room_types: [
         { text: "Single", value: "Single" },
         { text: "Double", value: "Double" },
+        { text: "Family Room", value: "Family Room" },
       ],
 
 
