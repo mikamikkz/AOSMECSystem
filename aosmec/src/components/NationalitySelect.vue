@@ -1,6 +1,8 @@
 <template>
   <v-autocomplete
     v-bind:items="nationalities"
+    v-bind:value="value"
+    v-on:input="$emit('input', $event)"
     item-text="text"
     item-value="value"
     label="Nationality"
@@ -13,6 +15,7 @@
 <script>
 export default {
     name: "NationalitySelect",
+    props: ["value"],
     data () {
         return {
             nationalities: [

@@ -47,19 +47,93 @@
         </v-menu>
       </v-col>
     </v-row>
-    <BarChart
-      v-bind:chartData="checkIn"
-      v-bind:options="checkInOptions"
-      v-bind:label="checkInLabel"
-      v-bind:backgroundColor="backgroundColor"
-    ></BarChart>
+    <v-row class="mb-5">
+      <v-col cols="3">
+        <v-card color="#456990">
+          <v-row>
+            <v-col cols="3">
+              <v-icon x-large class="pl-4 pt-3" style="color: #eff3fc">
+                mdi-chart-areaspline
+              </v-icon>
+            </v-col>
+            <v-col cols="9">
+              <p class="text-subtitle-2 text-left my-0" style="color: #eff3fc">
+                Total Renevue
+              </p>
+              <p class="text-left my-0" style="font-size: 28px; color: #eff3fc">
+                14000
+              </p>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+      <v-col cols="3">
+        <v-card color="#13b150">
+          <v-row>
+            <v-col cols="3">
+              <v-icon x-large class="pl-4 pt-3" style="color: #f2fcef">
+                mdi-account-group
+              </v-icon>
+            </v-col>
+            <v-col cols="9">
+              <p class="text-subtitle-2 text-left my-0" style="color: #f2fcef">
+                Total Guests
+              </p>
+              <p class="text-left my-0" style="font-size: 28px; color: #f2fcef">
+                30
+              </p>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row class="mt-5">
+      <v-col>
+        <v-card class="px-5 py-2">
+          <BarChart
+            v-bind:chartData="checkIn"
+            v-bind:options="checkInOptions"
+            v-bind:label="checkInLabel"
+            v-bind:backgroundColor="backgroundColor"
+          ></BarChart>
+        </v-card>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="7">
+        <v-card class="pa-3">
+          <h3 style="color: #00695C">Booking Commissions</h3>
+          <v-data-table
+            :headers="resTypeTableHeader"
+            :items="resTypeTableBody"
+            hide-default-footer
+          ></v-data-table>
+        </v-card>
+      </v-col>
+      <v-col cols="5">
+        <v-card class="pa-3">
+          <h3 style="color: #00695C">Number of Reservations</h3>
+          <PieChart
+            v-bind:chartData="reservationType"
+            v-bind:options="reservationTypeOptions"
+            v-bind:backgroundColor="resTypeBgColor"
+          ></PieChart>
+        </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
+<style scoped>
+.h2 {
+  color: #eff3fc;
+}
+</style>
 <script>
 import BarChart from "../components/BarChart";
+import PieChart from "../components/PieChart";
 export default {
   name: "Reports",
-  components: { BarChart },
+  components: { BarChart, PieChart },
   data() {
     return {
       menu: false,
@@ -80,39 +154,80 @@ export default {
         },
       },
       checkIn: [
-        { date: "1", total: "2" },
-        { date: "2", total: "1" },
-        { date: "3", total: "3" },
-        { date: "4", total: "2" },
-        { date: "5", total: "5" },
-        { date: "6", total: "3" },
-        { date: "7", total: "2" },
-        { date: "8", total: "5" },
-        { date: "9", total: "2" },
-        { date: "10", total: "5" },
-        { date: "11", total: "2" },
-        { date: "12", total: "1" },
-        { date: "13", total: "3" },
-        { date: "14", total: "2" },
-        { date: "15", total: "5" },
-        { date: "16", total: "3" },
-        { date: "17", total: "2" },
-        { date: "18", total: "5" },
-        { date: "19", total: "2" },
-        { date: "20", total: "5" },
-        { date: "21", total: "2" },
-        { date: "22", total: "1" },
-        { date: "23", total: "3" },
-        { date: "24", total: "2" },
-        { date: "25", total: "5" },
-        { date: "26", total: "3" },
-        { date: "27", total: "2" },
-        { date: "28", total: "5" },
-        { date: "29", total: "2" },
-        { date: "30", total: "5" },
+        { date: "1", totalCheckIn: "2", totalCheckout: "2" },
+        { date: "2", totalCheckIn: "1", totalCheckout: "2" },
+        { date: "3", totalCheckIn: "3", totalCheckout: "1" },
+        { date: "4", totalCheckIn: "2", totalCheckout: "3" },
+        { date: "5", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "6", totalCheckIn: "3", totalCheckout: "2" },
+        { date: "7", totalCheckIn: "2", totalCheckout: "3" },
+        { date: "8", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "9", totalCheckIn: "2", totalCheckout: "1" },
+        { date: "10", totalCheckIn: "2", totalCheckout: "1" },
+        { date: "11", totalCheckIn: "2", totalCheckout: "2" },
+        { date: "12", totalCheckIn: "1", totalCheckout: "2" },
+        { date: "13", totalCheckIn: "3", totalCheckout: "1" },
+        { date: "14", totalCheckIn: "2", totalCheckout: "5" },
+        { date: "15", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "16", totalCheckIn: "3", totalCheckout: "2" },
+        { date: "17", totalCheckIn: "2", totalCheckout: "3" },
+        { date: "18", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "19", totalCheckIn: "2", totalCheckout: "1" },
+        { date: "20", totalCheckIn: "2", totalCheckout: "1" },
+        { date: "21", totalCheckIn: "2", totalCheckout: "2" },
+        { date: "22", totalCheckIn: "1", totalCheckout: "4" },
+        { date: "23", totalCheckIn: "3", totalCheckout: "2" },
+        { date: "24", totalCheckIn: "2", totalCheckout: "3" },
+        { date: "25", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "26", totalCheckIn: "3", totalCheckout: "2" },
+        { date: "27", totalCheckIn: "2", totalCheckout: "3" },
+        { date: "28", totalCheckIn: "5", totalCheckout: "2" },
+        { date: "29", totalCheckIn: "2", totalCheckout: "1" },
+        { date: "30", totalCheckIn: "2", totalCheckout: "1" },
       ],
-      checkInLabel: "No of Check In",
-      backgroundColor: "#7CB342",
+      checkInLabel: ["Check In", "CheckOut"],
+      backgroundColor: ["#49beaa", "#E57373"],
+      resTypeBgColor: [
+        "#49beaa",
+        "#E57373",
+        "#456990",
+        "#EEB868",
+        "#264653",
+        "#f4a261",
+      ],
+      reservationType: [
+        { name: "Booking.com", total: "10" },
+        { name: "Agoda", total: "10" },
+        { name: "Walkin", total: "20" },
+        { name: "Expedia", total: "1" },
+      ],
+      reservationTypeOptions: {
+        responsive: true,
+        maintainAspectRatio: false,
+        xAxes: [
+          {
+            gridLines: {
+              display: false,
+            },
+          },
+        ],
+        yAxes: [
+          {
+            gridLines: {
+              display: false,
+            },
+          },
+        ],
+        // legend: {
+        //   position: "right",
+        // },
+        cutoutPercentage: 30,
+      },
+      resTypeTableHeader: [
+        { text: 'Type', value: 'type' },
+        { text: 'Revenue', value: 'total' },
+        { text: 'Commission Check(15%)', value: 'commission' },
+      ]
     };
   },
   methods: {
