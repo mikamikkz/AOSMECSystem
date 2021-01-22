@@ -5,9 +5,9 @@
         <v-toolbar-title>
           <h5 class="font-weight-medium pa-0 ma-0 pt-3" style="color: green">
             <v-icon x-large left color="success" style="margin-bottom: 12px"
-              >mdi-home-floor-3</v-icon
+              >mdi-home-floor-1</v-icon
             >
-            ROOMS ON FLOOR 3
+            ROOMS ON FLOOR 1
           </h5>
         </v-toolbar-title>
         <v-spacer></v-spacer>
