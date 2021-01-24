@@ -43,8 +43,14 @@
                 :items="status"
                 label="Status"
                 dense
+                v-on:click="statusChanged(props.item.status)"
               >
               </v-select>
+              <!-- <v-select v-model="props.item.status">
+                <v-option v-for="option in status" :key="option.id" :value="{ id: option.id, text: option.name }">
+                  {{ option.name }}
+                </v-option>
+              </v-select> -->
             </v-col>
           </v-row>
         </template>
@@ -92,7 +98,7 @@
 
             <v-row>
               <v-col cols="5">
-                <p>Pending Balance:</p>
+                <p>Pending Balance: </p>
               </v-col>
               <v-col cols="7">
                 <p>Php</p>
@@ -103,7 +109,7 @@
                 <p>Key Deposit:</p>
               </v-col>
               <v-col cols="7">
-                <v-checkbox color="success" class="mt-0 mb-0 pa-0" label="Php 200.00"></v-checkbox>
+                <v-checkbox color="success" class="mt-0 mb-0 pa-0" label="Php 200.00" v-on:click="addKeyDeposit()" v-model="guestBill.keyDeposit"></v-checkbox>
               </v-col>
             </v-row>
 
@@ -230,6 +236,7 @@
               </v-col>
               <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
                 <v-text-field
+                  v-model="addToService.qty"
                   label="Qty"
                   dense
                   outlined
@@ -347,13 +354,27 @@ export default {
           guestDetails: "blahblah",
         }
       ],
+      // check out details
+      guestBillDetails: [
+        { id: '1', billId: '1', name: "service 1", total: "210", status: "Pending"},
+        { id: '2', billId: '1', name: "service 2", total: "210", status: "Pending"},
+        { id: '2', billId: '2', name: "service 1", total: "210", status: "Pending"},
+        { id: '3', billId: '3', name: "service 1", total: "210", status: "Pending"},
+        { id: '4', billId: '4', name: "service 1", total: "210", status: "Pending"},
+      ],
+      guestBill: [ //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
+        { id: '1', roomId: "1", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '2', roomId: "2", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '3', roomId: "3", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '4', roomId: "4", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+      ],
       // rules
       numberRules: [
         v => v.length > 0 || 'This field may not be empty',
         v => Number.isFloat(v) || 'The value must be an float number',
         v => v > 0 || 'The value must be greater than zero'
       ],
-      // services    
+      // services details
       services: [
         { text: "Sample", value: "Sample" },
         { text: "Sample2", value: "Sample2" },
@@ -381,10 +402,25 @@ export default {
     };
   },
   methods: {
+    statusChanged(item) {
+      console.log(item)
+      let chosenGuest = this.rooms.find((item)=> item.roomNo == this.currentDialogItem.roomNo)
+      console.log(chosenGuest)
+    },
     // checkout
+    addKeyDeposit: function() {
+      let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
+      chosenGuest.keyDeposit = '1'
+      if(chosenGuest.keyDeposit === '1'){
+        this.guestBill.balance = parseInt(this.guestBill.balance) - 200;
+      }
+      console.log(chosenGuest.keyDeposit)
+    },
     showCheckOutDialog(item) {
-      this.showCheckOut = true;
-      this.currentDialogItem = item;
+      this.showCheckOut = true
+      this.currentDialogItem = item
+      let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
+      console.log(chosenGuest)
     },
     checkOutClose: function () {
       this.showCheckOut = false
