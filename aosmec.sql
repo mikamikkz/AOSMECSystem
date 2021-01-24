@@ -173,6 +173,7 @@ CREATE TABLE `room` (
   `roomTypeId` int(255) NOT NULL,
   `roomNo` int(11) NOT NULL,
   `status` varchar(255) NOT NULL,
+  `state` varchar(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
