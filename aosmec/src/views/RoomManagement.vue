@@ -10,6 +10,9 @@
         <v-toolbar 
           style="background: #13b150"
           flat
+          rounded
+          elevation="2"
+          color="font-weight-bold"
         >
           <v-toolbar-title 
             class="white--text py-3"

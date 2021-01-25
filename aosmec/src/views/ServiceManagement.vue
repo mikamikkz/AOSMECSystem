@@ -5,15 +5,22 @@
       :items="service_mgmt"
       class="mt-3 mx-1"
     >
+    
       <template v-slot:top>
-        <v-toolbar style="background: #13b150"
+        <v-toolbar 
+          style="background: #13b150"
           flat
+          rounded
+          elevation="2"
+          color="font-weight-bold"
         >
+        
           <v-toolbar-title 
             class="white--text py-3"
             color="light-green white--text font-weight-bold"
             style="font-size: 16px"
           >Manage Services</v-toolbar-title>
+          
           <v-divider
             class="mx-4"
             inset
@@ -37,6 +44,7 @@
               </v-btn>
             </template>
             <v-card>
+              
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>
               </v-card-title>
@@ -164,6 +172,7 @@
     </v-data-table>
   </v-container>
 </template>
+
 
 <script>
   export default {
