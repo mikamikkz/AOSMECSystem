@@ -12,12 +12,12 @@
         </v-toolbar-title>
         <v-spacer></v-spacer>
       </v-toolbar>
-      <v-data-table dense :headers="headers" :items="rooms" item-key="roomNo">
+      <v-data-table dense :headers="headers" :items="rooms" item-key="id">
         <template v-slot:item.name="props">
           <td>
             <v-dialog v-model="dialog[props.item.roomNo]" width="500">
               <template v-slot:activator="{ on, attrs }">
-                <v-btn color="success" depressed dark v-bind="attrs" v-on="on">
+                <v-btn color="success" depressed dark v-bind="attrs" v-on="on" v-if="props.item.state === 'occupied' ">
                   {{ props.item.name }}
                 </v-btn>
               </template>
@@ -43,37 +43,43 @@
                 :items="status"
                 label="Status"
                 dense
+                v-on:click="statusChanged(props.item.status)"
               >
               </v-select>
+              <!-- <v-select v-model="props.item.status">
+                <v-option v-for="option in status" :key="option.id" :value="{ id: option.id, text: option.name }">
+                  {{ option.name }}
+                </v-option>
+              </v-select> -->
             </v-col>
           </v-row>
         </template>
 
         <template v-slot:item.checkout="props">
           <!-- checkout -->
-          <v-btn class="mx-2" color="error" fab depressed small @click="showCheckOutDialog(props.item)">
+          <v-btn class="mx-2 mt-2" color="error" fab depressed small @click="showCheckOutDialog(props.item)"  :disabled="props.item.state !== 'occupied' ">
             <v-icon small dark>mdi-door-open</v-icon>
           </v-btn>
           <!-- payment -->
-          <v-btn class="mx-2" color="primary" fab depressed small @click="showPaymentDialog(props.item)">
+          <v-btn class="mx-2 mt-2" color="primary" fab depressed small @click="showPaymentDialog(props.item)" :disabled="props.item.state !== 'occupied' ">
             <v-icon small dark>mdi-cash-multiple</v-icon>
           </v-btn>
           <!-- add service -->
-          <v-btn class="mx-2" color="warning" fab depressed small @click="showAddServiceDialog(props.item)">
+          <v-btn class="mx-2 mt-2" color="warning" fab depressed small @click="showAddServiceDialog(props.item)" :disabled="props.item.state !== 'occupied' ">
             <v-icon small dark>mdi-plus-box-multiple</v-icon>
           </v-btn>
         </template>
       </v-data-table>
 
       <!-- checkout dialog -->
-      <v-dialog v-model="showCheckOut" width="500">
+      <v-dialog persistent v-model="showCheckOut" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
             Checking Out Details
           </v-card-title>
           <v-card-text class="mt-3">
 
-            <v-simple-table dense class=" pa-2 mb-3">
+            <v-simple-table dense class=" pa-0 mb-3">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -92,7 +98,7 @@
 
             <v-row>
               <v-col cols="5">
-                <p>Pending Balance:</p>
+                <p>Pending Balance: </p>
               </v-col>
               <v-col cols="7">
                 <p>Php</p>
@@ -103,7 +109,7 @@
                 <p>Key Deposit:</p>
               </v-col>
               <v-col cols="7">
-                <v-checkbox color="success" class="mt-0 mb-0 pa-0" label="Php 200.00"></v-checkbox>
+                <v-checkbox color="success" class="mt-0 mb-0 pa-0" label="Php 200.00" v-on:click="addKeyDeposit()" v-model="guestBill.keyDeposit"></v-checkbox>
               </v-col>
             </v-row>
 
@@ -119,14 +125,14 @@
       </v-dialog>
 
       <!-- payment dialog -->
-      <v-dialog v-model="showPayment" width="500">
+      <v-dialog persistent v-model="showPayment" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
             Payment
           </v-card-title>
           <v-card-text class="mt-3">
             
-            <v-simple-table dense class=" pa-2 mb-3">
+            <v-simple-table dense class=" pa-0 mb-3">
               <template v-slot:default>
                 <thead>
                   <tr>
@@ -172,7 +178,7 @@
       </v-dialog>
 
       <!-- add service dialog -->
-      <v-dialog v-model="showAddService" width="500">
+      <v-dialog persistent v-model="showAddService" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
             Services
@@ -183,34 +189,54 @@
               <template v-slot:default>
                 <thead>
                   <tr>
+                    <th class="ma-0 pa-0"></th>
                     <th class="text-left pl-1">Name</th>
                     <th class="text-left">Rate</th>
                     <th class="text-left">Qty</th>
+                    <th class="text-left">Paid</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="service in services" :key="service.name">
+                  <tr v-for="service in guestServices" :key="service.name">
+                    <td class="pa-0 ma-0">
+                      <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
+                        <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
+                      </v-btn>
+                    </td>
                     <td class="pl-1">{{ service.name }}</td>
                     <td>{{ service.rate }}</td>
                     <td>{{ service.quantity }}</td>
+                    <td>
+                      <v-btn icon small v-if="!service.add">
+                        <v-icon color="green lighten-3"
+                          >mdi-checkbox-marked</v-icon
+                        >
+                      </v-btn>
+                    </td>
                   </tr>
                 </tbody>
               </template>
             </v-simple-table>
             <v-row class="mt-2">
               <v-col lg="1" md="1" sm="12" d-flex class="mr-1">
-                <v-btn icon small class="mt-2">
+                <v-btn icon small class="mt-2" v-on:click="addToList(addToService)">
                   <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
                 </v-btn>
               </v-col>
               <v-col lg="7" md="" sm="12" d-flex class="pr-1">
                 <v-select
+                  :items="services"
+                  v-model="addToService.name"
+                  label="Service Name"
+                  item-text="text"
+                  item-value="value"
                   dense
                   outlined
                 ></v-select>
               </v-col>
               <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
                 <v-text-field
+                  v-model="addToService.qty"
                   label="Qty"
                   dense
                   outlined
@@ -288,40 +314,59 @@ export default {
       ],
       rooms: [
         {
-          roomNo: "100",
-          name: "Kim Taehyung",
-          guestDetails: "blahblah",
+          id: '1',
           roomType: "single",
-          status: "clean"
+          roomNo: "100",
+          status: "clean",
+          state: "occupied",
+          // check in -> guest
+          name: "Kim Taehyung",
+          guestDetails: "blahblah",
         },
         {
+          id: '2',
+          roomType: "double",
           roomNo: "101",
+          status: "clean",
+          state: "occupied",
+          // check in -> guest
           name: "Kim Taehyung",
           guestDetails: "blahblah",
-          roomType: "double",
-          status: "clean"
         },
         {
+          id: '3',
+          roomType: "single",
           roomNo: "102",
+          status: "clean",
+          state: "occupied",
+          // check in -> guest
           name: "Kim Taehyung",
           guestDetails: "blahblah",
-          roomType: "double",
-          status: "clean"
         },
         {
+          id: '4',
+          roomType: "double",
           roomNo: "103",
+          status: "clean",
+          state: "occupied",
+          // check in -> guest
           name: "Kim Taehyung",
           guestDetails: "blahblah",
-          roomType: "double",
-          status: "clean"
-        },
-        {
-          roomNo: "104",
-          name: "Kim Taehyung",
-          guestDetails: "blahblah",
-          roomType: "double",
-          status: "clean"
-        },
+        }
+      ],
+      // check out details
+      guestBillDetails: [
+        { id: '1', billId: '1', name: "service 1", total: "210", status: "Pending"},
+        { id: '2', billId: '1', name: "service 2", total: "210", status: "Pending"},
+        { id: '2', billId: '2', name: "service 1", total: "210", status: "Pending"},
+        { id: '3', billId: '3', name: "service 1", total: "210", status: "Pending"},
+        { id: '4', billId: '4', name: "service 1", total: "210", status: "Pending"},
+      ],
+      guestBill: [ //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
+        { id: '1', roomId: "1", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '2', roomId: "2", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '3', roomId: "3", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
+        { id: '4', roomId: "4", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
       ],
       // rules
       numberRules: [
@@ -329,8 +374,16 @@ export default {
         v => Number.isFloat(v) || 'The value must be an float number',
         v => v > 0 || 'The value must be greater than zero'
       ],
-      // services
+      // services details
       services: [
+        { text: "Sample", value: "Sample" },
+        { text: "Sample2", value: "Sample2" },
+      ],  
+      addToService: {
+        name: "",
+        qty: "",
+      },
+      guestServices: [
         {
           add: false,
           name: "Extra Bed",
@@ -349,20 +402,35 @@ export default {
     };
   },
   methods: {
+    statusChanged(item) {
+      console.log(item)
+      let chosenGuest = this.rooms.find((item)=> item.roomNo == this.currentDialogItem.roomNo)
+      console.log(chosenGuest)
+    },
     // checkout
+    addKeyDeposit: function() {
+      let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
+      chosenGuest.keyDeposit = '1'
+      if(chosenGuest.keyDeposit === '1'){
+        this.guestBill.balance = parseInt(this.guestBill.balance) - 200;
+      }
+      console.log(chosenGuest.keyDeposit)
+    },
     showCheckOutDialog(item) {
-      this.showCheckOut = true;
-      this.currentDialogItem = item;
+      this.showCheckOut = true
+      this.currentDialogItem = item
+      let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
+      console.log(chosenGuest)
     },
     checkOutClose: function () {
       this.showCheckOut = false
     },
     checkOut: function () {
       this.showCheckOut = false;
-      let item = this.currentDialogItem;
-      this.index = this.rooms.indexOf(item);
-      this.currentDialogItem = {};
-      this.rooms.splice(this.index, 1);
+      let chosenGuest = this.rooms.find((item)=> item.roomNo == this.currentDialogItem.roomNo)
+      console.log(chosenGuest)
+      chosenGuest.status = "dirty"
+      chosenGuest.state = "Vacant"
     },
     // payment
     showPaymentDialog(item) {
@@ -383,7 +451,22 @@ export default {
     },
     addServiceClose() {
       this.showAddService = false
-    }
+    },
+    addToList: function(input) {
+      console.log(input);
+      var addData = {
+        add: true,
+        name: input.name,
+        rate: "",
+        quantity: input.qty,
+        status: false,
+      }
+      this.guestServices.push(addData);
+    },
+    removeFromList: function(input) {
+      var index = this.guestServices.indexOf(input.name);
+      this.guestServices.splice(index, 1);
+    },
   }
 };
 </script>
