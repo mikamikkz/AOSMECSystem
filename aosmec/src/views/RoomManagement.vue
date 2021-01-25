@@ -24,7 +24,7 @@
           ></v-divider>
           <v-spacer></v-spacer>
           <v-dialog 
-            v-model="dialog"
+            v-model="addRoomDialog"
             max-width="500px"
           >
             <template v-slot:activator="{ on, attrs }">
@@ -118,21 +118,21 @@
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="close"
+                  v-on:click="addRoomDialog=false"
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="save"
+                  v-on:click="save"
                 >
                   Save
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" persistent width="1100px">
             <v-card>
               <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Room</v-card-title>
               <v-card-text>Are you sure you want to delete this room? This action cannot be undone and you will be unable to recover any data.</v-card-text>
@@ -147,21 +147,23 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon
+        <v-btn
           small
-          class="mr-2"
-          color="green"
+          class="white--text"
+          color="amber darken-2"
           @click="editItem(item)"
         >
-          mdi-pencil
-        </v-icon>
-        <v-icon
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+        
+        <v-btn
           small
-          color="green"
+          class="white--text"
+          color="red darken-2"
           @click="deleteItem(item)"
         >
-          mdi-delete
-        </v-icon>
+        <v-icon small>mdi-delete</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
   </v-container>
@@ -185,7 +187,7 @@
   export default {
     data: () => ({
       
-      dialog: false,
+      addRoomDialog: false,
       dialogDelete: false,
       headers: [
         {
@@ -234,7 +236,7 @@
     },
 
     watch: {
-      dialog (val) {
+      addRoomDialog (val) {
         val || this.close()
       },
       dialogDelete (val) {
@@ -279,7 +281,7 @@
       },
 
       close () {
-        this.dialog = false
+        this.addRoomDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1

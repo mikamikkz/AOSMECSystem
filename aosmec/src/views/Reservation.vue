@@ -13,11 +13,11 @@
         </v-row>
       </v-card-title>
     </v-card>
+    
     <v-dialog v-model="addReservationDialog" persistent width="1100">
       <v-card>
         <v-card-title class="green white--text" fixed-header>
-          Add Reservation</v-card-title
-        >
+          Add Reservation</v-card-title>
         <v-card-text class="mt-5">
           <v-row>
             <v-col cols="6">
@@ -765,105 +765,6 @@
                       color="green"
                       prepend-icon="mdi-calendar-edit"
                     >
-<<<<<<< HEAD
-                      <v-spacer></v-spacer>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="checkOut = false"
-                      >
-                        Cancel
-                      </v-btn>
-                      <v-btn
-                        text
-                        color="green darken-2"
-                        v-on:click="$refs.checkOut.save(date)"
-                      >
-                        OK
-                      </v-btn>
-                    </v-date-picker>
-                  </v-menu>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col class="pa-0" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfDays"
-                    type="number"
-                    label="No of Days"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-calendar-edit"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-spacer></v-spacer>
-                <v-col class="pa-0" xl="6" md="6" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfHeads"
-                    type="number"
-                    label="No of Head"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-account-multiple"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-              <v-row  v-for="room in noOfRoomForm" :key="room">
-                <v-col class="pa-0" lg="5" md="5" xs="12">
-                  <v-select
-                    :items="roomType"
-                    v-model="editReservationDetails.roomType"
-                    label="Room Type"
-                    prepend-icon="mdi-bed-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="5" md="5" xs="12">
-                  <v-text-field
-                    v-model="editReservationDetails.noOfRooms"
-                    type="number"
-                    label="No of Room"
-                    outlined
-                    dense
-                    color="green"
-                    prepend-icon="mdi-door"
-                  >
-                  </v-text-field>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfRoomForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfRoomForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-              <v-row  v-for="service in noOfServiceForm" :key="service">
-                <v-col class="pa-0" lg="7" md="7" xs="12">
-                  <v-select
-                    :items="services"
-                    v-model="addReservationDetails.service"
-                    label="Service"
-                    prepend-icon="mdi-hand-heart-outline"
-                    item-text="text"
-                    item-value="value"
-                    outlined
-                    dense
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="addNoOfServiceForm()"><v-icon color="green">mdi-plus-circle</v-icon></v-btn>
-                  <v-btn icon small color="success" elevation="0" class="mt-2" v-on:click="removeNoOfServiceForm()"><v-icon color="red">mdi-minus-circle</v-icon></v-btn>
-                </v-col>
-              </v-row>
-          </v-card>
-=======
                     </v-text-field>
                   </v-col>
                   <v-spacer></v-spacer>
@@ -976,7 +877,6 @@
                   </v-col>
                 </v-row>
               </v-card>
->>>>>>> 1aa13471cc8f67bf91c8a16091d1b764bc24db47
             </v-col>
           </v-row>
         </v-card-text>

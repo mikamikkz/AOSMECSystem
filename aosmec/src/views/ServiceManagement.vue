@@ -3,7 +3,7 @@
     <v-data-table
       :headers="headers"
       :items="service_mgmt"
-      class="mt-3"
+      class="mt-3 mx-1"
     >
       <template v-slot:top>
         <v-toolbar style="background: #13b150"
@@ -21,8 +21,8 @@
           ></v-divider>
           <v-spacer></v-spacer>
           <v-dialog
-            v-model="dialog"
-            max-width="500px"
+            v-model="addServiceDialog"
+            persistent width="1100"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -112,14 +112,15 @@
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="close"
+                  class="px-5"
+                  v-on:click="addServiceDialog = false" 
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="save"
+                  v-on:click="save"                  
                 >
                   Save
                 </v-btn>
@@ -141,21 +142,23 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon
+        <v-btn
           small
-          class="mr-2"
-          color="green"
+          class="white--text"
+          color="amber darken-2"
           @click="editItem(item)"
         >
-          mdi-pencil
-        </v-icon>
-        <v-icon
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+        
+        <v-btn
           small
-          color="green"
+          class="white--text"
+          color="red darken-2"
           @click="deleteItem(item)"
         >
-          mdi-delete
-        </v-icon>
+        <v-icon small>mdi-delete</v-icon>
+        </v-btn>
       </template>
       
     </v-data-table>
@@ -165,7 +168,7 @@
 <script>
   export default {
     data: () => ({
-      dialog: false,
+      addServiceDialog: false,
       dialogDelete: false,
       headers: [
         {
@@ -206,7 +209,7 @@
     },
 
     watch: {
-      dialog (val) {
+      addServiceDialog (val) {
         val || this.close()
       },
       dialogDelete (val) {
@@ -233,7 +236,7 @@
       editItem (item) {
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialog = true
+        this.addServiceDialog = true
         console.log(this.editedItem)
       },
 
@@ -251,7 +254,7 @@
       },
 
       close () {
-        this.dialog = false
+        this.addServiceDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
