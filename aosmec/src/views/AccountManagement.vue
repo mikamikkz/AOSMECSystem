@@ -3,16 +3,19 @@
     <v-data-table
       :headers="headers"
       :items="acc_mgmt"
-      class="mt-3"
+      class="mt-3 mx-1"
     >
       <template v-slot:top>
         <v-toolbar style="background: #13b150"
           flat
+          rounded
+          elevation="2"
+          color="font-weight-bold"
         >
-          <v-toolbar-title 
-          class="white--text py-3"
-          color="light-green white--text font-weight-bold"
-          style="font-size: 16px"
+        <v-toolbar-title
+            class="white--text py-3"
+            color="light-green white--text font-weight-bold"
+            style="font-size: 16px"
           >Manage Accounts</v-toolbar-title>
           <v-divider
             class="mx-4"
@@ -21,8 +24,8 @@
           ></v-divider>
           <v-spacer></v-spacer>
           <v-dialog
-            v-model="dialog"
-            max-width="500px"
+            v-model="addAccountDialog"
+            persistent width = "1100"     
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -49,10 +52,14 @@
                       sm="6"
                       md="4"
                     >
+                    
                       <v-text-field
-                        v-model="editedItem.id"
-                        label="ID Number"
+                        v-model="id_no"
+                        v-bind:items="id_no"
+                        label="ID Number"    
                         outlined
+                        readonly 
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -64,6 +71,7 @@
                         v-model="editedItem.username"
                         label="Username"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -75,6 +83,7 @@
                         v-model="editedItem.password"
                         label="Password"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -87,6 +96,7 @@
                         v-model="editedItem.lname"
                         label="Last Name"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -99,6 +109,7 @@
                         v-model="editedItem.fname"
                         label="First Name"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -111,6 +122,7 @@
                         v-model="editedItem.mname"
                         label="Middle Name"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -119,35 +131,35 @@
                       md="4"
                     >
 
-                    <v-menu
-                      ref="menu"
-                      v-model="editedItem.menu"
-                      :close-on-content-click="false"
-                      transition="scale-transition"
-                      offset-y
-                      min-width="auto"
-                    >
-    
-                    <template v-slot:activator="{ on, attrs }">
-                      <v-text-field
-                        v-model="editedItem.date"
-                        label="Birthday"
-                        readonly
-                        outlined
-                        v-bind="attrs"
-                        v-on="on"
-                      ></v-text-field>
-                      </template>
-                      <v-date-picker
-                        ref="picker"
-                        v-model="editedItem.date"
-                        :max="new Date().toISOString().substr(0, 10)"
-                        min="1950-01-01"
-                      ></v-date-picker>
-                      
-                      </v-menu>
-                    </v-col>
-                    <v-col
+                      <v-menu
+                        ref="menu"
+                        v-model="editedItem.menu"
+                        :close-on-content-click="false"
+                        transition="scale-transition"
+                        offset-y
+                        min-width="auto"
+                      >
+      
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-text-field
+                            v-model="editedItem.date"
+                            label="Birthday"
+                            readonly
+                            outlined
+                            v-bind="attrs"
+                            v-on="on"
+                            color="green"
+                          ></v-text-field>
+                          </template>
+                          <v-date-picker
+                            ref="picker"
+                            v-model="editedItem.date"
+                            :max="new Date().toISOString().substr(0, 10)"
+                            min="1950-01-01"
+                          ></v-date-picker>
+                        </v-menu>
+                      </v-col>
+                      <v-col
                       cols="12"
                       sm="6"
                       md="4"
@@ -160,7 +172,6 @@
                       item-value="value"
                       label="Gender"
                       outlined
-                      dense
                       color="green"
                   ></v-select>
                       
@@ -169,19 +180,20 @@
                 </v-container>
               </v-card-text>
 
-              <v-card-actions>
+              <v-card-actions class="d-flex justify-center pb-6">
                 <v-spacer></v-spacer>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="close"
+                  class="px-5"
+                  v-on:click="addAccountDialog = false" 
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="save"
+                  v-on:click="save"                  
                 >
                   Save
                 </v-btn>
@@ -203,42 +215,59 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          color="green"
+        <v-btn
+        small
+          class="white--text"
+          color="amber darken-2"
+          elevation="0"
           @click="editItem(item)"
         >
-          mdi-pencil
-        </v-icon>
-        <v-icon
-          small
-          color="green"
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+        
+        <v-btn
+        small
+          class="white--text"
+          color="red darken-2"
+          elevation="0"
           @click="deleteItem(item)"
         >
-          mdi-delete
-        </v-icon>
+        <v-icon small>mdi-delete</v-icon>
+        </v-btn>
       </template>
-      
     </v-data-table>
   </v-container>  
 </template>
 
+<style>
+
+.v-data-table__expanded.v-data-table__expanded__content {
+  box-shadow: none !important;
+  background:#f8f8f8;
+}
+
+.v-data-table thead span {
+  font-weight: bolder;
+  font-size: 13px;
+  
+}
+
+</style>
+
 <script>
   export default {
     data: () => ({
-      
       date: null,
       menu: false,
-
-      dialog: false,
+      id_no: 10000000,
+      addAccountDialog: false,
       dialogDelete: false,
       headers: [
         {
           text: 'ID Number',
           align: 'start',
           sortable: false,
-          value: 'id',
+          value: 'id_no',
         },
         { text: 'Username', value: 'username', },
         { text: 'Password', value: 'password' },
@@ -253,28 +282,28 @@
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
-        { text: "Other", value: "Other" },
+        { text: "Prefer Not to Say", value: "Prefer Not to Say" },
       ],
       editedIndex: -1,
       editedItem: {
-        id: '',
+        id_no: '',
         username: '',
         password: '',
         lname: '',
         fname: '',
         mname: '',
-        birthday: 'date',
+        birthday: '',
         gender: '',
       },
       defaultItem: {
-        id: '',
+        id_no: '',
         username: '',
         password: '',
         lname: '',
         fname: '',
         mname: '',
-        birthday: 'date',
-        gender: 'gender',
+        birthday: '',
+        gender: '',
       },
     }),
 
@@ -290,7 +319,7 @@
         val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
       },
 
-      dialog (val) {
+      addAccountDialog (val) {
         val || this.close()
       },
       dialogDelete (val) {
@@ -306,7 +335,7 @@
       initialize () {
         this.acc_mgmt = [
           {
-            id: '11111111',
+            id_no: this.getID(),
             username: 'messi10',
             password: 'cisco',
             lname: 'Messi',
@@ -318,11 +347,24 @@
         ]
       },
 
+      getID (){
+        return this.id_no;
+      },
+
+      incrementID () {
+        this.id_no += 1540;
+        return this.id_no;
+      },
+
+      decrementID () {
+        this.id_no -= 203;
+      },
+
       editItem (item) {
         this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         console.log(this.editedItem)
-        this.dialog = true
+        this.addAccountdialog = true
       },
 
       deleteItem (item) {
@@ -330,6 +372,7 @@
         this.editedItem = Object.assign({}, item)
         console.log(this.editedItem)
         this.dialogDelete = true
+        this.decrementID()
       },
 
       deleteItemConfirm () {
@@ -340,7 +383,7 @@
       },
 
       close () {
-        this.dialog = false
+        this.addAccountDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
@@ -361,6 +404,7 @@
         } else {
           this.acc_mgmt.push(this.editedItem)
         }
+        this.incrementID()
         this.$refs.menu.save(date)
         console.log(this.editedItem)
         this.close()

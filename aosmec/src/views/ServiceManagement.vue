@@ -3,17 +3,24 @@
     <v-data-table
       :headers="headers"
       :items="service_mgmt"
-      class="mt-3"
+      class="mt-3 mx-1"
     >
+    
       <template v-slot:top>
-        <v-toolbar style="background: #13b150"
+        <v-toolbar 
+          style="background: #13b150"
           flat
+          rounded
+          elevation="2"
+          color="font-weight-bold"
         >
+        
           <v-toolbar-title 
             class="white--text py-3"
             color="light-green white--text font-weight-bold"
             style="font-size: 16px"
           >Manage Services</v-toolbar-title>
+          
           <v-divider
             class="mx-4"
             inset
@@ -21,8 +28,8 @@
           ></v-divider>
           <v-spacer></v-spacer>
           <v-dialog
-            v-model="dialog"
-            max-width="500px"
+            v-model="addServiceDialog"
+            persistent width="1100"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -37,6 +44,7 @@
               </v-btn>
             </template>
             <v-card>
+              
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>
               </v-card-title>
@@ -53,18 +61,25 @@
                         v-model="editedItem.id"
                         label="ID Number"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
-                    <v-col
+                   <v-col
                       cols="12"
                       sm="6"
                       md="4"
                     >
-                      <v-text-field
-                        v-model="editedItem.name"
-                        label="Service"
-                        outlined
-                      ></v-text-field>
+                    
+                    <v-select
+                      v-bind:items="service_name"
+                      v-model="editedItem.service_name"
+                      item-text="text"
+                      item-value="value"
+                      label="Service"
+                      outlined
+                      color="green"
+                  ></v-select>
+                      
                     </v-col>
                     <v-col
                       cols="12"
@@ -75,6 +90,7 @@
                         v-model="editedItem.rate"
                         label="Service Rate"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -86,6 +102,7 @@
                         v-model="editedItem.pricing"
                         label="Pricing"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -103,14 +120,15 @@
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="close"
+                  class="px-5"
+                  v-on:click="addServiceDialog = false" 
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="save"
+                  v-on:click="save"                  
                 >
                   Save
                 </v-btn>
@@ -132,31 +150,34 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon
+        <v-btn
           small
-          class="mr-2"
-          color="green"
+          class="white--text"
+          color="amber darken-2"
           @click="editItem(item)"
         >
-          mdi-pencil
-        </v-icon>
-        <v-icon
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+        
+        <v-btn
           small
-          color="green"
+          class="white--text"
+          color="red darken-2"
           @click="deleteItem(item)"
         >
-          mdi-delete
-        </v-icon>
+        <v-icon small>mdi-delete</v-icon>
+        </v-btn>
       </template>
       
     </v-data-table>
   </v-container>
 </template>
 
+
 <script>
   export default {
     data: () => ({
-      dialog: false,
+      addServiceDialog: false,
       dialogDelete: false,
       headers: [
         {
@@ -165,12 +186,16 @@
           sortable: false,
           value: 'id',
         },
-        { text: 'Service Name', value: 'name', sortable: false },
+        { text: 'Service Name', value: 'service_name', sortable: false },
         { text: 'Service Rate', value: 'rate' },
         { text: 'Pricing', value: 'pricing' },
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       service_mgmt: [],
+      service_name: [
+        { text: "Airport Shuttle", value: "Airport Shuttle" },
+        { text: "Extra Bed", value: "Extra Bed" },
+      ],
       editedIndex: -1,
       editedItem: {
         id: '',
@@ -193,7 +218,7 @@
     },
 
     watch: {
-      dialog (val) {
+      addServiceDialog (val) {
         val || this.close()
       },
       dialogDelete (val) {
@@ -210,7 +235,7 @@
         this.service_mgmt = [
           {
             id: '12345678',
-            name: 'Cleaning',
+            service_name: 'Extra Bed',
             rate: 0,
             pricing: 0,
           },
@@ -220,7 +245,7 @@
       editItem (item) {
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialog = true
+        this.addServiceDialog = true
         console.log(this.editedItem)
       },
 
@@ -238,7 +263,7 @@
       },
 
       close () {
-        this.dialog = false
+        this.addServiceDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1

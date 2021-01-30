@@ -58,20 +58,41 @@ app.get('/reservation', (req,res) => {
 
 /***********************************************     C H E C K   I N     ****************************************************/
 app.get('/checkin', (req,res) => {
-    res.render('checkin');
+    res.json({
+        message: "Hi",
+    });
 });
+
+app.post('/checkin', urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO service(name, rate, pricing) VALUES ("'+req.body.name+'",'+req.body.rate+',"'+req.body.pricing+'")', (err, result) => {
+        console.log(result);
+        res.json({
+            message: "Service Added",
+            status: 200,
+        })
+    });
+})
 
 /****************************************     R O O M   M A N A G E M E N T     *********************************************/
 
+app.get('/room-mgmt/all', (req,res) => {
+    res.render('room-mgmt');
+});
 
 /***********************************************       F L O O R S       ****************************************************/
 
 
 /*************************************     S E R V I C E   M A N A G E M E N T     ******************************************/
 
+app.get('/service-mgmt', (req,res) => {
+    res.render('service-mgmt');
+});
 
 /*************************************     A C C O U N T   M A N A G E M E N T     ******************************************/ 
 
+app.get('/account-mgmt', (req,res) => {
+    res.render('account-mgmt');
+});
 
 /***********************************************       R E P O R T       ****************************************************/
 app.get('/report', (req,res) => {

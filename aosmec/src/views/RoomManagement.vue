@@ -10,6 +10,9 @@
         <v-toolbar 
           style="background: #13b150"
           flat
+          rounded
+          elevation="2"
+          color="font-weight-bold"
         >
           <v-toolbar-title 
             class="white--text py-3"
@@ -24,7 +27,7 @@
           ></v-divider>
           <v-spacer></v-spacer>
           <v-dialog 
-            v-model="dialog"
+            v-model="addRoomDialog"
             max-width="500px"
           >
             <template v-slot:activator="{ on, attrs }">
@@ -51,13 +54,13 @@
                       sm="6"
                       md="4"
                     >
-                      <v-select
+                      <v-select 
                       v-bind:items="room_types"
                       v-model="editedItem.room_types"
                       item-text="text"
                       item-value="value"
                       label="Room Type"
-                      outlined
+                      outlined                      
                       color="green"
                   ></v-select>
                     </v-col>
@@ -70,6 +73,7 @@
                         v-model="editedItem.no_of_rooms"
                         label="No. of Rooms"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -81,6 +85,7 @@
                         v-model="editedItem.no_of_adults"
                         label="No. of Adults"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -92,6 +97,7 @@
                         v-model="editedItem.additional_head_rate"
                         label="Additional Head Rate"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                     <v-col
@@ -103,6 +109,7 @@
                         v-model="editedItem.unit_price"
                         label="Unit Price"
                         outlined
+                        color="green"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -114,22 +121,21 @@
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="close"
+                  v-on:click="addRoomDialog=false"
                 >
                   Cancel
                 </v-btn>
                 <v-btn
                   color="green darken-1"
                   text
-                  @click="save"
-                  
+                  v-on:click="save"
                 >
                   Save
                 </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-          <v-dialog v-model="dialogDelete" max-width="500px">
+          <v-dialog v-model="dialogDelete" persistent width="1100px">
             <v-card>
               <v-card-title fixed-header><v-icon large color="red lighten-1" class="mr-4">mdi-alert</v-icon>Delete Room</v-card-title>
               <v-card-text>Are you sure you want to delete this room? This action cannot be undone and you will be unable to recover any data.</v-card-text>
@@ -144,21 +150,23 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
-        <v-icon
+        <v-btn
           small
-          class="mr-2"
-          color="green"
+          class="white--text"
+          color="amber darken-2"
           @click="editItem(item)"
         >
-          mdi-pencil
-        </v-icon>
-        <v-icon
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+        
+        <v-btn
           small
-          color="green"
+          class="white--text"
+          color="red darken-2"
           @click="deleteItem(item)"
         >
-          mdi-delete
-        </v-icon>
+        <v-icon small>mdi-delete</v-icon>
+        </v-btn>
       </template>
     </v-data-table>
   </v-container>
@@ -176,15 +184,13 @@
   font-size: 13px;
 }
 
-
 </style>
-
-
 
 <script>
   export default {
     data: () => ({
-      dialog: false,
+      
+      addRoomDialog: false,
       dialogDelete: false,
       headers: [
         {
@@ -205,6 +211,7 @@
       room_types: [
         { text: "Single", value: "Single" },
         { text: "Double", value: "Double" },
+        { text: "Family Room", value: "Family Room" },
       ],
 
 
@@ -232,7 +239,7 @@
     },
 
     watch: {
-      dialog (val) {
+      addRoomDialog (val) {
         val || this.close()
       },
       dialogDelete (val) {
@@ -277,7 +284,7 @@
       },
 
       close () {
-        this.dialog = false
+        this.addRoomDialog = false
         this.$nextTick(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1

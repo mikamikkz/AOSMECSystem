@@ -13,11 +13,11 @@
         </v-row>
       </v-card-title>
     </v-card>
+    
     <v-dialog v-model="addReservationDialog" persistent width="1100">
       <v-card>
         <v-card-title class="green white--text" fixed-header>
-          Add Reservation</v-card-title
-        >
+          Add Reservation</v-card-title>
         <v-card-text class="mt-5">
           <v-row>
             <v-col cols="6">
