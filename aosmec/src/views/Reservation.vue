@@ -399,14 +399,18 @@
             <v-btn
               color="amber darken-2"
               small
+              rounded
               class="white--text"
               v-on:click="editReservationBtn(props.item)"
+              elevation="0"
             >
               <v-icon small>mdi-pencil</v-icon>
             </v-btn>
             <v-btn
               color="deep-orange lighten-1"
               small
+              rounded
+              v-if="props.item.reservationStatus == true"
               class="ml-1 white--text"
               v-on:click="cancelReservationBtn(props.item)"
               elevation="0"
@@ -414,8 +418,20 @@
               <v-icon small>mdi-cancel</v-icon>
             </v-btn>
             <v-btn
+              color="light-green"
+              small
+              rounded
+              v-if="props.item.reservationStatus == false"
+              class="ml-1 white--text"
+              v-on:click="activeReservationBtn(props.item)"
+              elevation="0"
+            >
+              <v-icon small>mdi-power</v-icon>
+            </v-btn>
+            <v-btn
               color="red"
               small
+              rounded
               class="ml-1 white--text"
               v-on:click="deleteReservationBtn(props.item)"
               elevation="0"
@@ -449,10 +465,22 @@
                       >: {{ item.reservationType }}
                     </v-col>
                   </v-row>
-                  <v-row class="pl-3">
-                    <v-col cols="4" class="py-2"> Confirmation Number </v-col>
+                  <v-row class="pl-3" v-if=" item.reservationType == 'Walk In'">
+                    <v-col cols="4" class="py-2"> Reservation Fee </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: Php{{ item.reservationFee }}
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3" v-else>
+                    <v-col cols="4" class="py-2"> Booking No </v-col>
                     <v-col cols="8" class="py-2"
                       >: {{ item.confirmationNo }}
+                    </v-col>
+                  </v-row>
+                  <v-row class="pl-3">
+                    <v-col cols="4" class="py-2"> Reserved Date </v-col>
+                    <v-col cols="8" class="py-2"
+                      >: {{ item.reservedDate }}
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
@@ -918,6 +946,52 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="cancelReservationDialog" persistent width="450">
+      <v-card>
+        <v-card-title fixed-header
+          ><v-icon large color="orange darken-2" class="mr-4">mdi-alert</v-icon
+          >Cancel Reservation</v-card-title
+        >
+        <v-card-text>
+          Are you sure you want to cancel this reservation?
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center pb-6">
+          <v-btn class="px-9" v-on:click="cancelReservationDialog = false">
+            No
+          </v-btn>
+          <v-btn
+            color="orange darken-2 white--text"
+            class="px-9"
+            v-on:click="cancelReservationDialog = false"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="activeReservationDialog" persistent width="450">
+      <v-card>
+        <v-card-title fixed-header
+          ><v-icon large color="orange darken-2" class="mr-4">mdi-alert</v-icon
+          >Activate Reservation</v-card-title
+        >
+        <v-card-text>
+          Are you sure you want to revoke cancellation this reservation?
+        </v-card-text>
+        <v-card-actions class="d-flex justify-center pb-6">
+          <v-btn class="px-9" v-on:click="activeReservationDialog = false">
+            No
+          </v-btn>
+          <v-btn
+            color="orange darken-2 white--text"
+            class="px-9"
+            v-on:click="activeReservationDialog = false"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <style scoped>
@@ -944,6 +1018,8 @@ export default {
       addReservationDialog: false,
       editReservationDialog: false,
       deleteReservationDialog: false,
+      cancelReservationDialog: false,
+      activeReservationDialog: false,
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
@@ -971,7 +1047,9 @@ export default {
             { name: "", quantity: "" },
           ],
       },
-      editReservationDetails: { },
+      editReservationDetails: {},
+      deleteReservationDetails: "",
+      cancelReservationDetails: "",
       date: "",
       checkIn: "",
       checkOut: "",
@@ -992,13 +1070,8 @@ export default {
       ],
       reservationHeaders: [
         {
-          text: "Reserved Date",
-          align: "start",
-          value: "reservedDate",
-          class: "green--text darken-4 title",
-        },
-        {
           text: "Check In Date",
+          align: "start",
           value: "checkIn",
           class: "green--text darken-4 title",
         },
@@ -1037,29 +1110,6 @@ export default {
         },
       ],
       reservations: [
-        {
-          reservedDate: "January 21, 2021",
-          reservationId: '1',
-          reservationType: 'Booking.com',
-          confirmationNo: "142361723",
-          noOfDays: 2,
-          checkIn: "2021-01-25",
-          checkOut: "2021-01-28",
-          noOfHeads: 1,
-          roomType: [ "Regular", "Family"],
-          roomDetails: [
-            { type: "Regular", number: "2" },
-            { type: "Family", number: "1" }],
-          services: [
-            { name: "Extra Bed  ", quantity: "1" },
-          ],
-          reserveeId: "2",
-          reserveeName: "Vin",
-          reserveeGender: "Female",
-          reserveeCountry: "Philippines",
-          reserveeEmail: "vin@gmail.com",
-          reserveePhone: "820931864",
-        },
       ],
     };
   },
@@ -1124,9 +1174,33 @@ export default {
         services: input.services,
       }
     },
-    deleteReservationBtn: function (reservation) {
+    deleteReservationBtn: function (input) {
       this.deleteReservationDialog = true;
-      console.log(reservation);
+      this.deleteReservationDetails = {
+        reservationId: input.reservationId,
+        reserveeId: input.reserveeId,
+        roomDetails: input.roomDetails,
+        services: input.services,
+      };
+      console.log(this.deleteReservationDetails);
+    },
+    cancelReservationBtn: function(input) {
+      this.cancelReservationDialog = true;
+      this.cancelReservationDetails = {
+        reservationId: input.reservationId,
+        reserveeId: input.reserveeId,
+        roomDetails: input.roomDetails,
+        services: input.services,
+      };
+    },
+    activeReservationBtn: function(input) {
+      this.activeReservationDialog = true;
+      this.activeReservationDetails = {
+        reservationId: input.reservationId,
+        reserveeId: input.reserveeId,
+        roomDetails: input.roomDetails,
+        services: input.services,
+      };
     },
     addReservation: function (input) {
       this.addReservationDialog = false;
@@ -1150,5 +1224,34 @@ export default {
       }
     },
   },
+  beforeMount(){
+    const addData = {
+      reservedDate: "January 21, 2021",
+      reservationId: '1',
+      reservationType: 'Booking.com',
+      confirmationNo: "142361723",
+      noOfDays: 2,
+      checkIn: "2021-01-25",
+      checkOut: "2021-01-28",
+      noOfHeads: 1,
+      roomType: [ "Regular", "Family"],
+      roomDetails: [
+        { type: "Regular", number: "2" },
+        { type: "Family", number: "1" }
+      ],
+      services: [
+        { name: "Extra Bed  ", quantity: "1" }
+      ],
+      reserveeId: "2",
+      reserveeName: "Vin",
+      reserveeGender: "Female",
+      reserveeCountry: "Philippines",
+      reserveeEmail: "vin@gmail.com",
+      reserveePhone: "820931864",
+      reservationStatus: true,
+    }
+    this.reservations.push(addData)
+    console.log(addData);
+  }
 };
 </script>
