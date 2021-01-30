@@ -14,7 +14,7 @@
           <v-card class="bordered" height="167px">
             <div class="col pa-3 py-4 green--text">
               <h4 class="text-truncate text-uppercase">Total Revenue</h4>
-              <h1>53</h1>
+              <h1>{{ totalRevenue }}</h1>
             </div>
           </v-card>
         </v-col>
@@ -28,28 +28,28 @@
               <v-row class="roomStatusRow">
                 <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-sparkles</v-icon>
-                  <span class="roomStatusData">Clean: <span>53</span></span>
+                  <span class="roomStatusData">Clean: <span>{{ clean }}</span></span>
                 </v-col>
                 <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-account-multiple-check</v-icon>
-                  <span class="roomStatusData">Occupied: <span>53</span></span>
+                  <span class="roomStatusData">Occupied: <span>{{ occupied }}</span></span>
                 </v-col>
               </v-row>
               <v-row class="roomStatusRow">
                 <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-broom</v-icon>
-                  <span class="roomStatusData">Dirty: <span>53</span></span>
+                  <span class="roomStatusData">Dirty: <span>{{ dirty }}</span></span>
                   
                 </v-col>
                 <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-account-remove</v-icon>
-                  <span class="roomStatusData">Vacant: <span>53</span></span>
+                  <span class="roomStatusData">Vacant: <span>{{ vacant }}</span></span>
                 </v-col>
               </v-row>
               <v-row class="roomStatusRow">
                 <v-col class="roomStatusCol">
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-tools</v-icon>
-                  <span class="roomStatusData">Out-of-Order: <span>53</span></span>
+                  <span class="roomStatusData">Out-of-Order: <span>{{ outOfOrder }}</span></span>
                 </v-col>
               </v-row>
             </v-card-text>
@@ -74,7 +74,7 @@
       <v-toolbar class="ml-0 mb-0 mt-10" flat color="grey lighten-2">
         <v-toolbar-title>
           <h5 class="font-weight-medium pa-0 ma-0 pt-3" style="color: green">
-            <v-icon x-large left color="success" style="margin-bottom: 12px">mdi-account-multiple-minus</v-icon>
+            <v-icon x-large left color="success" style="margin-bottom: 12px">mdi-door-open</v-icon>
             Guests scheduled to checkout today
           </h5>
         </v-toolbar-title>
@@ -118,6 +118,14 @@ export default {
   data() {
     return {
       date: "",
+      totalRevenue: "123456",
+      // room status
+      clean: "25",
+      dirty: "3",
+      outOfOrder: "1",
+      occupied: "15",
+      vacant: "5",
+      // tables
       headers: [
         {
           text: "Confirmation No.",
