@@ -89,7 +89,7 @@ app.post('/checkin', urlEncodedParser, (req, res) => {
 })
 
 app.put('/checkin', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES ('+req.body.reservationId+','+req.body.accountId+','+req.body.roomId+',"'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+')', (err, result) => {
+    connection.query('UPDATE checkin SET )', (err, result) => {
         console.log(err)
         if(err){
             res.json({
