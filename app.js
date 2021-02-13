@@ -36,19 +36,45 @@ connection.connect((err) => {
     console.log("Database Connected");
 });
 
-/************************************************       L O G I N       *****************************************************/
-app.get("/login", (req, res) => {
-    res.render('login');
+/*****************************************       R O O M       ************************************************/
+
+app.get("/room", (req, res) => {
+    connection.query('SELECT * FROM `room`', (err, result) => {
+        console.log(result);
+        res.json({
+            message: "Room",
+            status: 200,
+        })
+    });
 });
 
-/************************************************  REGISTER (to be del)   *****************************************************/
-app.get("/register", (req, res) => {
-    res.render('register');
+app.post("/room", urlEncodedParser, (req, res) => {
+     connection.query('INSERT INTO room (roomTypeId, roomNo, status, occupied) VALUES ('+req.body.roomTypeId+','+req.body.roomNo+',"'+req.body.status+'", '+req.body.occupied+')', (err, result) => {
+        console.log(result);
+        if(err){
+            res.json({
+                message: "Room Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Room Added",
+                status: 200,
+            })
+        }
+    });
 });
 
-/**********************************************     D A S H B O A R D     ***************************************************/
-app.get('/dashboard', (req,res) => {
-    res.render('Dashboard');
+/**********************************************    G U E S T     ***************************************************/
+
+app.get("/guest", (req, res) => {
+    connection.query('SELECT * FROM `guest`', (err, result) => {
+        console.log(result);
+        res.json({
+            message: "Guest",
+            status: 200,
+        })
+    });
 });
 
 /********************************************     R E S E R V A T I O N     *************************************************/
