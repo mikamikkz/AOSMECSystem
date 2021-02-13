@@ -83,19 +83,51 @@ app.get('/reservation', (req,res) => {
 });
 
 /***********************************************     C H E C K   I N     ****************************************************/
-app.get('/checkin', (req,res) => {
-    res.json({
-        message: "Hi",
-    });
+app.get('/checkin/:date', (req,res) => {
+    connection.query('SELECT * FROM checkIn WHERE checkInDate = '+req.params.date+'', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Current Date Required"
+            });
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+            });
+        }
+    })
 });
 
 app.post('/checkin', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO service(name, rate, pricing) VALUES ("'+req.body.name+'",'+req.body.rate+',"'+req.body.pricing+'")', (err, result) => {
-        console.log(result);
-        res.json({
-            message: "Service Added",
-            status: 200,
-        })
+    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES ('+req.body.reservationId+','+req.body.accountId+','+req.body.roomId+',"'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+')', (err, result) => {
+        console.log(err)
+        if(err){
+            res.json({
+                message: "CheckIn Failed",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Successfully Checked In",
+                status: 201,
+            })
+        }
+    });
+})
+
+app.put('/checkin', urlEncodedParser, (req, res) => {
+    connection.query('UPDATE INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES ('+req.body.reservationId+','+req.body.accountId+','+req.body.roomId+',"'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+')', (err, result) => {
+        console.log(err)
+        if(err){
+            res.json({
+                message: "CheckIn Failed",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Successfully Checked In",
+                status: 201,
+            })
+        }
     });
 })
 

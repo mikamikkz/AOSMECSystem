@@ -291,7 +291,7 @@
               </template>
             </v-simple-table>
               <v-card-actions class="d-flex justify-center">
-                  <v-btn color="success" v-on:click="checkInModal(guest)">Check In</v-btn>
+                  <v-btn color="success" v-on:click="checkInModal(input, guestServices, guestBillDetails)">Check In</v-btn>
               </v-card-actions>
           </v-card-text>
           <v-dialog v-model="checkInDialog" persistent width="450">
@@ -443,30 +443,15 @@ export default {
       ],
       guestBillDetails: [
         {
-          name: "Sample",
+          name: "Hey",
           total: "210",
           status: "Paid"
         },
         {
-          name: "Sample2",
+          name: "There",
           total: "210",
           status: "Pending"
-        },
-        {
-          name: "Sample3",
-          total: "210",
-          status: "Pending"
-        },
-        {
-          name: "Sample4",
-          total: "210",
-          status: "Pending"
-        },
-        {
-          name: "Sample5",
-          total: "210",
-          status: "Pending"
-        },
+        }
       ],
       guestBill: {
         roomNo: "101",
@@ -501,15 +486,31 @@ export default {
         quantity: input.qty,
         status: false,
       }
+      var addBill = {
+        name: input.name,
+        total: 1 * input.qty,
+        status: "Pending"
+      }
+      this.guestBillDetails.push(addBill);
       this.guestServices.push(addData);
     },
     removeFromList: function(input) {
       var index = this.guestServices.indexOf(input.name);
       this.guestServices.splice(index, 1);
     },
-    checkInModal: function(input) {
+    checkInModal: function(reservation, service, bill) {
       this.checkInDialog = true;
-      console.log(input);
+      var totalBill = 0;
+      var balance = 0;
+      for(var i = 0; i < bill.length; i++){
+        totalBill += parseInt(bill[i].total);
+        if(bill[i].status == "Pending"){
+          balance += parseInt(bill[i].total)
+        }
+      }
+      this.guestBill.total = totalBill;
+      this.guestBill.balance = balance;
+      console.log(totalBill);
     },
     addKeyDeposit: function() {
       if(this.guestBill.keyDeposit){
@@ -519,5 +520,8 @@ export default {
       }
     }
   },
+  beforeMount(){
+    
+  }
 };
 </script>
