@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 17, 2021 at 11:00 AM
+-- Generation Time: Feb 13, 2021 at 04:31 PM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -40,6 +40,13 @@ CREATE TABLE `account` (
   `updatedAt` date DEFAULT NULL,
   `deletedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `account`
+--
+
+INSERT INTO `account` (`id`, `username`, `password`, `fname`, `mname`, `lname`, `birthdate`, `gender`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(1, 'admin', 'admin', 'Vin Myca', 'Casanova', 'Sagarino', '1999-09-14', 'Female', '0000-00-00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -81,16 +88,23 @@ CREATE TABLE `bill_detail` (
 
 CREATE TABLE `checkin` (
   `id` int(255) NOT NULL,
-  `reservationId` int(255) NOT NULL,
+  `reservationId` int(255) DEFAULT NULL,
   `accountId` int(255) NOT NULL,
   `roomId` int(255) NOT NULL,
-  `checkInDate` date NOT NULL,
+  `checkInDate` date NOT NULL DEFAULT current_timestamp(),
   `checkOutDate` date NOT NULL,
   `noOfDays` int(11) NOT NULL,
   `noOfHead` int(3) NOT NULL,
-  `createdAt` date NOT NULL,
-  `updatedAt` date NOT NULL
+  `createdAt` date NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `checkin`
+--
+
+INSERT INTO `checkin` (`id`, `reservationId`, `accountId`, `roomId`, `checkInDate`, `checkOutDate`, `noOfDays`, `noOfHead`, `createdAt`, `updatedAt`) VALUES
+(4, NULL, 1, 1, '2021-02-13', '2021-02-15', 2, 2, '2021-02-13', NULL);
 
 -- --------------------------------------------------------
 
@@ -124,12 +138,13 @@ CREATE TABLE `reservation` (
   `reserveeId` int(255) NOT NULL,
   `accountId` int(255) NOT NULL,
   `type` varchar(255) NOT NULL,
-  `status` varchar(255) NOT NULL,
+  `status` tinyint(1) NOT NULL,
   `checkInDate` date NOT NULL,
   `checkOutDate` date NOT NULL,
   `noOfDays` int(11) NOT NULL,
   `noOfHead` int(2) NOT NULL,
   `confirmationNo` varchar(255) DEFAULT NULL,
+  `reservationFee` int(255) DEFAULT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -159,7 +174,8 @@ CREATE TABLE `reservee` (
 CREATE TABLE `reserve_room` (
   `id` int(11) NOT NULL,
   `reservationId` int(11) NOT NULL,
-  `roomType` int(11) NOT NULL
+  `roomType` int(11) NOT NULL,
+  `noOfRoom` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -173,9 +189,16 @@ CREATE TABLE `room` (
   `roomTypeId` int(255) NOT NULL,
   `roomNo` int(11) NOT NULL,
   `status` varchar(255) NOT NULL,
-  `state` varchar(255) NOT NULL,
+  `occupied` tinyint(1) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `room`
+--
+
+INSERT INTO `room` (`id`, `roomTypeId`, `roomNo`, `status`, `occupied`, `createdAt`) VALUES
+(1, 1, 101, 'clean', 0, '2021-02-13');
 
 -- --------------------------------------------------------
 
@@ -185,13 +208,20 @@ CREATE TABLE `room` (
 
 CREATE TABLE `room_type` (
   `id` int(255) NOT NULL,
-  `name` int(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
   `rate` int(255) NOT NULL,
   `totalNoOfRoom` int(10) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` date NOT NULL,
-  `deletedAt` date NOT NULL
+  `updatedAt` date DEFAULT NULL,
+  `deletedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `room_type`
+--
+
+INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(1, 'Regular', 700, 20, '2021-02-13', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -208,6 +238,15 @@ CREATE TABLE `service` (
   `updatedAt` date DEFAULT NULL,
   `deletedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `service`
+--
+
+INSERT INTO `service` (`id`, `name`, `rate`, `pricing`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(1, 'Extra Bed', 160, 'per head', '2021-01-21', NULL, NULL),
+(2, 'Airport Shuttle', 150, 'Per ride', '2021-01-21', NULL, NULL),
+(3, 'sample', 160, 'per head', '2021-02-13', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -296,7 +335,7 @@ ALTER TABLE `service`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `bill`
@@ -308,7 +347,7 @@ ALTER TABLE `bill`
 -- AUTO_INCREMENT for table `checkin`
 --
 ALTER TABLE `checkin`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `guest`
@@ -332,19 +371,19 @@ ALTER TABLE `reservee`
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `room_type`
 --
 ALTER TABLE `room_type`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
