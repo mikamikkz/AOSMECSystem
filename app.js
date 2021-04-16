@@ -510,6 +510,21 @@ app.get('/checkin/:date', (req,res) => {
     })
 });
 
+app.get('/checkin/id/:id', (req,res) => {
+    connection.query('SELECT * FROM checkIn WHERE id = '+req.params.id+'', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Check in ID Required"
+            });
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+                result
+            });
+        }
+    })
+});
+
 app.post('/checkin', urlEncodedParser, (req, res) => {
     connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES ('+req.body.reservationId+','+req.body.accountId+','+req.body.roomId+',"'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+')', (err, result) => {
         if(err){
