@@ -195,8 +195,8 @@ app.get("/bill-details", (req, res) => {
 });
 
 //Update:
-app.get("/bill-details/:id", (req, res) => {
-    connection.query("SELECT BD.billId, BD.serviceId, BD.quantity, BD.total, BD.status FROM bill_detail BD JOIN bill B ON B.id = BD.billId WHERE BD.billId = "+req.params.id+" ", (err, result) => {
+app.get("/bill-details/:id/:ip", (req, res) => {
+    connection.query("SELECT billId, serviceId, quantity, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
         // console.log(result);
         res.json({
             message: "Bill Details Update1",
@@ -205,8 +205,8 @@ app.get("/bill-details/:id", (req, res) => {
         })
     });
 });
-app.post("/bill-details/:id", urlEncodedParser, (req, res) => {
-    connection.query("UPDATE `bill_detail` SET `quantity`='+req.body.quantity+',`total`='+req.body.total+',`status`='"+req.body.status+"' ", (err, result) => {
+app.post("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
+    connection.query("UPDATE `bill_detail` SET `quantity`='+req.body.quantity+',`total`='+req.body.total+',`status`='"+req.body.status+"' WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
         // console.log(result);
            if(err){
                res.json({
