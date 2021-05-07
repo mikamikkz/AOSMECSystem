@@ -9,11 +9,13 @@ const bcrpyt = require("bcrypt");
 const { response } = require("express");
 const saltRounds = 10;
 const flash = require("connect-flash");
+const cors = require('cors');
 
 app.set("view engine", "ejs");
 app.use(express.static("./public"));
 app.use(flash());
 app.use(bodyParser.json());
+app.use(cors());
 
 const connection = mysql.createConnection({
     multipleStatements: true,
