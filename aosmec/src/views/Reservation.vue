@@ -302,53 +302,6 @@
                     >
                   </v-col>
                 </v-row>
-                <v-row v-for="(service, index) in addReservationDetails.services" :key="service.name">
-                  <v-col class="pa-0" lg="6" md="6" xs="12">
-                    <v-select
-                      :items="services"
-                      v-model="service.name"
-                      label="Service"
-                      prepend-icon="mdi-hand-heart-outline"
-                      item-text="text"
-                      item-value="value"
-                      outlined
-                      dense
-                      color="green"
-                    ></v-select>
-                  </v-col>
-                  <v-col class="pa-0 pl-3" xl="4" md="4" xs="12">
-                    <v-text-field
-                      v-model="service.quantity"
-                      type="number"
-                      label="Quantity"
-                      outlined
-                      dense
-                      color="green"
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                    <v-btn
-                      icon
-                      small
-                      color="success"
-                      elevation="0"
-                      class="mt-2"
-                      v-if="index == 0"
-                      v-on:click="addNoOfServicesForm()"
-                      ><v-icon color="green">mdi-plus-circle</v-icon></v-btn
-                    >
-                    <v-btn
-                      icon
-                      small
-                      elevation="0"
-                      class="mt-2"
-                      v-if="index >= 0"
-                      v-on:click="removeNoOfServicesForm(index)"
-                      ><v-icon color="red">mdi-minus-circle</v-icon></v-btn
-                    >
-                  </v-col>
-                </v-row>
               </v-card>
             </v-col>
           </v-row>
@@ -385,7 +338,7 @@
           :items="reservations"
           :single-expand="true"
           :expanded.sync="expanded"
-          item-key="name"
+          item-key="reservationId"
           show-expand
           :search="search"
           :custom-filter="filter"
@@ -512,10 +465,6 @@
                     <v-col cols="4" class="py-2"> <span v-if="index == 0">Room</span> </v-col>
                     <v-col cols="8" class="py-2">: {{ room.number }} {{ room.type }}</v-col>
                   </v-row>
-                  <v-row class="pl-3" v-for="(service, index) in item.services" :key="service.name">
-                    <v-col cols="4" class="py-2"> <span v-if="index == 0">Service</span> </v-col>
-                    <v-col cols="8" class="py-2">: {{ service.quantity }} {{ service.name }}</v-col>
-                  </v-row>
                 </v-col>
                 <v-col cols="4">
                   <v-row>
@@ -523,12 +472,6 @@
                       <v-card flat color="blue-grey lighten-4" class="pa-1 pl-3"
                         >Reservee Details</v-card
                       >
-                    </v-col>
-                  </v-row>
-                  <v-row class="pl-3">
-                    <v-col cols="4" class="py-2"> Id </v-col>
-                    <v-col cols="8" class="py-2"
-                      >: {{ item.reserveeId }}
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
@@ -843,7 +786,7 @@
                       elevation="0"
                       class="mt-2"
                       v-if="index == 0"
-                      v-on:click="addNoOfAddRoomForm()"
+                      v-on:click="addNoOfEditRoomForm()"
                       ><v-icon color="green">mdi-plus-circle</v-icon></v-btn
                     >
                     <v-btn
@@ -852,54 +795,7 @@
                       elevation="0"
                       class="mt-2"
                       v-if="index >= 0"
-                      v-on:click="removeNoOfAddRoomForm(index)"
-                      ><v-icon color="red">mdi-minus-circle</v-icon></v-btn
-                    >
-                  </v-col>
-                </v-row>
-                <v-row v-for="(service, index) in editReservationDetails.services" :key="service.name">
-                  <v-col class="pa-0" lg="6" md="6" xs="12">
-                    <v-select
-                      :items="services"
-                      v-model="service.name"
-                      label="Service"
-                      prepend-icon="mdi-hand-heart-outline"
-                      item-text="text"
-                      item-value="value"
-                      outlined
-                      dense
-                      color="green"
-                    ></v-select>
-                  </v-col>
-                  <v-col class="pa-0 pl-3" xl="4" md="4" xs="12">
-                    <v-text-field
-                      v-model="service.quantity"
-                      type="number"
-                      label="Quantity"
-                      outlined
-                      dense
-                      color="green"
-                    >
-                    </v-text-field>
-                  </v-col>
-                  <v-col class="pa-0 pl-3" xl="2" md="2" xs="12">
-                    <v-btn
-                      icon
-                      small
-                      color="success"
-                      elevation="0"
-                      class="mt-2"
-                      v-if="index == 0"
-                      v-on:click="addNoOfServicesForm()"
-                      ><v-icon color="green">mdi-plus-circle</v-icon></v-btn
-                    >
-                    <v-btn
-                      icon
-                      small
-                      elevation="0"
-                      class="mt-2"
-                      v-if="index >= 0"
-                      v-on:click="removeNoOfServicesForm(index)"
+                      v-on:click="removeNoOfEditRoomForm(index)"
                       ><v-icon color="red">mdi-minus-circle</v-icon></v-btn
                     >
                   </v-col>
@@ -1009,6 +905,8 @@
 </style>
 <script>
 import CountrySelect from "../components/CountrySelect";
+import axios from "axios";
+
 export default {
   components: { CountrySelect },
   data() {
@@ -1043,9 +941,6 @@ export default {
           roomDetails: [
             { type: "", number: "" },
           ],
-          services: [
-            { name: "", quantity: "" },
-          ],
       },
       editReservationDetails: {},
       deleteReservationDetails: "",
@@ -1062,11 +957,6 @@ export default {
         { text: "Walk In", value: "Walk In" },
         { text: "Expedia", value: "Expedia" },
         { text: "Airbnb", value: "Airbnb" },
-      ],
-      services: [
-        { text: "Sample", value: "Sample" },
-        { text: "Sample2", value: "Sample2" },
-        { text: "Sample3", value: "Sample3" },
       ],
       reservationHeaders: [
         {
@@ -1088,11 +978,6 @@ export default {
         {
           text: "No of Days",
           value: "noOfDays",
-          class: "green--text darken-4 title",
-        },
-        {
-          text: "Room Type",
-          value: "roomType",
           class: "green--text darken-4 title",
         },
         {
@@ -1136,23 +1021,15 @@ export default {
         this.addReservationDetails.roomDetails.splice(index, 1)
       }
     },
-    addNoOfServicesForm: function () {
-      this.addReservationDetails.services.push({
-        name: "",
-        quantity: ""
+    addNoOfEditRoomForm: function () {
+      this.editReservationDetails.roomDetails.push({
+        type: "",
+        number: ""
       })
     },
-    removeNoOfServicesForm: function (index) {
-      if(this.addReservationDetails.services.length > 1){
-        this.addReservationDetails.services.splice(index, 1)
-      }
-    },
-    addNoOfEditRoomForm: function () {
-      this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) + 1;
-    },
-    removeNoOfEditRoomForm: function () {
-      if (this.noOfEditRoomForm > 1) {
-        this.noOfEditRoomForm = parseInt(this.noOfEditRoomForm, 10) - 1;
+    removeNoOfEditRoomForm: function (index) {
+      if(this.editReservationDetails.roomDetails.length > 1){
+        this.editReservationDetails.roomDetails.splice(index, 1)
       }
     },
     editReservationBtn: function (input) {
@@ -1171,7 +1048,6 @@ export default {
         noOfDays: input.noOfDays,
         noOfHeads: input.noOfHeads,
         roomDetails: input.roomDetails,
-        services: input.services,
       }
     },
     deleteReservationBtn: function (input) {
@@ -1180,7 +1056,6 @@ export default {
         reservationId: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
-        services: input.services,
       };
       console.log(this.deleteReservationDetails);
     },
@@ -1190,7 +1065,6 @@ export default {
         reservationId: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
-        services: input.services,
       };
     },
     activeReservationBtn: function(input) {
@@ -1199,7 +1073,6 @@ export default {
         reservationId: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
-        services: input.services,
       };
     },
     addReservation: function (input) {
@@ -1220,38 +1093,54 @@ export default {
           roomDetails: [
             { type: "", number: "" },
           ],
-          service: [],
       }
     },
   },
   beforeMount(){
-    const addData = {
-      reservedDate: "January 21, 2021",
-      reservationId: '1',
-      reservationType: 'Booking.com',
-      confirmationNo: "142361723",
-      noOfDays: 2,
-      checkIn: "2021-01-25",
-      checkOut: "2021-01-28",
-      noOfHeads: 1,
-      roomType: [ "Regular", "Family"],
-      roomDetails: [
-        { type: "Regular", number: "2" },
-        { type: "Family", number: "1" }
-      ],
-      services: [
-        { name: "Extra Bed  ", quantity: "1" }
-      ],
-      reserveeId: "2",
-      reserveeName: "Vin",
-      reserveeGender: "Female",
-      reserveeCountry: "Philippines",
-      reserveeEmail: "vin@gmail.com",
-      reserveePhone: "820931864",
-      reservationStatus: true,
-    }
-    this.reservations.push(addData)
-    console.log(addData);
+    axios
+      .get("http://localhost:3000/reservation")
+      .then((res) => {
+        var reservation = res.data.data;
+        for(var i = 0; i < reservation.length; i++){
+          var addData = {
+              reservedDate: reservation[i].reserve.createdAt,
+              reservationId: reservation[i].reserve.id,
+              reservationType: reservation[i].reserve.type,
+              confirmationNo: reservation[i].reserve.confirmationNo,
+              noOfDays: reservation[i].reserve.noOfDays,
+              noOfHeads: reservation[i].reserve.noOfHead,
+              checkIn: reservation[i].reserve.checkInDate,
+              checkOut: reservation[i].reserve.checkOutDate,
+              reservationStatus: reservation[i].reserve.status,
+              reserveeName: reservation[i].reserve.name,
+              reserveeGender: reservation[i].reserve.gender,
+              reserveeCountry: reservation[i].reserve.country,
+              reserveeEmail: reservation[i].reserve.email,
+              reserveePhone: reservation[i].reserve.phoneNo,
+              roomDetails: [],
+          }
+          for(var j = 0; j < reservation[i].roomDetails.length; j++){
+            var detail = {
+              type: reservation[i].roomDetails[j].roomType,
+              number: reservation[i].roomDetails[j].noOfRoom
+            }
+            addData.roomDetails.push(detail)
+          }
+          this.reservations.push(addData);
+        }
+      })  
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+    axios
+      .get("http://localhost:3000/room-mgmt/all")
+      .then((res) => {
+        var room = res.data;
+        console.log(room);
+      })  
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
   }
 };
 </script>

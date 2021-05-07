@@ -10,6 +10,7 @@ const { response } = require("express");
 const saltRounds = 10;
 const flash = require("connect-flash");
 const cors = require('cors');
+var isEmpty = require('is-empty');
 
 app.set("view engine", "ejs");
 app.use(express.static("./public"));
@@ -345,17 +346,51 @@ app.get('/reservation/id/:id', (req,res) => {
     })
 });
 
-app.get('/reservation', (req,res) => {
-    connection.query('SELECT * FROM reservation ORDER BY checkInDate', (err, result) => {
+app.get('/reservation', urlEncodedParser, (req,res) => {
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id ORDER BY checkInDate', function(err, result){
         if(err) {
+            console.log(err);
             res.json({
                 message: "Failed to Retrieve all Reservation"
             });
         } else {
-            res.json({
-                message: "Reservation Retrieved",
-                result
-            });
+            connection.query('SELECT O.reservationId, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId', (err, room) => {
+                var data = [];
+                for(var i = 0; i < room.length; i++){
+                    for(var j = 0; j < result.length; j++){
+                        if(room[i].reservationId == result[j].id){
+                            var temp = {
+                                roomDetails: [],
+                                reserve: []
+                            }
+                            var check = false;
+                            if(isEmpty(data)){
+                                temp.roomDetails.push(room[i])
+                                temp.reserve = result[j]
+                                data.push(temp);
+                            } else {
+                                for(var k = 0; k < data.length; k++){
+                                    if(room[i].reservationId == data[k].reserve.id){
+                                        data[k].roomDetails.push(room[i]);
+                                        check = true;
+                                        break
+                                    }
+                                }
+                                if(check == false) {
+                                    temp.roomDetails.push(room[i])
+                                    temp.reserve = result[j]
+                                    data.push(temp);
+                                }
+                                check = false;
+                            }
+                        };
+                    }
+                }
+                res.json({
+                    message: "Reservation Retrieved",
+                    data
+                });
+            })
         }
     })
 });
