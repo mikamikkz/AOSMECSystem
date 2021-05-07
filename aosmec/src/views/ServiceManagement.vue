@@ -45,12 +45,28 @@
             </template>
             <v-card>
               
-              <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
-              </v-card-title>
+              <v-card-title class="green white--text" fixed-header>
+                New Service
+              </v-card-title>          
 
               <v-card-text>
                 <v-container>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="10"
+                    >
+
+                    <v-chip
+                      color="light-green white--text font-weight-bold"
+                      style="font-size: 16px"
+                      >
+                      Service Details
+                    </v-chip>
+                    </v-col>
+                  </v-row>
+                  
                   <v-row>
                     <v-col
                       cols="12"
@@ -62,6 +78,7 @@
                         label="ID Number"
                         outlined
                         color="green"
+                        readonly
                       ></v-text-field>
                     </v-col>
                    <v-col
@@ -71,8 +88,8 @@
                     >
                     
                     <v-select
-                      v-bind:items="service_name"
-                      v-model="editedItem.service_name"
+                      v-bind:items="name"
+                      v-model="editedItem.name"
                       item-text="text"
                       item-value="value"
                       label="Service"
@@ -90,6 +107,7 @@
                         v-model="editedItem.rate"
                         label="Service Rate"
                         outlined
+                        required
                         color="green"
                       ></v-text-field>
                     </v-col>
@@ -128,7 +146,7 @@
                 <v-btn
                   color="green darken-1"
                   text
-                  v-on:click="save"                  
+                  v-on:click="save"                 
                 >
                   Save
                 </v-btn>
@@ -150,23 +168,28 @@
         </v-toolbar>
       </template>
       <template v-slot:[`item.actions`]="{ item }">
+        
         <v-btn
-          small
-          class="white--text"
           color="amber darken-2"
-          @click="editItem(item)"
+          small
+          rounded
+          class="white--text"
+          v-on:click="editItem(item)"
+          elevation="0"
         >
           <v-icon small>mdi-pencil</v-icon>
         </v-btn>
         
         <v-btn
-          small
-          class="white--text"
-          color="red darken-2"
-          @click="deleteItem(item)"
-        >
-        <v-icon small>mdi-delete</v-icon>
-        </v-btn>
+              color="red"
+              small
+              rounded
+              class="ml-1 white--text"
+              v-on:click="deleteItem(item)"
+              elevation="0"
+            >
+              <v-icon small>mdi-delete-outline</v-icon>
+            </v-btn>
       </template>
       
     </v-data-table>
@@ -175,39 +198,47 @@
 
 
 <script>
+
+
   export default {
     data: () => ({
       addServiceDialog: false,
       dialogDelete: false,
       headers: [
-        {
-          text: 'ID Number',
-          align: 'start',
-          sortable: false,
-          value: 'id',
-        },
-        { text: 'Service Name', value: 'service_name', sortable: false },
+        { text: 'ID Number', align: 'start', sortable: false, value: 'id'},
+        { text: 'Service Name', value: 'name', sortable: false },
         { text: 'Service Rate', value: 'rate' },
         { text: 'Pricing', value: 'pricing' },
         { text: 'Actions', value: 'actions', sortable: false },
+        
       ],
-      service_mgmt: [],
-      service_name: [
+      service_mgmt: [
+        {
+            id: 1,
+            name: 'Extra Bed',
+            rate: 160,
+            pricing: 'per head'
+          },
+      ],
+      name: [
         { text: "Airport Shuttle", value: "Airport Shuttle" },
         { text: "Extra Bed", value: "Extra Bed" },
       ],
+
+     
       editedIndex: -1,
       editedItem: {
-        id: '',
+        id: 0,
         name: '',
         rate: 0,
-        pricing: 0,
+        pricing: ''
       },
+
       defaultItem: {
-        id: '',
-        name: '',
-        rate: 0,
-        pricing: 0,
+        id: 1,
+        name: 'Extra Bed',
+        rate: 160,
+        pricing: 'per head'
       },
     }),
 
@@ -234,10 +265,10 @@
       initialize () {
         this.service_mgmt = [
           {
-            id: '12345678',
-            service_name: 'Extra Bed',
-            rate: 0,
-            pricing: 0,
+            id: 1,
+            name: 'Extra Bed',
+            rate: 160,
+            pricing: 'per head',
           },
         ]
       },
@@ -253,7 +284,6 @@
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialogDelete = true
-        console.log(this.editedItem)
       },
 
       deleteItemConfirm () {

@@ -42,12 +42,29 @@
               </v-btn>
             </template>
             <v-card>
-              <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
+              <v-card-title class="green white--text" fixed-header>
+                New Room
               </v-card-title>
 
               <v-card-text>
                 <v-container>
+
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="10"
+                    >
+
+                    <v-chip
+                      color="light-green white--text font-weight-bold"
+                      style="font-size: 16px"
+                      >
+                      Room Details
+                    </v-chip>
+                    </v-col>
+                  </v-row>
+
                   <v-row>
                     <v-col
                       cols="12"
@@ -55,8 +72,8 @@
                       md="4"
                     >
                       <v-select 
-                      v-bind:items="room_types"
-                      v-model="editedItem.room_types"
+                      v-bind:items="name"
+                      v-model="editedItem.name"
                       item-text="text"
                       item-value="value"
                       label="Room Type"
@@ -70,7 +87,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.no_of_rooms"
+                        v-model="editedItem.rate"
                         label="No. of Rooms"
                         outlined
                         color="green"
@@ -82,7 +99,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.no_of_adults"
+                        v-model="editedItem.totalNoOfRoom"
                         label="No. of Adults"
                         outlined
                         color="green"
@@ -151,22 +168,26 @@
       </template>
       <template v-slot:[`item.actions`]="{ item }">
         <v-btn
-          small
-          class="white--text"
           color="amber darken-2"
-          @click="editItem(item)"
+          small
+          rounded
+          class="white--text"
+          v-on:click="editItem(item)"
+          elevation="0"
         >
           <v-icon small>mdi-pencil</v-icon>
         </v-btn>
         
         <v-btn
-          small
-          class="white--text"
-          color="red darken-2"
-          @click="deleteItem(item)"
-        >
-        <v-icon small>mdi-delete</v-icon>
-        </v-btn>
+              color="red"
+              small
+              rounded
+              class="ml-1 white--text"
+              v-on:click="deleteItem(item)"
+              elevation="0"
+            >
+              <v-icon small>mdi-delete-outline</v-icon>
+            </v-btn>
       </template>
     </v-data-table>
   </v-container>
@@ -193,22 +214,14 @@
       addRoomDialog: false,
       dialogDelete: false,
       headers: [
-        {
-          text: 'Room Type',
-          align: 'start',
-          sortable: false,
-          value: 'room_types',
-        },
-        { text: 'No. of Rooms', value: 'no_of_rooms', sortable: false},
-        { text: 'No. of Adults', value: 'no_of_adults' },
-        { text: 'Additional Head Rate', value: 'additional_head_rate' },
-        { text: 'Unit Price', value: 'unit_price' },
-        { text: 'Actions', value: 'actions'},
+        { text: 'Room Name', align: 'start', sortable: false, value: 'name'},
+        { text: 'Rate', value: 'rate', sortable: false},
+        { text: 'Total Number of Rooms', value: 'totalNoOfRoom' }
       ],
       room_mgmt: [],
 
 
-      room_types: [
+      name: [
         { text: "Single", value: "Single" },
         { text: "Double", value: "Double" },
         { text: "Family Room", value: "Family Room" },
@@ -217,18 +230,14 @@
 
       editedIndex: -1,
       editedItem: {
-        room_types: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0.00,
-        unit_price: 0,
+        name: '',
+        rate: 0,
+        totalNoOfRoom: 0,
       },
       defaultItem: {
-        room_types: '',
-        no_of_rooms: 0,
-        no_of_adults: 0,
-        additional_head_rate: 0.00,
-        unit_price: 0,
+        name: '',
+        rate: 0,
+        totalNoOfRoom: 0,
       },
     }),
 
@@ -255,9 +264,9 @@
       initialize () {
         this.room_mgmt = [
           {
-            room_types: 'Single',
-            no_of_rooms: 2,
-            no_of_adults: 2,
+            name: 'Single',
+            rate: 2,
+            totalNoOfRoom: 2,
             additional_head_rate: 100,
             unit_price: 3500,
           },

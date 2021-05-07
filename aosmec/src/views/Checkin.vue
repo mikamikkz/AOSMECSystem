@@ -219,7 +219,7 @@
                     </td>
                     <td class="pl-1">{{ service.name }}</td>
                     <td>{{ service.rate }}</td>
-                    <td>{{ service.quantity }}</td>
+                    <td>{{ service.quantity }}fgbg</td>
                     <td>
                       <v-btn icon small v-if="!service.add">
                         <v-icon color="green lighten-3"

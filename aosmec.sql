@@ -230,7 +230,7 @@ INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `up
 --
 
 CREATE TABLE `service` (
-  `id` int(255) NOT NULL,
+  `id` int(255) AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `rate` int(255) NOT NULL,
   `pricing` varchar(255) NOT NULL,
