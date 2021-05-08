@@ -208,6 +208,8 @@
 </style>
 
 <script>
+
+  import axios from "axios";
   export default {
     data: () => ({
       
@@ -218,8 +220,9 @@
         { text: 'Rate', value: 'rate', sortable: false},
         { text: 'Total Number of Rooms', value: 'totalNoOfRoom' }
       ],
-      room_mgmt: [],
+      room_mgmt: [
 
+      ],
 
       name: [
         { text: "Single", value: "Single" },
@@ -230,14 +233,9 @@
 
       editedIndex: -1,
       editedItem: {
-        name: '',
-        rate: 0,
-        totalNoOfRoom: 0,
-      },
-      defaultItem: {
-        name: '',
-        rate: 0,
-        totalNoOfRoom: 0,
+        name: "",
+        rate: "",
+        totalNoOfRoom: "",
       },
     }),
 
@@ -256,22 +254,7 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.room_mgmt = [
-          {
-            name: 'Single',
-            rate: 2,
-            totalNoOfRoom: 2,
-            additional_head_rate: 100,
-            unit_price: 3500,
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.room_mgmt.indexOf(item)
@@ -318,5 +301,22 @@
         this.close()
       },
     },
+
+    beforeMount(){
+      axios
+        .get("http://localhost:3000/room-mgmt/all")
+        .then((res) => {
+          var room = res.data.result;
+          for(var x = 0; x < room.length; x++){
+            var addData = {
+              name: room[x].name,
+              rate: room[x].rate,
+              totalNoOfRoom: room[x].totalNoOfRoom
+            }
+            this.room_mgmt.push(addData);
+          }
+          console.log(res.data);
+        })
+    }
   }
 </script>

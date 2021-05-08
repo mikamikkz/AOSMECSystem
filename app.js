@@ -601,18 +601,13 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
 
 /****************************************     R O O M   M A N A G E M E N T     *********************************************/
 //retrieve
-app.get('/room-mgmt/all', (req, res) => {
+app.get("/room-mgmt/all", (req, res) => {
     connection.query('SELECT * FROM room_type', (err, result) => {
-        if(err){
-            res.json({
-                message: "Rooms Info was not retrieved.",
-                status: 404,
-            })
-        } else res.json({
+        res.json({
+            result,
             message: "Rooms info was retrieved.",
-            status: 100,
+            status: 100,            
         })
-        console.log(result)
     });
 });
 
@@ -687,19 +682,13 @@ app.get('/room-mgmt/all/delete/:id', (req, res) => {
 /*************************************     S E R V I C E   M A N A G E M E N T     ******************************************/
 
 //retrieve
-app.get('/service-mgmt', (req, res) => {
+app.get("/service-mgmt", (req, res) => {
     connection.query('SELECT * FROM service', (err, result) => {
-        if(err){
-            res.json({
-                message: "Services were not retrieved.",
-                status: 404,
-            })
-        }
         res.json({
+            result,
             message: "Services were retrieved.",
-            status: 100,
+            status: 200,            
         })
-        console.log(result)
     });
 });
 
@@ -767,6 +756,7 @@ app.get('/account-mgmt', (req, res) => {
             })
         }
         res.json({
+            result,
             message: "Account was retrieved.",
             status: 100,
         })

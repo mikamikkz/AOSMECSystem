@@ -70,21 +70,6 @@
                       sm="6"
                       md="4"
                     >
-                    
-                      <v-text-field
-                        v-model="id"
-                        v-bind:items="id"
-                        label="ID Number"    
-                        outlined
-                        readonly 
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
                       <v-text-field
                         v-model="editedItem.username"
                         label="Username"
@@ -281,20 +266,16 @@
 </style>
 
 <script>
+
+  import axios from "axios";
+
   export default {
     data: () => ({
       date: null,
       menu: false,
-      id: 10000000,
       addAccountDialog: false,
       dialogDelete: false,
       headers: [
-        {
-          text: 'ID Number',
-          align: 'start',
-          sortable: false,
-          value: 'id',
-        },
         { text: 'Username', value: 'username', },
         { text: 'Password', value: 'password' },
         { text: 'First Name', value: 'fname' },
@@ -304,33 +285,27 @@
         { text: 'Gender', value: 'gender' },
         { text: 'Actions', value: 'actions'},
       ],
-      acc_mgmt: [],
+      acc_mgmt: [
+
+      ],
+
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
         { text: "Prefer Not to Say", value: "Prefer Not to Say" },
       ],
+
       editedIndex: -1,
       editedItem: {
-        id: 1,
-        username: 'admin',
-        password: 'admin',
-        fname: 'Vin Myca',
-        mname: 'Casanova',
-        lname: 'Sagarino',
-        birthdate: '1999-09-14',
-        gender: 'Female'
+        username: "",
+        password: "",
+        fname: "",
+        mname: "",
+        lname: "",
+        birthdate: "",
+        gender: ""
       },
-      defaultItem: {
-        id: 1,
-        username: 'admin',
-        password: 'admin',
-        fname: 'Vin Myca',
-        mname: 'Casanova',
-        lname: 'Sagarino',
-        birthdate: '1999-09-14',
-        gender: 'Female'
-      },
+
     }),
 
     computed: {
@@ -353,25 +328,7 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.acc_mgmt = [
-          {
-            id: 1,
-            username: 'admin',
-            password: 'admin',
-            fname: 'Vin Myca',
-            mname: 'Casanova',
-            lname: 'Sagarino',
-            birthdate: '1999-09-14',
-            gender: 'Female'
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.acc_mgmt.indexOf(item)
@@ -419,6 +376,30 @@
         console.log(this.editedItem)
         this.close()
       },
+    },
+
+    beforeMount(){
+      axios
+      .get("http://localhost:3000/account-mgmt")
+      .then((res) => {
+        var account = res.data.result;
+        for(var x = 0; x < account.length; x++){
+          var addData = {
+            username: account[x].username,
+            password: account[x].password,
+            fname: account[x].fname,
+            mname: account[x].mname,
+            lname: account[x].lname,
+            birthdate: account[x].birthdate,
+            gender: account[x].gender
+          }
+          this.acc_mgmt.push(addData);
+        }
+        console.log(res.data);
+      })
+      .catch((err) => {
+          console.log(err.res);
+      });
     }
   }
 </script>

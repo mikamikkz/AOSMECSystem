@@ -198,8 +198,8 @@
 
 
 <script>
-
-
+  import axios from "axios";
+  
   export default {
     data: () => ({
       addServiceDialog: false,
@@ -212,14 +212,11 @@
         { text: 'Actions', value: 'actions', sortable: false },
         
       ],
+
       service_mgmt: [
-        {
-            id: 1,
-            name: 'Extra Bed',
-            rate: 160,
-            pricing: 'per head'
-          },
+        
       ],
+
       name: [
         { text: "Airport Shuttle", value: "Airport Shuttle" },
         { text: "Extra Bed", value: "Extra Bed" },
@@ -228,17 +225,9 @@
      
       editedIndex: -1,
       editedItem: {
-        id: 0,
-        name: '',
-        rate: 0,
-        pricing: ''
-      },
-
-      defaultItem: {
-        id: 1,
-        name: 'Extra Bed',
-        rate: 160,
-        pricing: 'per head'
+        name: "",
+        rate: "",
+        pricing: ""
       },
     }),
 
@@ -257,21 +246,7 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.service_mgmt = [
-          {
-            id: 1,
-            name: 'Extra Bed',
-            rate: 160,
-            pricing: 'per head',
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.service_mgmt.indexOf(item)
@@ -318,5 +293,24 @@
         this.close()
       },
     },
+
+    beforeMount(){
+
+      axios
+        .get("http://localhost:3000/service-mgmt")
+        .then((res) => {
+          var service = res.data.result;
+          for(var x = 0; x < service.length; x++){
+            var addData = {
+              name: service[x].name,
+              rate: service[x].rate,
+              pricing: service[x].pricing
+            }
+            this.service_mgmt.push(addData);  
+          }
+          console.log(res.data);
+          console.log("HERE");
+        })
+    }
   }
 </script>
