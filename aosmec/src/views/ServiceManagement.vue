@@ -68,19 +68,6 @@
                   </v-row>
                   
                   <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.id"
-                        label="ID Number"
-                        outlined
-                        color="green"
-                        readonly
-                      ></v-text-field>
-                    </v-col>
                    <v-col
                       cols="12"
                       sm="6"
@@ -205,7 +192,6 @@
       addServiceDialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'ID Number', align: 'start', sortable: false, value: 'id'},
         { text: 'Service Name', value: 'name', sortable: false },
         { text: 'Service Rate', value: 'rate' },
         { text: 'Pricing', value: 'pricing' },
@@ -252,7 +238,13 @@
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.addServiceDialog = true
-        console.log(this.editedItem)
+
+        axios.post("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, {
+          id: this.editedItem.id,
+          name: this.editedItem.name,
+          rate: this.editedItem.rate,
+          pricing: this.editedItem.pricing
+        })
       },
 
       deleteItem (item) {
@@ -262,9 +254,9 @@
       },
 
       deleteItemConfirm () {
+        axios.delete("http://localhost:3000/service-mgmt/delete/" + this.service_mgmt[this.editedIndex].id)
         this.service_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
-        console.log(this.editedItem)
       },
 
       close () {
@@ -283,34 +275,50 @@
         })
       },
 
+      addAService () {
+        var addedService = {
+          id: this.editedItem.id,
+          name: this.editedItem.name,
+          rate: this.editedItem.rate,
+          pricing: this.editedItem.pricing
+        }
+        axios.post("http://localhost:3000/service-mgmt", addedService)
+      },
+
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
         } else {
           this.service_mgmt.push(this.editedItem)
         }
+        this.addAService()
         console.log(this.editedItem)
         this.close()
       },
+
     },
 
-    beforeMount(){
+    beforeMount(){  
 
-      axios
-        .get("http://localhost:3000/service-mgmt")
+      axios([
+        axios.get("http://localhost:3000/service-mgmt")
         .then((res) => {
-          var service = res.data.result;
-          for(var x = 0; x < service.length; x++){
-            var addData = {
-              name: service[x].name,
-              rate: service[x].rate,
-              pricing: service[x].pricing
+          var getService = res.data.result;
+          for(var x = 0; x < getService.length; x++){
+            var retrievedData = {
+              id: getService[x].id,
+              name: getService[x].name,
+              rate: getService[x].rate,
+              pricing: getService[x].pricing
             }
-            this.service_mgmt.push(addData);  
+            this.service_mgmt.push(retrievedData);  
           }
           console.log(res.data);
-          console.log("HERE");
         })
+        .catch((err) => {
+          console.log(err.res.data.message);
+        }),
+      ]);  
     }
   }
 </script>
