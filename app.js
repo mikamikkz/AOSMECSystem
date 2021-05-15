@@ -637,8 +637,8 @@ app.post("/room-mgmt/all", (req, res) => {
 });
 
 //update
-app.post('/room-mgmt/all/:id', (req, res) => {
-    connection.query('UPDATE room_type SET name = '+req.body.name+', rate = '+req.body.rate+', totalNoOfRoom = '+req.body.totalNoOfRoom+' WHERE id = '+req.params.id+' ', (err, result) => {
+app.patch("/room-mgmt/all/update/:id", (req, res) => {
+    connection.query('UPDATE room_type SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", totalNoOfRoom = "'+req.body.totalNoOfRoom+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Room was not added.",
@@ -714,7 +714,7 @@ app.post("/service-mgmt", urlEncodedParser, (req, res) => {
 })
 
 //update
-app.post("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
+app.patch("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
     connection.query('UPDATE service SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", pricing = "'+req.body.pricing+'" WHERE id='+req.params.id+' ',(err, result) => {
         if(err){
             res.json({
@@ -723,7 +723,6 @@ app.post("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
-                result,
                 message: "Successfully updated service.",
                 status: 201,
             })
@@ -819,8 +818,9 @@ app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
     });
 })
 
-app.post('/account-mgmt/update/:id', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE account SET username = '+req.body.username+', password = '+req.body.password+', fname = '+req.body.fname+', mname = '+req.body.mname+', lname = '+req.body.lname+', birthdate = "'+req.body.birthdate+'", gender = '+req.body.gender+' WHERE id = '+req.params.id+' ', (err, result) => {
+//update
+app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE account SET username = "'+req.body.username+'", password = "'+req.body.password+'", fname = "'+req.body.fname+'", mname = "'+req.body.mname+'", lname = "'+req.body.lname+'", birthdate = "'+req.body.birthdate+'", gender = "'+req.body.gender+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Update of Account has failed.",

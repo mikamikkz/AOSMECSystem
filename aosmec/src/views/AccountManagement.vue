@@ -26,7 +26,6 @@
           <v-dialog
             v-model="addAccountDialog"
             persistent width = "1100"   
-              
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -228,7 +227,7 @@
           color="amber darken-2"
           small
           rounded
-          class="white--text"
+          class="ml-1 white--text"
           v-on:click="editItem(item)"
           elevation="0"
         >
@@ -260,7 +259,6 @@
 .v-data-table thead span {
   font-weight: bolder;
   font-size: 13px;
-  
 }
 
 </style>
@@ -276,14 +274,14 @@
       addAccountDialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'Username', value: 'username', },
-        { text: 'Password', value: 'password' },
-        { text: 'First Name', value: 'fname' },
-        { text: 'Middle Name', value: 'mname' },
-        { text: 'Last Name', value: 'lname' },
-        { text: 'Birthday', value: 'birthdate' },
-        { text: 'Gender', value: 'gender' },
-        { text: 'Actions', value: 'actions'},
+        { text: 'Username', value: 'username', sortable: false },
+        { text: 'Password', value: 'password', sortable: false },
+        { text: 'First Name', value: 'fname', sortable: false },
+        { text: 'Middle Name', value: 'mname', sortable: false },
+        { text: 'Last Name', value: 'lname', sortable: false },
+        { text: 'Birthday', value: 'birthdate', sortable: false },
+        { text: 'Gender', value: 'gender', sortable: false },
+        { text: 'Actions', value: 'actions', sortable: false},
       ],
       acc_mgmt: [
 
@@ -305,7 +303,6 @@
         birthdate: "",
         gender: ""
       },
-
     }),
 
     computed: {
@@ -333,7 +330,7 @@
       editItem (item) {
         this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.addAccountdialog = true
+        this.addAccountDialog = true
       },
 
       deleteItem (item) {
@@ -381,12 +378,12 @@
       save (date) {
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
+          axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
         } else {
+          this.addAnAccount()
           this.acc_mgmt.push(this.editedItem)
         }
         this.$refs.menu.save(date)
-        this.addAnAccount()
-        console.log(this.editedItem)
         this.close()
       },
     },
@@ -409,7 +406,6 @@
           }
           this.acc_mgmt.push(addData);
         }
-        console.log(res.data);
       })
       .catch((err) => {
           console.log(err.res);
