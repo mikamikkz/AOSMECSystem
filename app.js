@@ -10,6 +10,7 @@ const { response } = require("express");
 const saltRounds = 10;
 const flash = require("connect-flash");
 const cors = require('cors');
+var isEmpty = require('is-empty');
 
 app.set("view engine", "ejs");
 app.use(express.static("./public"));
@@ -345,17 +346,51 @@ app.get('/reservation/id/:id', (req,res) => {
     })
 });
 
-app.get('/reservation', (req,res) => {
-    connection.query('SELECT * FROM reservation ORDER BY checkInDate', (err, result) => {
+app.get('/reservation', urlEncodedParser, (req,res) => {
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id ORDER BY checkInDate', function(err, result){
         if(err) {
+            console.log(err);
             res.json({
                 message: "Failed to Retrieve all Reservation"
             });
         } else {
-            res.json({
-                message: "Reservation Retrieved",
-                result
-            });
+            connection.query('SELECT O.reservationId, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId', (err, room) => {
+                var data = [];
+                for(var i = 0; i < room.length; i++){
+                    for(var j = 0; j < result.length; j++){
+                        if(room[i].reservationId == result[j].id){
+                            var temp = {
+                                roomDetails: [],
+                                reserve: []
+                            }
+                            var check = false;
+                            if(isEmpty(data)){
+                                temp.roomDetails.push(room[i])
+                                temp.reserve = result[j]
+                                data.push(temp);
+                            } else {
+                                for(var k = 0; k < data.length; k++){
+                                    if(room[i].reservationId == data[k].reserve.id){
+                                        data[k].roomDetails.push(room[i]);
+                                        check = true;
+                                        break
+                                    }
+                                }
+                                if(check == false) {
+                                    temp.roomDetails.push(room[i])
+                                    temp.reserve = result[j]
+                                    data.push(temp);
+                                }
+                                check = false;
+                            }
+                        };
+                    }
+                }
+                res.json({
+                    message: "Reservation Retrieved",
+                    data
+                });
+            })
         }
     })
 });
@@ -566,53 +601,42 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
 
 /****************************************     R O O M   M A N A G E M E N T     *********************************************/
 //retrieve
-app.get('/room-mgmt/all', (req, res) => {
+app.get("/room-mgmt/all", (req, res) => {
     connection.query('SELECT * FROM room_type', (err, result) => {
         if(err){
             res.json({
-                message: "Rooms Info was not retrieved.",
-                status: 404,
+                message: "Rooms info was retrieved.",
+                status: 100,            
             })
-        } else res.json({
-            message: "Rooms info was retrieved.",
-            status: 100,
-        })
-        console.log(result)
-    });
-});
-
-app.get('/room-mgmt/all/:id', (req, res) => {
-    connection.query('SELECT * FROM room_type WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+        } else {
             res.json({
-                message: "Rooms Info was not retrieved.",
-                status: 404,
+                result,
+                message: "Rooms info was retrieved.",
+                status: 100,            
             })
-        } else res.json({
-            message: "Rooms info was retrieved.",
-            status: 100,
-        })
-        console.log(result)
+        }
     });
 });
 
 //create
-app.post('/room-mgmt/all', (req, res) => {
-    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ('+req.body.name+','+req.body.rate+','+req.body.totalNoOfRoom+') ', (err, result) => {
+app.post("/room-mgmt/all", (req, res) => {
+    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.totalNoOfRoom+'") ', (err, result) => {
         if(err){
             res.json({
                 message: "Room was not added.",
                 status: 404,
             })
-        } else res.json({
-            message: "Room was added.",
-            status: 100,
-        })
-        console.log(result)
-        console.log(err)
+        } else {
+            res.json({
+                result,
+                message: "Room was added.",
+                status: 100,
+            })
+        }
     });
 });
 
+//update
 app.post('/room-mgmt/all/:id', (req, res) => {
     connection.query('UPDATE room_type SET name = '+req.body.name+', rate = '+req.body.rate+', totalNoOfRoom = '+req.body.totalNoOfRoom+' WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
@@ -620,29 +644,30 @@ app.post('/room-mgmt/all/:id', (req, res) => {
                 message: "Room was not added.",
                 status: 404,
             })
-        } else res.json({
-            message: "Room was added.",
-            status: 100,
-        })
-        console.log(result)
-        console.log(err)
+        } else{ 
+           res.json({
+                message: "Room was added.",
+                status: 100,
+            })
+        }
     });
 });
 
 //delete
-app.get('/room-mgmt/all/delete/:id', (req, res) => {
+app.delete("/room-mgmt/all/delete/:id", (req, res) => {
     connection.query('DELETE FROM room_type WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Rooms Info was not deleted.",
                 status: 404,
             })
+        } else {
+            res.json({
+                result,
+                message: "Rooms info was deleted.",
+                status: 100,
+            })
         }
-        res.json({
-            message: "Rooms info was deleted.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
@@ -652,25 +677,26 @@ app.get('/room-mgmt/all/delete/:id', (req, res) => {
 /*************************************     S E R V I C E   M A N A G E M E N T     ******************************************/
 
 //retrieve
-app.get('/service-mgmt', (req, res) => {
+app.get("/service-mgmt", (req, res) => {
     connection.query('SELECT * FROM service', (err, result) => {
         if(err){
             res.json({
                 message: "Services were not retrieved.",
-                status: 404,
+                status: 100,            
+            })
+        } else {
+            res.json({
+                result,
+                message: "Services were retrieved.",
+                status: 200,            
             })
         }
-        res.json({
-            message: "Services were retrieved.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
 //create
-app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO service (name, rate, pricing) VALUES ('+req.body.name+','+req.body.rate+','+req.body.pricing+')', (err, result) => {
+app.post("/service-mgmt", urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO service (name, rate, pricing) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.pricing+'")', (err, result) => {
         if(err){
             res.json({
                 message: "Insertion of Service has failed.",
@@ -678,6 +704,7 @@ app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully added service.",
                 status: 201,
             })
@@ -687,8 +714,8 @@ app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
 })
 
 //update
-app.post('/service-mgmt/update/:id', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE service SET name = '+req.body.name+', rate = '+req.body.rate+', pricing = '+req.body.pricing+' WHERE id = '+req.params.id+' WHERE id = '+req.params.id+' ',(err, result) => {
+app.post("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE service SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", pricing = "'+req.body.pricing+'" WHERE id='+req.params.id+' ',(err, result) => {
         if(err){
             res.json({
                 message: "Update of Service has failed.",
@@ -696,16 +723,16 @@ app.post('/service-mgmt/update/:id', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully updated service.",
                 status: 201,
             })
         }
-        console.log(err)
     });
 })
 
 //delete
-app.get('/service-mgmt/delete/:id', (req,res) => {
+app.delete("/service-mgmt/delete/:id", (req,res) => {
     connection.query('DELETE FROM service WHERE id='+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -714,11 +741,11 @@ app.get('/service-mgmt/delete/:id', (req,res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Service Successfully Deleted",
                 status: 201,
             })
         }
-        console.log(result)
     });
 });
 /*************************************     A C C O U N T   M A N A G E M E N T     ******************************************/ 
@@ -732,6 +759,7 @@ app.get('/account-mgmt', (req, res) => {
             })
         }
         res.json({
+            result,
             message: "Account was retrieved.",
             status: 100,
         })
@@ -746,18 +774,18 @@ app.get('/account-mgmt/:id', (req, res) => {
                 message: "Account was not retrieved.",
                 status: 404,
             })
+        } else {
+            res.json({
+                message: "Account was retrieved.",
+                status: 100,
+            })
         }
-        res.json({
-            message: "Account was retrieved.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
 //create
 app.post('/account-mgmt', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ('+req.body.username+','+req.body.password+','+req.body.fname+','+req.body.mname+','+req.body.lname+',"'+req.body.birthdate+'",'+req.body.gender+')', (err, result) => {
+    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ("'+req.body.username+'","'+req.body.password+'","'+req.body.fname+'","'+req.body.mname+'","'+req.body.lname+'","'+req.body.birthdate+'","'+req.body.gender+'")', (err, result) => {
         if(err){
             res.json({
                 message: "Insertion of Account has failed.",
@@ -765,17 +793,16 @@ app.post('/account-mgmt', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully added account.",
                 status: 201,
             })
         }
-        console.log(err)
-        console.log(result)
     });
 })
 
 //delete
-app.get('/account-mgmt/delete/:id', urlEncodedParser, (req, res) => {
+app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
     connection.query('DELETE FROM account WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -784,10 +811,10 @@ app.get('/account-mgmt/delete/:id', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully deleted account.",
                 status: 201,
             })
-            console.log(result)
         }
     });
 })
@@ -805,8 +832,6 @@ app.post('/account-mgmt/update/:id', urlEncodedParser, (req, res) => {
                 status: 201,
             })
         }
-        console.log(err)
-        console.log(result)
     });
 })
 

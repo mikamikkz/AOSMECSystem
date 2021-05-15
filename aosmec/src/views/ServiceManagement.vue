@@ -68,19 +68,6 @@
                   </v-row>
                   
                   <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.id"
-                        label="ID Number"
-                        outlined
-                        color="green"
-                        readonly
-                      ></v-text-field>
-                    </v-col>
                    <v-col
                       cols="12"
                       sm="6"
@@ -198,28 +185,24 @@
 
 
 <script>
-
-
+  import axios from "axios";
+  
   export default {
     data: () => ({
       addServiceDialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'ID Number', align: 'start', sortable: false, value: 'id'},
         { text: 'Service Name', value: 'name', sortable: false },
         { text: 'Service Rate', value: 'rate' },
         { text: 'Pricing', value: 'pricing' },
         { text: 'Actions', value: 'actions', sortable: false },
         
       ],
+
       service_mgmt: [
-        {
-            id: 1,
-            name: 'Extra Bed',
-            rate: 160,
-            pricing: 'per head'
-          },
+        
       ],
+
       name: [
         { text: "Airport Shuttle", value: "Airport Shuttle" },
         { text: "Extra Bed", value: "Extra Bed" },
@@ -228,17 +211,9 @@
      
       editedIndex: -1,
       editedItem: {
-        id: 0,
-        name: '',
-        rate: 0,
-        pricing: ''
-      },
-
-      defaultItem: {
-        id: 1,
-        name: 'Extra Bed',
-        rate: 160,
-        pricing: 'per head'
+        name: "",
+        rate: "",
+        pricing: ""
       },
     }),
 
@@ -257,27 +232,19 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.service_mgmt = [
-          {
-            id: 1,
-            name: 'Extra Bed',
-            rate: 160,
-            pricing: 'per head',
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.addServiceDialog = true
-        console.log(this.editedItem)
+
+        axios.post("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, {
+          id: this.editedItem.id,
+          name: this.editedItem.name,
+          rate: this.editedItem.rate,
+          pricing: this.editedItem.pricing
+        })
       },
 
       deleteItem (item) {
@@ -287,9 +254,9 @@
       },
 
       deleteItemConfirm () {
+        axios.delete("http://localhost:3000/service-mgmt/delete/" + this.service_mgmt[this.editedIndex].id)
         this.service_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
-        console.log(this.editedItem)
       },
 
       close () {
@@ -308,15 +275,50 @@
         })
       },
 
+      addAService () {
+        var addedService = {
+          id: this.editedItem.id,
+          name: this.editedItem.name,
+          rate: this.editedItem.rate,
+          pricing: this.editedItem.pricing
+        }
+        axios.post("http://localhost:3000/service-mgmt", addedService)
+      },
+
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
         } else {
           this.service_mgmt.push(this.editedItem)
         }
+        this.addAService()
         console.log(this.editedItem)
         this.close()
       },
+
     },
+
+    beforeMount(){  
+
+      axios([
+        axios.get("http://localhost:3000/service-mgmt")
+        .then((res) => {
+          var getService = res.data.result;
+          for(var x = 0; x < getService.length; x++){
+            var retrievedData = {
+              id: getService[x].id,
+              name: getService[x].name,
+              rate: getService[x].rate,
+              pricing: getService[x].pricing
+            }
+            this.service_mgmt.push(retrievedData);  
+          }
+          console.log(res.data);
+        })
+        .catch((err) => {
+          console.log(err.res.data.message);
+        }),
+      ]);  
+    }
   }
 </script>

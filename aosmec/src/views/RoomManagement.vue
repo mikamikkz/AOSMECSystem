@@ -69,7 +69,7 @@
                     <v-col
                       cols="12"
                       sm="6"
-                      md="4"
+                      md="6"
                     >
                       <v-select 
                       v-bind:items="name"
@@ -84,11 +84,11 @@
                     <v-col
                       cols="12"
                       sm="6"
-                      md="4"
+                      md="6"
                     >
                       <v-text-field
                         v-model="editedItem.rate"
-                        label="No. of Rooms"
+                        label="Rate"
                         outlined
                         color="green"
                       ></v-text-field>
@@ -96,39 +96,16 @@
                     <v-col
                       cols="12"
                       sm="6"
-                      md="4"
+                      md="6"
                     >
                       <v-text-field
                         v-model="editedItem.totalNoOfRoom"
-                        label="No. of Adults"
+                        label="Total Number of Rooms"
                         outlined
                         color="green"
                       ></v-text-field>
                     </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.additional_head_rate"
-                        label="Additional Head Rate"
-                        outlined
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.unit_price"
-                        label="Unit Price"
-                        outlined
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
+                    
                   </v-row>
                 </v-container>
               </v-card-text>
@@ -208,6 +185,8 @@
 </style>
 
 <script>
+
+  import axios from "axios";
   export default {
     data: () => ({
       
@@ -216,10 +195,12 @@
       headers: [
         { text: 'Room Name', align: 'start', sortable: false, value: 'name'},
         { text: 'Rate', value: 'rate', sortable: false},
-        { text: 'Total Number of Rooms', value: 'totalNoOfRoom' }
+        { text: 'Total Number of Rooms', value: 'totalNoOfRoom' },
+        { text: 'Actions', value: 'actions', sortable: false },
       ],
-      room_mgmt: [],
+      room_mgmt: [
 
+      ],
 
       name: [
         { text: "Single", value: "Single" },
@@ -230,14 +211,9 @@
 
       editedIndex: -1,
       editedItem: {
-        name: '',
-        rate: 0,
-        totalNoOfRoom: 0,
-      },
-      defaultItem: {
-        name: '',
-        rate: 0,
-        totalNoOfRoom: 0,
+        name: "",
+        rate: "",
+        totalNoOfRoom: "",
       },
     }),
 
@@ -256,22 +232,7 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.room_mgmt = [
-          {
-            name: 'Single',
-            rate: 2,
-            totalNoOfRoom: 2,
-            additional_head_rate: 100,
-            unit_price: 3500,
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.room_mgmt.indexOf(item)
@@ -287,9 +248,13 @@
       },
 
       deleteItemConfirm () {
+        axios
+        .delete("http://localhost:3000/room-mgmt/all/delete/" + this.room_mgmt[this.editedIndex].id)
+        .catch((err) => {
+          console.log(err.res.data.message);
+        }),
         this.room_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
-        console.log(this.editedItem)
       },
 
       close () {
@@ -308,15 +273,43 @@
         })
       },
 
+      addARoom () {
+        var addedRoom = {
+          id: this.editedItem.id,
+          name: this.editedItem.name,
+          rate: this.editedItem.rate,
+          totalNoOfRoom: this.editedItem.totalNoOfRoom
+        }
+        axios.post("http://localhost:3000/room-mgmt/all", addedRoom)
+      },
+
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
         } else {
           this.room_mgmt.push(this.editedItem)
         }
-        console.log(this.editedItem)
+        this.addARoom()
         this.close()
       },
     },
+
+    beforeMount(){
+      axios
+        .get("http://localhost:3000/room-mgmt/all")
+        .then((res) => {
+          var room = res.data.result;
+          for(var x = 0; x < room.length; x++){
+            var addData = {
+              id: room[x].id,
+              name: room[x].name,
+              rate: room[x].rate,
+              totalNoOfRoom: room[x].totalNoOfRoom
+            }
+            this.room_mgmt.push(addData);
+          }
+          console.log(res.data);
+        })
+    }
   }
 </script>
