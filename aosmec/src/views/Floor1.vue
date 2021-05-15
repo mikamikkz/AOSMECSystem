@@ -437,7 +437,7 @@ export default {
   },
   beforeMount(){
     var date = new Date().toISOString().slice(0,10);
-    let room = "http://localhost:3000/room"
+    let room = "http://localhost:3000/room/1"
     let guest = "http://localhost:3000/guest"
     const requestRoom = axios.get(room);
     const requestGuest = axios.get(guest);
@@ -474,7 +474,7 @@ export default {
           for(var y = 0; y < requestGuest.length; y++){
             for(var z = 0; z < requestRoom.length; z++){
               if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
-                this.rooms[z].name = requestGuest[y].fname + " " + requestGuest[i].lname,
+                this.rooms[z].name = requestGuest[y].fname + " " + requestGuest[y].lname,
                 this.rooms[z].gender = requestGuest[y].gender,
                 this.rooms[z].country = requestGuest[y].country,
                 this.rooms[z].nationality = requestGuest[y].nationality,
@@ -486,8 +486,8 @@ export default {
             }
           }
         }
-      console.log(this.rooms)
       }
+      
       
     })).catch(err => {
       console.log(err.response.data.message);
