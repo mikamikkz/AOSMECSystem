@@ -58,9 +58,58 @@ app.post("/room", urlEncodedParser, (req, res) => {
    });
 });
 
-//Retrieve:
-app.get("/room", (req, res) => {
-    connection.query('SELECT * FROM `room`', (err, result) => {
+//Retrieve 1st floor:
+app.get("/room/1", (req, res) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "Room",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve 2nd floor:
+app.get("/room/2", (req, res) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id  WHERE roomNo BETWEEN 201 AND 222', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "Room",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve 3rd floor:
+app.get("/room/3", (req, res) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 301 AND 309', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "Room",
+            status: 200,
+            result
+        })
+    });
+});
+
+
+//Retrieve total # of clean rooms:
+app.get("/room/clean", (req, res) => {
+    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "clean"', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "Room",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve total # of dirty rooms:
+app.get("/room/dirty", (req, res) => {
+    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "dirty"', (err, result) => {
         // console.log(result);
         res.json({
             message: "Room",
@@ -608,83 +657,73 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
 
 /****************************************     R O O M   M A N A G E M E N T     *********************************************/
 //retrieve
-app.get('/room-mgmt/all', (req, res) => {
+app.get("/room-mgmt/all", (req, res) => {
     connection.query('SELECT * FROM room_type', (err, result) => {
         if(err){
             res.json({
-                message: "Rooms Info was not retrieved.",
-                status: 404,
+                message: "Rooms info was retrieved.",
+                status: 100,            
             })
-        } else res.json({
-            message: "Rooms info was retrieved.",
-            status: 100,
-        })
-        console.log(result)
-    });
-});
-
-app.get('/room-mgmt/all/:id', (req, res) => {
-    connection.query('SELECT * FROM room_type WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+        } else {
             res.json({
-                message: "Rooms Info was not retrieved.",
-                status: 404,
+                result,
+                message: "Rooms info was retrieved.",
+                status: 100,            
             })
-        } else res.json({
-            message: "Rooms info was retrieved.",
-            status: 100,
-        })
-        console.log(result)
+        }
     });
 });
 
 //create
-app.post('/room-mgmt/all', (req, res) => {
-    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ('+req.body.name+','+req.body.rate+','+req.body.totalNoOfRoom+') ', (err, result) => {
+app.post("/room-mgmt/all", (req, res) => {
+    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.totalNoOfRoom+'") ', (err, result) => {
         if(err){
             res.json({
                 message: "Room was not added.",
                 status: 404,
             })
-        } else res.json({
-            message: "Room was added.",
-            status: 100,
-        })
-        console.log(result)
-        console.log(err)
+        } else {
+            res.json({
+                result,
+                message: "Room was added.",
+                status: 100,
+            })
+        }
     });
 });
 
-app.post('/room-mgmt/all/:id', (req, res) => {
-    connection.query('UPDATE room_type SET name = '+req.body.name+', rate = '+req.body.rate+', totalNoOfRoom = '+req.body.totalNoOfRoom+' WHERE id = '+req.params.id+' ', (err, result) => {
+//update
+app.patch("/room-mgmt/all/update/:id", (req, res) => {
+    connection.query('UPDATE room_type SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", totalNoOfRoom = "'+req.body.totalNoOfRoom+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Room was not added.",
                 status: 404,
             })
-        } else res.json({
-            message: "Room was added.",
-            status: 100,
-        })
-        console.log(result)
-        console.log(err)
+        } else{ 
+           res.json({
+                message: "Room was added.",
+                status: 100,
+            })
+        }
     });
 });
 
 //delete
-app.get('/room-mgmt/all/delete/:id', (req, res) => {
+app.delete("/room-mgmt/all/delete/:id", (req, res) => {
     connection.query('DELETE FROM room_type WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Rooms Info was not deleted.",
                 status: 404,
             })
+        } else {
+            res.json({
+                result,
+                message: "Rooms info was deleted.",
+                status: 100,
+            })
         }
-        res.json({
-            message: "Rooms info was deleted.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
@@ -694,25 +733,26 @@ app.get('/room-mgmt/all/delete/:id', (req, res) => {
 /*************************************     S E R V I C E   M A N A G E M E N T     ******************************************/
 
 //retrieve
-app.get('/service-mgmt', (req, res) => {
+app.get("/service-mgmt", (req, res) => {
     connection.query('SELECT * FROM service', (err, result) => {
         if(err){
             res.json({
                 message: "Services were not retrieved.",
-                status: 404,
+                status: 100,            
+            })
+        } else {
+            res.json({
+                result,
+                message: "Services were retrieved.",
+                status: 200,            
             })
         }
-        res.json({
-            message: "Services were retrieved.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
 //create
-app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO service (name, rate, pricing) VALUES ('+req.body.name+','+req.body.rate+','+req.body.pricing+')', (err, result) => {
+app.post("/service-mgmt", urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO service (name, rate, pricing) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.pricing+'")', (err, result) => {
         if(err){
             res.json({
                 message: "Insertion of Service has failed.",
@@ -720,6 +760,7 @@ app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully added service.",
                 status: 201,
             })
@@ -729,8 +770,8 @@ app.post('/service-mgmt/add', urlEncodedParser, (req, res) => {
 })
 
 //update
-app.post('/service-mgmt/update/:id', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE service SET name = '+req.body.name+', rate = '+req.body.rate+', pricing = '+req.body.pricing+' WHERE id = '+req.params.id+' WHERE id = '+req.params.id+' ',(err, result) => {
+app.patch("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE service SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", pricing = "'+req.body.pricing+'" WHERE id='+req.params.id+' ',(err, result) => {
         if(err){
             res.json({
                 message: "Update of Service has failed.",
@@ -742,12 +783,11 @@ app.post('/service-mgmt/update/:id', urlEncodedParser, (req, res) => {
                 status: 201,
             })
         }
-        console.log(err)
     });
 })
 
 //delete
-app.get('/service-mgmt/delete/:id', (req,res) => {
+app.delete("/service-mgmt/delete/:id", (req,res) => {
     connection.query('DELETE FROM service WHERE id='+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -756,11 +796,11 @@ app.get('/service-mgmt/delete/:id', (req,res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Service Successfully Deleted",
                 status: 201,
             })
         }
-        console.log(result)
     });
 });
 /*************************************     A C C O U N T   M A N A G E M E N T     ******************************************/ 
@@ -774,6 +814,7 @@ app.get('/account-mgmt', (req, res) => {
             })
         }
         res.json({
+            result,
             message: "Account was retrieved.",
             status: 100,
         })
@@ -788,18 +829,18 @@ app.get('/account-mgmt/:id', (req, res) => {
                 message: "Account was not retrieved.",
                 status: 404,
             })
+        } else {
+            res.json({
+                message: "Account was retrieved.",
+                status: 100,
+            })
         }
-        res.json({
-            message: "Account was retrieved.",
-            status: 100,
-        })
-        console.log(result)
     });
 });
 
 //create
 app.post('/account-mgmt', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ('+req.body.username+','+req.body.password+','+req.body.fname+','+req.body.mname+','+req.body.lname+',"'+req.body.birthdate+'",'+req.body.gender+')', (err, result) => {
+    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ("'+req.body.username+'","'+req.body.password+'","'+req.body.fname+'","'+req.body.mname+'","'+req.body.lname+'","'+req.body.birthdate+'","'+req.body.gender+'")', (err, result) => {
         if(err){
             res.json({
                 message: "Insertion of Account has failed.",
@@ -807,17 +848,16 @@ app.post('/account-mgmt', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully added account.",
                 status: 201,
             })
         }
-        console.log(err)
-        console.log(result)
     });
 })
 
 //delete
-app.get('/account-mgmt/delete/:id', urlEncodedParser, (req, res) => {
+app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
     connection.query('DELETE FROM account WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -826,16 +866,17 @@ app.get('/account-mgmt/delete/:id', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                result,
                 message: "Successfully deleted account.",
                 status: 201,
             })
-            console.log(result)
         }
     });
 })
 
-app.post('/account-mgmt/update/:id', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE account SET username = '+req.body.username+', password = '+req.body.password+', fname = '+req.body.fname+', mname = '+req.body.mname+', lname = '+req.body.lname+', birthdate = "'+req.body.birthdate+'", gender = '+req.body.gender+' WHERE id = '+req.params.id+' ', (err, result) => {
+//update
+app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE account SET username = "'+req.body.username+'", password = "'+req.body.password+'", fname = "'+req.body.fname+'", mname = "'+req.body.mname+'", lname = "'+req.body.lname+'", birthdate = "'+req.body.birthdate+'", gender = "'+req.body.gender+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Update of Account has failed.",
@@ -847,8 +888,6 @@ app.post('/account-mgmt/update/:id', urlEncodedParser, (req, res) => {
                 status: 201,
             })
         }
-        console.log(err)
-        console.log(result)
     });
 })
 

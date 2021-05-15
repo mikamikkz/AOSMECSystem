@@ -26,7 +26,6 @@
           <v-dialog
             v-model="addAccountDialog"
             persistent width = "1100"   
-              
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
@@ -65,21 +64,6 @@
                   </v-row>
 
                   <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                    
-                      <v-text-field
-                        v-model="id"
-                        v-bind:items="id"
-                        label="ID Number"    
-                        outlined
-                        readonly 
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
                     <v-col
                       cols="12"
                       sm="6"
@@ -243,7 +227,7 @@
           color="amber darken-2"
           small
           rounded
-          class="white--text"
+          class="ml-1 white--text"
           v-on:click="editItem(item)"
           elevation="0"
         >
@@ -275,61 +259,49 @@
 .v-data-table thead span {
   font-weight: bolder;
   font-size: 13px;
-  
 }
 
 </style>
 
 <script>
+
+  import axios from "axios";
+
   export default {
     data: () => ({
       date: null,
       menu: false,
-      id: 10000000,
       addAccountDialog: false,
       dialogDelete: false,
       headers: [
-        {
-          text: 'ID Number',
-          align: 'start',
-          sortable: false,
-          value: 'id',
-        },
-        { text: 'Username', value: 'username', },
-        { text: 'Password', value: 'password' },
-        { text: 'First Name', value: 'fname' },
-        { text: 'Middle Name', value: 'mname' },
-        { text: 'Last Name', value: 'lname' },
-        { text: 'Birthday', value: 'birthdate' },
-        { text: 'Gender', value: 'gender' },
-        { text: 'Actions', value: 'actions'},
+        { text: 'Username', value: 'username', sortable: false },
+        { text: 'Password', value: 'password', sortable: false },
+        { text: 'First Name', value: 'fname', sortable: false },
+        { text: 'Middle Name', value: 'mname', sortable: false },
+        { text: 'Last Name', value: 'lname', sortable: false },
+        { text: 'Birthday', value: 'birthdate', sortable: false },
+        { text: 'Gender', value: 'gender', sortable: false },
+        { text: 'Actions', value: 'actions', sortable: false},
       ],
-      acc_mgmt: [],
+      acc_mgmt: [
+
+      ],
+
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
         { text: "Prefer Not to Say", value: "Prefer Not to Say" },
       ],
+
       editedIndex: -1,
       editedItem: {
-        id: 1,
-        username: 'admin',
-        password: 'admin',
-        fname: 'Vin Myca',
-        mname: 'Casanova',
-        lname: 'Sagarino',
-        birthdate: '1999-09-14',
-        gender: 'Female'
-      },
-      defaultItem: {
-        id: 1,
-        username: 'admin',
-        password: 'admin',
-        fname: 'Vin Myca',
-        mname: 'Casanova',
-        lname: 'Sagarino',
-        birthdate: '1999-09-14',
-        gender: 'Female'
+        username: "",
+        password: "",
+        fname: "",
+        mname: "",
+        lname: "",
+        birthdate: "",
+        gender: ""
       },
     }),
 
@@ -353,43 +325,23 @@
       },
     },
 
-    created () {
-      this.initialize()
-    },
-
     methods: {                   
-      initialize () {
-        this.acc_mgmt = [
-          {
-            id: 1,
-            username: 'admin',
-            password: 'admin',
-            fname: 'Vin Myca',
-            mname: 'Casanova',
-            lname: 'Sagarino',
-            birthdate: '1999-09-14',
-            gender: 'Female'
-          },
-        ]
-      },
 
       editItem (item) {
         this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        console.log(this.editedItem)
-        this.addAccountdialog = true
+        this.addAccountDialog = true
       },
 
       deleteItem (item) {
         this.editedIndex = this.acc_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        console.log(this.editedItem)
         this.dialogDelete = true
       },
 
       deleteItemConfirm () {
+        axios.delete("http://localhost:3000/account-mgmt/delete/" + this.acc_mgmt[this.editedIndex].id)
         this.acc_mgmt.splice(this.editedIndex, 1)
-        console.log(this.editedItem)
         this.closeDelete()
       },
 
@@ -409,16 +361,55 @@
         })
       },
 
+      addAnAccount () {
+        var addedAccount = {
+          id: this.editedItem.id,
+          username: this.editedItem.username,
+          password: this.editedItem.password,
+          fname: this.editedItem.fname,
+          mname: this.editedItem.mname,
+          lname: this.editedItem.lname,
+          birthdate: this.editedItem.birthdate,
+          gender: this.editedItem.gender
+        }
+        axios.post("http://localhost:3000/account-mgmt", addedAccount)
+      },
+
       save (date) {
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
+          axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
         } else {
+          this.addAnAccount()
           this.acc_mgmt.push(this.editedItem)
         }
         this.$refs.menu.save(date)
-        console.log(this.editedItem)
         this.close()
       },
+    },
+
+    beforeMount(){
+      axios
+      .get("http://localhost:3000/account-mgmt")
+      .then((res) => {
+        var account = res.data.result;
+        for(var x = 0; x < account.length; x++){
+          var addData = {
+            id: account[x].id,
+            username: account[x].username,
+            password: account[x].password,
+            fname: account[x].fname,
+            mname: account[x].mname,
+            lname: account[x].lname,
+            birthdate: account[x].birthdate,
+            gender: account[x].gender
+          }
+          this.acc_mgmt.push(addData);
+        }
+      })
+      .catch((err) => {
+          console.log(err.res);
+      });
     }
   }
 </script>
