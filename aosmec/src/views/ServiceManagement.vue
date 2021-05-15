@@ -238,13 +238,6 @@
         this.editedIndex = this.service_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.addServiceDialog = true
-
-        axios.post("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, {
-          id: this.editedItem.id,
-          name: this.editedItem.name,
-          rate: this.editedItem.rate,
-          pricing: this.editedItem.pricing
-        })
       },
 
       deleteItem (item) {
@@ -254,7 +247,11 @@
       },
 
       deleteItemConfirm () {
-        axios.delete("http://localhost:3000/service-mgmt/delete/" + this.service_mgmt[this.editedIndex].id)
+        axios
+          .delete("http://localhost:3000/service-mgmt/delete/" + this.service_mgmt[this.editedIndex].id)
+          .catch((err) => {
+            console.log(err.res.data.message);
+          });
         this.service_mgmt.splice(this.editedIndex, 1)
         this.closeDelete()
       },
@@ -288,10 +285,11 @@
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
+          axios.patch("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, this.editedItem)
         } else {
+          this.addAService()
           this.service_mgmt.push(this.editedItem)
         }
-        this.addAService()
         console.log(this.editedItem)
         this.close()
       },
@@ -299,9 +297,8 @@
     },
 
     beforeMount(){  
-
-      axios([
-        axios.get("http://localhost:3000/service-mgmt")
+      axios
+        .get("http://localhost:3000/service-mgmt")
         .then((res) => {
           var getService = res.data.result;
           for(var x = 0; x < getService.length; x++){
@@ -317,8 +314,7 @@
         })
         .catch((err) => {
           console.log(err.res.data.message);
-        }),
-      ]);  
+        });
     }
   }
 </script>

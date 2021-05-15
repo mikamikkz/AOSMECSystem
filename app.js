@@ -362,19 +362,26 @@ app.get('/reservee/delete/:id', (req, res)=> {
 /*RESERVATION TABLE*/
 
 app.post('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES ('+req.body.reserveeId+','+req.body.accountId+',"'+req.body.type+'", '+req.body.status+', "'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+','+req.body.confirmationNo+','+req.body.reservationFee+')', (err, result) => {
-        if(err){
-            res.json({
-                message: "Reservation Failed",
-                status: 400,
-            })
-        } else {
-            res.json({
-                message: "Reservation Success",
-                status: 201,
-            })
-        }
-    });
+    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("'+req.body.name+'","'+req.body.gender+'","'+req.body.country+'","'+req.body.email+'","'+req.body.phone+'")', (err, result1) => {
+        connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES ('+result1.insertId+','+req.body.accountId+',"'+req.body.reservationType+'", '+req.body.status+', "'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHeads+',"'+req.body.confirmationNo+'",'+req.body.reservationFee+')', (error, reservation_result) => {
+            console.log(reservation_result.insertId);
+            for(var i = 0; i < req.body.roomDetails.length; i++){
+                connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES ('+reservation_result.insertId+',"'+req.body.roomDetails[i].type+'", '+req.body.roomDetails[i].number+')', (error2, result) => {
+                });
+            }
+            if(error){
+                res.json({
+                    message: "Reservation Failed",
+                    status: 400,
+                })
+            } else {
+                res.json({
+                    message: "Reservation Success",
+                    status: 201,
+                })
+            }
+        });
+    })
 });
 
 app.get('/reservation/:date', (req,res) => {
@@ -698,8 +705,8 @@ app.post("/room-mgmt/all", (req, res) => {
 });
 
 //update
-app.post('/room-mgmt/all/:id', (req, res) => {
-    connection.query('UPDATE room_type SET name = '+req.body.name+', rate = '+req.body.rate+', totalNoOfRoom = '+req.body.totalNoOfRoom+' WHERE id = '+req.params.id+' ', (err, result) => {
+app.patch("/room-mgmt/all/update/:id", (req, res) => {
+    connection.query('UPDATE room_type SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", totalNoOfRoom = "'+req.body.totalNoOfRoom+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Room was not added.",
@@ -775,7 +782,7 @@ app.post("/service-mgmt", urlEncodedParser, (req, res) => {
 })
 
 //update
-app.post("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
+app.patch("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
     connection.query('UPDATE service SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", pricing = "'+req.body.pricing+'" WHERE id='+req.params.id+' ',(err, result) => {
         if(err){
             res.json({
@@ -784,7 +791,6 @@ app.post("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
-                result,
                 message: "Successfully updated service.",
                 status: 201,
             })
@@ -880,8 +886,9 @@ app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
     });
 })
 
-app.post('/account-mgmt/update/:id', urlEncodedParser, (req, res) => {
-    connection.query('UPDATE account SET username = '+req.body.username+', password = '+req.body.password+', fname = '+req.body.fname+', mname = '+req.body.mname+', lname = '+req.body.lname+', birthdate = "'+req.body.birthdate+'", gender = '+req.body.gender+' WHERE id = '+req.params.id+' ', (err, result) => {
+//update
+app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE account SET username = "'+req.body.username+'", password = "'+req.body.password+'", fname = "'+req.body.fname+'", mname = "'+req.body.mname+'", lname = "'+req.body.lname+'", birthdate = "'+req.body.birthdate+'", gender = "'+req.body.gender+'" WHERE id = '+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
                 message: "Update of Account has failed.",

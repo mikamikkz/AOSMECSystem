@@ -193,9 +193,9 @@
       addRoomDialog: false,
       dialogDelete: false,
       headers: [
-        { text: 'Room Name', align: 'start', sortable: false, value: 'name'},
+        { text: 'Room Name', value: 'name' ,align: 'start', sortable: false },
         { text: 'Rate', value: 'rate', sortable: false},
-        { text: 'Total Number of Rooms', value: 'totalNoOfRoom' },
+        { text: 'Total Number of Rooms', value: 'totalNoOfRoom', sortable: false},
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       room_mgmt: [
@@ -237,8 +237,7 @@
       editItem (item) {
         this.editedIndex = this.room_mgmt.indexOf(item)
         this.editedItem = Object.assign({}, item)
-        this.dialog = true
-        console.log(this.editedItem)
+        this.addRoomDialog = true
       },
 
       deleteItem (item) {
@@ -286,10 +285,12 @@
       save () {
         if (this.editedIndex > -1) {
           Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
+          axios.patch("http://localhost:3000/room-mgmt/all/update/" + this.room_mgmt[this.editedIndex].id, this.editedItem)
+
         } else {
+          this.addARoom()
           this.room_mgmt.push(this.editedItem)
         }
-        this.addARoom()
         this.close()
       },
     },

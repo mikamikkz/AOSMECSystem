@@ -122,7 +122,6 @@
                     </v-text-field>
                     <v-text-field
                       v-model="addReservationDetails.confirmationNo"
-                      type="number"
                       label="Confirmation No"
                       outlined
                       dense
@@ -620,7 +619,6 @@
                     </v-text-field>
                     <v-text-field
                       v-model="editReservationDetails.confirmationNo"
-                      type="number"
                       label="Confirmation No"
                       outlined
                       dense
@@ -950,7 +948,11 @@ export default {
       checkOut: "",
       checkInEdit: "",
       checkOutEdit: "",
-      roomTypes: [],
+      roomTypes: [
+        "Regular",
+        "Family",
+        "Budget"
+      ],
       reservationTypes: [
         { text: "Booking.com", value: "Booking.com" },
         { text: "Agoda", value: "Agoda" },
@@ -1077,7 +1079,18 @@ export default {
     },
     addReservation: function (input) {
       this.addReservationDialog = false;
-      console.log(input);
+      input.accountId = 1;
+      input.status = true;
+      if(typeof input.reservationFee === 'undefined') {
+        input.reservationFee = 0;
+      } else if (typeof input.confirmationNo === 'undefined') {
+        input.confirmationNo = "";
+      }
+      axios
+      .post("http://localhost:3000/reservation", input)
+      .then((response) => {
+        console.log(response.data.message);
+      })
       this.addReservationDetails = {
           name: "",
           gender: "",
@@ -1128,6 +1141,7 @@ export default {
           }
           this.reservations.push(addData);
         }
+        console.log(res.data.message);
       })  
       .catch((err) => {
         console.log(err.response.data.message);
