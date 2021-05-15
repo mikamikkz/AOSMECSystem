@@ -64,7 +64,7 @@
 
         <template v-slot:item.checkout="props">
           <!-- checkout -->
-          <v-btn class="mx-2 mt-2" color="error" fab depressed small @click="showCheckOutDialog(props.item)"  :disabled="props.item.state !== 1 ">
+          <v-btn class="mx-2 mt-2" color="error" fab depressed small @click="showCheckOutDialog(props.item)"  :disabled="props.item.state !== 1">
             <v-icon small dark>mdi-door-open</v-icon>
           </v-btn>
           <!-- payment -->
@@ -78,26 +78,35 @@
         </template>
       </v-data-table>
 
-      <!-- checkout dialog -->
+      <!-- checkout dialog --> 
       <v-dialog persistent v-model="showCheckOut" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
             Checking Out Details
           </v-card-title>
           <v-card-text class="mt-3">
-
             <v-simple-table dense class=" pa-0 mb-3">
               <template v-slot:default>
                 <thead>
                   <tr>
                     <th class="text-left pa-0 pl-10">Payment Details</th>
-                    <th class="text-left pl-0 pr-0">Amount</th>
+                    <th class="text-left pr-15">Amount</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="pa-0"></td>
-                    <td class="pr-1 pl-0">Php </td>
+                  <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="billDetails.billId === chosenGuest.id">
+                      <span v-for="serviceName in guestService" :key="serviceName.id">
+                        <span v-if="serviceName.id == billDetails.serviceId">
+                          <td class="pa-0 pt-5"> 
+                            <li>Service: {{ serviceName.name }}</li> 
+                            <li>Quantity: {{ billDetails.quantity }}</li> 
+                            <li class="pb-3" >Status: {{ billDetails.status }}</li>
+                          </td>
+                        </span>
+                      </span>
+                      <td class="text-right pr-0 pl-15">Php {{ billDetails.total }}</td>
+                    </span>
                   </tr>
                 </tbody>
               </template>
@@ -108,7 +117,11 @@
                 <p>Pending Balance: </p>
               </v-col>
               <v-col cols="7">
-                <p>Php</p>
+                <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="billDetails.billId === chosenGuest.id && billDetails.status == 'unpaid' ">
+                      <p>Php {{ billDetails.total }}</p>
+                    </span>
+                </span>
               </v-col>
             </v-row>
             <v-row>
@@ -148,9 +161,19 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td class="pa-0"></td>
-                    <td class="pr-1 pl-0">Php </td>
+                  <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="billDetails.billId === chosenGuest.id">
+                      <span v-for="serviceName in guestService" :key="serviceName.id">
+                        <span v-if="serviceName.id == billDetails.serviceId && billDetails.status == 'unpaid' ">
+                          <td class="pa-0 pt-5"> 
+                            <li>Service: {{ serviceName.name }}</li> 
+                            <li>Quantity: {{ billDetails.quantity }}</li> 
+                            <li class="pb-3" >Status: {{ billDetails.status }}</li>
+                          </td>
+                          <td class="text-right pr-0 pl-15">Php {{ billDetails.total }}</td>
+                        </span>
+                      </span>
+                    </span>
                   </tr>
                 </tbody>
               </template>
@@ -161,7 +184,11 @@
                 <p>Pending Balance:</p>
               </v-col>
               <v-col cols="7">
-                <p>Php</p>
+                <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="billDetails.billId === chosenGuest.id && billDetails.status == 'unpaid' ">
+                      <p>Php {{ billDetails.total }}</p>
+                    </span>
+                </span>
               </v-col>
             </v-row>
             <v-row>
@@ -271,18 +298,20 @@ export default {
   components: {},
   data() {
     return {
-      // dialogs
+      /***** dialogs *****/
       showCheckOut: false,
       showPayment: false,
       showAddService: false,
       currentDialogItem: {},
       dialog: {},
       closeDialog: false,
-      // 
+      chosenGuest: {id: "", keyDeposit: "", roomId: "", status: "", total: ""},
+
       payment: "",
       index: -1,
       status: [ "clean", "dirty", "out of order"],
-      // main table
+      
+      /***** main table *****/
       headers: [
         {
           text: "Room No.",
@@ -320,21 +349,13 @@ export default {
           align: "center",
         },
       ],
+
+      /***** array lists *****/
       rooms: [],
       // check out details
-      guestBillDetails: [
-        // { id: '1', billId: '1', name: "service 1", total: "210", status: "Pending"},
-        // { id: '2', billId: '1', name: "service 2", total: "210", status: "Pending"},
-        // { id: '2', billId: '2', name: "service 1", total: "210", status: "Pending"},
-        // { id: '3', billId: '3', name: "service 1", total: "210", status: "Pending"},
-        // { id: '4', billId: '4', name: "service 1", total: "210", status: "Pending"},
-      ],
-      guestBill: [ //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
-        // { id: '1', roomId: "1", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
-        // { id: '2', roomId: "2", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
-        // { id: '3', roomId: "3", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
-        // { id: '4', roomId: "4", status: "Not Paid", keyDeposit: '0', total: "", balance: "", received: "0"},
-      ],
+      guestBillDetails: [],
+      guestBill: [], //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
+      guestService: [],
       // rules
       numberRules: [
         v => v.length > 0 || 'This field may not be empty',
@@ -377,17 +398,22 @@ export default {
     // checkout
     addKeyDeposit: function() {
       let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
-      chosenGuest.keyDeposit = '1'
+      // chosenGuest.keyDeposit = '1'
       if(chosenGuest.keyDeposit === '1'){
         this.guestBill.balance = parseInt(this.guestBill.balance) - 200;
       }
       console.log(chosenGuest.keyDeposit)
     },
     showCheckOutDialog(item) {
+      /* note: item = rooms */
       this.showCheckOut = true
       this.currentDialogItem = item
-      let chosenGuest = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id)
-      console.log(chosenGuest)
+      this.chosenGuest.id = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).id
+      this.chosenGuest.keyDeposit = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).keyDeposit
+      this.chosenGuest.roomId = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).roomId
+      this.chosenGuest.status = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).status
+      this.chosenGuest.total = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).total
+      // console.log(this.chosenGuest)
     },
     checkOutClose: function () {
       this.showCheckOut = false
@@ -488,21 +514,75 @@ export default {
         }
       }
       
-      
     })).catch(err => {
       console.log(err.response.data.message);
     })
 
-      // GET Services
-      // axios
-      // .get("http://localhost:3000/service-mgmt")
-      // .then((res) => {
-      //   var service = res.data.result
-      //   console.log(service)
-      // })  
-      //   .catch((err) => {
-      //   console.log(err.response.data.message);
-      // });
+    let bill = "http://localhost:3000/bill"
+    let billDetails = "http://localhost:3000/bill-details"
+    const requestBill = axios.get(bill);
+    const requestBillDetails = axios.get(billDetails);
+    axios
+    .all([requestRoom, requestBill, requestBillDetails])
+    .then(axios.spread((...responses) => {
+      // console.log(responses)
+      const requestRoom = responses[0].data.result
+      const requestBill = responses[1].data.result
+      const requestBillDetails = responses[2].data.result
+
+      for(var x = 0; x < requestRoom.length; x++){
+        for(var y = 0; y < requestBill.length; y++){
+          
+          if(requestBill[y].roomId == requestRoom[x].id) {
+              const addGuestBill = {
+                id: requestBill[y].id,
+                roomId: requestBill[y].roomId,
+                status: requestBill[y].status,
+                keyDeposit: requestBill[y].keyDeposit,
+                total: requestBill[y].total
+                // balance: requestBill[y].balance,
+                // received: requestBill[y].received
+              }
+              this.guestBill.push(addGuestBill)
+              
+              for(var z = 0; z < requestBillDetails.length; z++){  
+                if(requestBill[y].id == requestBillDetails[z].billId) {
+                  const addGuestBillDetails = {
+                    billId: requestBillDetails[z].billId,
+                    serviceId: requestBillDetails[z].serviceId,
+                    quantity: requestBillDetails[z].quantity,
+                    total: requestBillDetails[z].total,
+                    status: requestBillDetails[z].status
+                  }
+                  this.guestBillDetails.push(addGuestBillDetails)
+                }
+              }
+          }
+        }
+      }
+      // console.log(this.guestBillDetails)
+      // console.log(this.guestBill)
+    
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
+
+    axios
+    .get("http://localhost:3000/service-mgmt")
+    .then((res) => {
+      var requestService = res.data.result
+      for (var i = 0; i < requestService.length; i++){
+        const addService = {
+          id: requestService[i].id,
+          name: requestService[i].name,
+          rate: requestService[i].rate,
+          pricing: requestService[i].pricing
+        }
+        this.guestService.push(addService)
+      }
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
   }
 };
 </script>
