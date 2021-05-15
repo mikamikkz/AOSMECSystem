@@ -56,10 +56,10 @@ app.post("/room", urlEncodedParser, (req, res) => {
        }
    });
 });
-
+// 'SELECT * FROM `room` INNER JOIN `room_type` INNER JOIN `checkin` INNER JOIN `guest`'
 //Retrieve:
 app.get("/room", (req, res) => {
-    connection.query('SELECT * FROM `room`', (err, result) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id', (err, result) => {
         // console.log(result);
         res.json({
             message: "Room",
