@@ -301,19 +301,26 @@ app.get('/reservee/delete/:id', (req, res)=> {
 /*RESERVATION TABLE*/
 
 app.post('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES ('+req.body.reserveeId+','+req.body.accountId+',"'+req.body.type+'", '+req.body.status+', "'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+','+req.body.confirmationNo+','+req.body.reservationFee+')', (err, result) => {
-        if(err){
-            res.json({
-                message: "Reservation Failed",
-                status: 400,
-            })
-        } else {
-            res.json({
-                message: "Reservation Success",
-                status: 201,
-            })
-        }
-    });
+    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("'+req.body.name+'","'+req.body.gender+'","'+req.body.country+'","'+req.body.email+'","'+req.body.phone+'")', (err, result1) => {
+        connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES ('+result1.insertId+','+req.body.accountId+',"'+req.body.reservationType+'", '+req.body.status+', "'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHeads+',"'+req.body.confirmationNo+'",'+req.body.reservationFee+')', (error, reservation_result) => {
+            console.log(reservation_result.insertId);
+            for(var i = 0; i < req.body.roomDetails.length; i++){
+                connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES ('+reservation_result.insertId+',"'+req.body.roomDetails[i].type+'", '+req.body.roomDetails[i].number+')', (error2, result) => {
+                });
+            }
+            if(error){
+                res.json({
+                    message: "Reservation Failed",
+                    status: 400,
+                })
+            } else {
+                res.json({
+                    message: "Reservation Success",
+                    status: 201,
+                })
+            }
+        });
+    })
 });
 
 app.get('/reservation/:date', (req,res) => {
