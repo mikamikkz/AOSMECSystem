@@ -751,6 +751,7 @@
                   </v-col>
                 </v-row>
                 <v-row v-for="(roomDetail, index) in editReservationDetails.roomDetails" :key="index">
+                  <input type="hidden" v-model="roomDetail.id">
                   <v-col class="pa-0" lg="5" md="5" xs="12">
                     <v-select
                       :items="roomTypes"
@@ -809,7 +810,7 @@
           <v-btn
             color="light-green white--text"
             class="px-7"
-            v-on:click="editReservationDialog = false"
+            v-on:click="saveEditReservation(editReservationDetails)"
           >
             Save
           </v-btn>
@@ -824,7 +825,7 @@
         >
         <v-card-text>
           Are you sure you want to delete this reservation? This action cannot
-          be undone and you will be unable to recover any data
+          be undone.
         </v-card-text>
         <v-card-actions class="d-flex justify-center pb-6">
           <v-btn class="px-5" v-on:click="deleteReservationDialog = false">
@@ -833,7 +834,7 @@
           <v-btn
             color="red lighten-1 white--text"
             class="px-7"
-            v-on:click="deleteReservationDialog = false"
+            v-on:click="deleteReservationDialogBtn(deleteReservationDetails)"
           >
             Delete
           </v-btn>
@@ -856,7 +857,7 @@
           <v-btn
             color="orange darken-2 white--text"
             class="px-9"
-            v-on:click="cancelReservationDialog = false"
+            v-on:click="cancelReservationDialogBtn(cancelReservationDetails)"
           >
             Yes
           </v-btn>
@@ -879,7 +880,7 @@
           <v-btn
             color="orange darken-2 white--text"
             class="px-9"
-            v-on:click="activeReservationDialog = false"
+            v-on:click="activeReservationDialogBtn(activeReservationDetails)"
           >
             Yes
           </v-btn>
@@ -948,11 +949,7 @@ export default {
       checkOut: "",
       checkInEdit: "",
       checkOutEdit: "",
-      roomTypes: [
-        "Regular",
-        "Family",
-        "Budget"
-      ],
+      roomTypes: [],
       reservationTypes: [
         { text: "Booking.com", value: "Booking.com" },
         { text: "Agoda", value: "Agoda" },
@@ -1037,6 +1034,7 @@ export default {
     editReservationBtn: function (input) {
       this.editReservationDialog = true;
       this.editReservationDetails = {
+        id: input.reservationId,
         name: input.reserveeName,
         gender: input.reserveeGender,
         country: input.reserveeCountry,
@@ -1050,32 +1048,71 @@ export default {
         noOfDays: input.noOfDays,
         noOfHeads: input.noOfHeads,
         roomDetails: input.roomDetails,
+        status: true
       }
+      console.log(input);
+    },
+    saveEditReservation(input){
+      console.log(input);
+      axios
+      .patch("http://localhost:3000/reservation/"+input.id, input)
+      .then((response) => {
+        console.log(response.data.message);
+      })
+      this.editReservationDialog = false;
+      location.reload();
     },
     deleteReservationBtn: function (input) {
       this.deleteReservationDialog = true;
       this.deleteReservationDetails = {
-        reservationId: input.reservationId,
+        id: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
       };
-      console.log(this.deleteReservationDetails);
+    },
+    deleteReservationDialogBtn(input){
+      this.deleteReservationDialog = false;
+      axios
+      .patch("http://localhost:3000/reservation/delete/"+input.id)
+      .then((response) => {
+        console.log(response.data.message);
+      })
+      location.reload();
     },
     cancelReservationBtn: function(input) {
       this.cancelReservationDialog = true;
       this.cancelReservationDetails = {
-        reservationId: input.reservationId,
+        id: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
       };
     },
+    cancelReservationDialogBtn(input){
+      this.cancelReservationDialog = false;
+      axios
+      .patch("http://localhost:3000/reservation/cancel/"+input.id)
+      .then((response) => {
+        console.log(response.data.message);
+      })
+      location.reload();
+    },
     activeReservationBtn: function(input) {
       this.activeReservationDialog = true;
       this.activeReservationDetails = {
-        reservationId: input.reservationId,
+        id: input.reservationId,
         reserveeId: input.reserveeId,
         roomDetails: input.roomDetails,
       };
+    },
+    activeReservationDialogBtn(input){
+      this.activeReservationDialog = false;
+      console.log(input);
+      axios
+      .patch("http://localhost:3000/reservation/activate/"+input.id)
+      .then((response) => {
+        console.log(response.data.message);
+      })
+      location.reload();
     },
     addReservation: function (input) {
       this.addReservationDialog = false;
@@ -1120,6 +1157,7 @@ export default {
               reservationId: reservation[i].reserve.id,
               reservationType: reservation[i].reserve.type,
               confirmationNo: reservation[i].reserve.confirmationNo,
+              reservationFee: reservation[i].reserve.reservationFee,
               noOfDays: reservation[i].reserve.noOfDays,
               noOfHeads: reservation[i].reserve.noOfHead,
               checkIn: reservation[i].reserve.checkInDate,
@@ -1134,6 +1172,7 @@ export default {
           }
           for(var j = 0; j < reservation[i].roomDetails.length; j++){
             var detail = {
+              id: reservation[i].roomDetails[j].id,
               type: reservation[i].roomDetails[j].roomType,
               number: reservation[i].roomDetails[j].noOfRoom
             }
@@ -1149,8 +1188,10 @@ export default {
     axios
       .get("http://localhost:3000/room-mgmt/all")
       .then((res) => {
-        var room = res.data;
-        console.log(room);
+        var rooms = res.data.result;
+        for(var x = 0; x < rooms.length; x++){
+          this.roomTypes.push(rooms[x].name)
+        }
       })  
       .catch((err) => {
         console.log(err.response.data.message);
