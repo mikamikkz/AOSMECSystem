@@ -69,7 +69,7 @@
         <v-spacer></v-spacer>
       </v-toolbar>
 
-      <v-data-table class="mt-4" dense :headers="headers" :items="guests" :items-per-page="5"></v-data-table>
+      <v-data-table class="mt-4" dense :headers="headers" :items="arrivingGuests" :items-per-page="5"></v-data-table>
 
       <v-toolbar class="ml-0 mb-0 mt-10" flat color="grey lighten-2">
         <v-toolbar-title>
@@ -96,7 +96,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="item in guests"
+                v-for="item in CheckOutGuests"
                 :key="item.name"
               >
                 <td v-if="item.checkOutDate == today()">{{ item.name }}</td>
@@ -112,6 +112,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: "Dashboard",
   components: {},
@@ -120,11 +121,7 @@ export default {
       date: "",
       totalRevenue: "123456",
       // room status
-      clean: "25",
-      dirty: "3",
-      outOfOrder: "1",
-      occupied: "15",
-      vacant: "5",
+      clean: "0", dirty: "0", outOfOrder: "0", occupied: "0", vacant: "0",
       // tables
       headers: [
         {
@@ -164,108 +161,8 @@ export default {
           sortable: false,
         },
       ],
-      guests: [
-        {
-          confNo: "000-000",
-          name: "Kim Taehyung",
-          resType: "Agoda",
-          roomType: "single",
-          service: "xxx",
-          days: 6,
-          roomNo: 100,
-          checkOutDate: "01/21/2021"
-        },
-        {
-          confNo: "111-000",
-          name: "Kim Namjoon",
-          resType: "Agoda",
-          roomType: "single",
-          service: "xxx",
-          days: 10,
-          roomNo: 200,
-          checkOutDate: "02/14/2021"
-        },
-        {
-          confNo: "000-333",
-          name: "Jeon Jungkook",
-          resType: "Agoda",
-          roomType: "family room",
-          service: "xxx",
-          days: 2,
-          roomNo: 101,
-          checkOutDate: "01/21/2021"
-        },
-        {
-          confNo: "222-000",
-          name: "Park Jimin",
-          resType: "Agoda",
-          roomType: "single",
-          service: "xxx",
-          days: 6,
-          roomNo: 300,
-          checkOutDate: "03/21/2021"
-        },
-        {
-          confNo: "111-111",
-          name: "Min Yoongi",
-          resType: "Booking.com",
-          roomType: "double",
-          service: "xxx",
-          days: 3,
-          roomNo: 112,
-          checkOutDate: "10/21/2021"
-        },
-        {
-          confNo: "444-000",
-          name: "Kim Seokjin",
-          resType: "Booking.com",
-          roomType: "double",
-          service: "xxx",
-          days: 7,
-          roomNo: 107,
-          checkOutDate: "01/30/2021"
-        },
-        {
-          confNo: "000-111",
-          name: "Jung Hoseok",
-          resType: "Booking.com",
-          roomType: "family room",
-          service: "xxx",
-          days: 3,
-          roomNo: 113,
-          checkOutDate: "01/27/2021"
-        },
-        {
-          confNo: "100-001",
-          name: "Park Seojoon",
-          resType: "Booking.com",
-          roomType: "double",
-          service: "xxx",
-          days: 5,
-          roomNo: 105,
-          checkOutDate: "01/22/2021"
-        },
-        {
-          confNo: "444-440",
-          name: "Kim Jennie",
-          resType: "Booking.com",
-          roomType: "double",
-          service: "xxx",
-          days: 4,
-          roomNo: 104,
-          checkOutDate: "03/21/2021"
-        },
-        {
-          confNo: "500-500",
-          name: "Kim Seulgi",
-          resType: "Agoda",
-          roomType: "single",
-          service: "xxx",
-          days: 5,
-          roomNo: 205,
-          checkOutDate: "02/21/2021"
-        },
-      ],
+      arrivingGuests: [],
+      CheckOutGuests: []
     };
   },
   methods: {
@@ -281,6 +178,135 @@ export default {
   mounted() {
     this.today();
   },
+  beforeMount(){
+    //Room Status
+    axios
+    .get("http://localhost:3000/room/clean")
+    .then((res) => {
+      var requestCleanRooms = res.data.result.length
+      this.clean = requestCleanRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    axios
+    .get("http://localhost:3000/room/dirty")
+    .then((res) => {
+      var requestDirtyRooms = res.data.result.length
+      this.dirty = requestDirtyRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    axios
+    .get("http://localhost:3000/room/out-of-order")
+    .then((res) => {
+      var requestOutOfOrderRooms = res.data.result.length
+      this.outOfOrder = requestOutOfOrderRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    axios
+    .get("http://localhost:3000/room/occupied")
+    .then((res) => {
+      var requestOccupiedRooms = res.data.result.length
+      this.occupied = requestOccupiedRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    axios
+    .get("http://localhost:3000/room/vacant")
+    .then((res) => {
+      var requestVacantRooms = res.data.result.length
+      this.vacant = requestVacantRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    //Guests arriving today
+    var today = new Date().toISOString().slice(0,10);
+    let guest = "http://localhost:3000/guest"
+    let rooms = "http://localhost:3000/rooms"
+    let bill = "http://localhost:3000/bill"
+    let billDetails = "http://localhost:3000/bill-details"
+    let service = "http://localhost:3000/service-mgmt"
+    
+    const requestReservation = axios.get('http://localhost:3000/reservation/"'+today+'"');
+    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+today+'"');
+    const requestGuest = axios.get(guest);
+    const requestRooms = axios.get(rooms);
+    const requestBill = axios.get(bill);
+    const requestBillDetails = axios.get(billDetails);
+    const requestService = axios.get(service);
+    
+    axios
+    .all([requestReservation, requestCheckin, requestGuest, requestRooms, requestBill, requestBillDetails, requestService])
+    .then(axios.spread((...responses) => {
+      const requestReservation = responses[0].data.result
+      const requestCheckin = responses[1].data.result
+      const requestGuest = responses[2].data.result
+      const requestRooms = responses[3].data.result
+      const requestBill = responses[4].data.result
+      const requestBillDetails = responses[5].data.result
+      const requestService = responses[6].data.result
+      // console.log(responses)
+
+      for(var i = 0; i < requestReservation.length; i++){
+        for(var j = 0; j < requestCheckin.length; j++) {
+          if(requestReservation[i].id == requestCheckin[j].reservationId) {
+            const addArrivingGuests = {
+              confNo :  requestReservation[i].confirmationNo,
+              resType : requestReservation[i].type,
+              days : requestReservation[i].noOfDays,
+              name: "",
+              roomType: "",
+              service: []
+            }
+            this.arrivingGuests.push(addArrivingGuests)
+          }
+        }
+      }
+
+      for(var k = 0; k < requestCheckin.length; k++) {
+        for(var l = 0; l < requestGuest.length; l++) {
+          if(requestCheckin[k].id == requestGuest[l].checkInId) {
+          this.arrivingGuests[k].name = requestGuest[l].fname + " " + requestGuest[l].lname
+          }
+        }
+      }
+
+      for(var m = 0; m < requestGuest.length; m++) {
+        for(var n = 0; n < requestRooms.length; n++) {
+          this.arrivingGuests[m].roomType = requestRooms[n].name
+          this.arrivingGuests[m].roomId = requestRooms[n].id
+        }
+      }
+
+      for(var s = 0; s < requestCheckin.length; s++) {
+        for(var o = 0; o < requestRooms.length; o++) {
+          for(var p = 0; p < requestBill.length; p++) {
+            if(requestCheckin[s].roomId == requestRooms[o].id && requestBill[p].roomId == requestRooms[o].id) {
+              for(var q = 0; q < requestBillDetails.length; q++) {
+                if(requestBill[p].id == requestBillDetails[q].billId) {
+                  for(var r = 0; r < requestService.length; r++) {
+                    if(requestService[r].id === requestBillDetails[q].serviceId) {
+                      this.arrivingGuests[o].service.push(requestService[r].name)
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
+
+  }
 };
 </script>
 

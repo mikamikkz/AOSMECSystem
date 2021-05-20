@@ -58,6 +58,18 @@ app.post("/room", urlEncodedParser, (req, res) => {
    });
 });
 
+//Retrieve all rooms:
+app.get("/rooms", (req, res) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "All Rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
 //Retrieve 1st floor:
 app.get("/room/1", (req, res) => {
     connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
@@ -95,36 +107,60 @@ app.get("/room/3", (req, res) => {
 });
 
 
-//Retrieve total # of clean rooms:
+//Retrieve total clean rooms:
 app.get("/room/clean", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "clean"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "clean"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of clean rooms",
+            message: "total clean rooms",
             status: 200,
             result
         })
     });
 });
 
-//Retrieve total # of dirty rooms:
+//Retrieve total dirty rooms:
 app.get("/room/dirty", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "dirty"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "dirty"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of dirty rooms",
+            message: "total dirty rooms",
             status: 200,
             result
         })
     });
 });
 
-//Retrieve total # of out-of-order:
+//Retrieve total out-of-order rooms:
 app.get("/room/out-of-order", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "out-of-order"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "out-of-order"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of out-of-order rooms",
+            message: "total out-of-order rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve total # of occupied rooms:
+app.get("/room/occupied", (req, res) => {
+    connection.query('SELECT * FROM `room` WHERE occupied = 1', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "total occupied rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve total # of vacant rooms:
+app.get("/room/vacant", (req, res) => {
+    connection.query('SELECT * FROM `room` WHERE occupied = 0', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "total vacant rooms",
             status: 200,
             result
         })

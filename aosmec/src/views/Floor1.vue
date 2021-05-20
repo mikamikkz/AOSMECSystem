@@ -117,11 +117,25 @@
                 <p>Pending Balance: </p>
               </v-col>
               <v-col cols="7">
-                <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
-                    <span v-if="billDetails.billId === chosenGuest.id && billDetails.status == 'unpaid' ">
-                      <p>Php {{ billDetails.total }}</p>
+                <!-- <span v-for="bill in guestBill" :key="bill.id">
+                  <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="bill.id == chosenGuest.id && billDetails.billId == chosenGuest.id">
+                      {{ bill.pending }}
                     </span>
-                </span>
+                  </span>
+                </span> -->
+
+                <!-- for(var j = 0; j < this.guestBill.length; j++) {
+                  for(var i = 0; i < this.guestBillDetails.length; i++ ){
+                    if(this.guestBill[j].id == this.chosenGuest.id){
+                      if(this.guestBillDetails[i].billId == this.chosenGuest.id) {
+                        this.guestBill[j].pending += this.guestBillDetails[i].total
+                      }
+                    }
+                  }
+                } -->
+                
+                <!-- <span>Php {{ chosenGuest.pending }}</span> -->
               </v-col>
             </v-row>
             <v-row>
@@ -184,11 +198,12 @@
                 <p>Pending Balance:</p>
               </v-col>
               <v-col cols="7">
-                <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                <!-- <span v-for="billDetails in guestBillDetails" :key="billDetails.id">
                     <span v-if="billDetails.billId === chosenGuest.id && billDetails.status == 'unpaid' ">
                       <p>Php {{ billDetails.total }}</p>
                     </span>
-                </span>
+                </span> -->
+                <!-- <span>Php {{ chosenGuest.pending }}</span> -->
               </v-col>
             </v-row>
             <v-row>
@@ -231,22 +246,30 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="service in guestServices" :key="service.name">
-                    <td class="pa-0 ma-0">
-                      <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
-                        <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
-                      </v-btn>
-                    </td>
-                    <td class="pl-1">{{ service.name }}</td>
-                    <td>{{ service.rate }}</td>
-                    <td>{{ service.quantity }}</td>
-                    <td>
-                      <v-btn icon small v-if="!service.add">
-                        <v-icon color="green lighten-3"
-                          >mdi-checkbox-marked</v-icon
-                        >
-                      </v-btn>
-                    </td>
+                  <!-- old: in guestServices -->
+                  <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                    <span v-if="billDetails.billId === chosenGuest.id">
+                      <span v-for="service in guestService" :key="service.id">
+                        <span v-if="service.id == billDetails.serviceId">
+                  <!-- <tr v-for="service in guestService" :key="service.name"> -->
+                          <td class="pa-0 ma-0">
+                            <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
+                              <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
+                            </v-btn>
+                          </td>
+                          <td class="pl-1">{{ service.name }}</td>
+                          <td>{{ service.rate }}</td>
+                          <td>{{ service.quantity }}</td>
+                          <td>
+                            <v-btn icon small v-if="!service.add">
+                              <v-icon color="green lighten-3"
+                                >mdi-checkbox-marked</v-icon
+                              >
+                            </v-btn>
+                          </td>
+                        </span>
+                      </span>
+                    </span>
                   </tr>
                 </tbody>
               </template>
@@ -258,12 +281,13 @@
                 </v-btn>
               </v-col>
               <v-col lg="7" md="" sm="12" d-flex class="pr-1">
+                <!-- old: :items: services -->
                 <v-select
-                  :items="services"
+                  :items="guestService"
                   v-model="addToService.name"
                   label="Service Name"
-                  item-text="text"
-                  item-value="value"
+                  item-text="name"
+                  item-value="name"
                   dense
                   outlined
                 ></v-select>
@@ -365,28 +389,12 @@ export default {
       // services details
       services: [
         // { text: "Sample", value: "Sample" },
-        // { text: "Sample2", value: "Sample2" },
       ],  
       addToService: {
         // name: "",
         // qty: "",
       },
-      guestServices: [
-        // {
-        //   add: false,
-        //   name: "Extra Bed",
-        //   rate: "50",
-        //   quantity: "1",
-        //   status: true,
-        // },
-        // {
-        //   add: true,
-        //   name: "Airport Shuttle",
-        //   rate: "1500",
-        //   quantity: "2",
-        //   status: false,
-        // },
-      ],
+      guestServices: [],
     };
   },
   methods: {
@@ -413,7 +421,17 @@ export default {
       this.chosenGuest.roomId = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).roomId
       this.chosenGuest.status = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).status
       this.chosenGuest.total = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).total
-      // console.log(this.chosenGuest)
+      // this.chosenGuest.pending = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).pending
+      // for(var j = 0; j < this.guestBill.length; j++) {
+      //   for(var i = 0; i < this.guestBillDetails.length; i++ ){
+      //     if(this.guestBill[j].id == this.chosenGuest.id && this.guestBillDetails[i].billId == this.chosenGuest.id && this.guestBillDetails[i].status == 'unpaid'){
+      //       // if(this.guestBillDetails[i].billId == this.chosenGuest.id) {
+      //         this.guestBill[j].pending += this.guestBillDetails[i].total
+      //       // }
+      //     }
+      //   }
+      // }
+      
     },
     checkOutClose: function () {
       this.showCheckOut = false
@@ -429,6 +447,16 @@ export default {
     showPaymentDialog(item) {
       this.showPayment = true
       this.currentDialogItem = item
+      this.chosenGuest.id = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).id
+      this.chosenGuest.keyDeposit = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).keyDeposit
+      this.chosenGuest.roomId = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).roomId
+      this.chosenGuest.status = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).status
+      this.chosenGuest.total = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).total
+      // this.chosenGuest.pending = this.guestBill.find((item)=> item.roomId == this.currentDialogItem.id).pending
+      // for(var i = 0; i < this.guestBillDetails.length; i++ ){
+      //   if(this.guestBillDetails[i].billId == this.chosenGuest.id)
+      //   this.chosenGuest.pending += this.guestBillDetails[i].total
+      // }
     },
     paymentClose: function () {
       this.showPayment = false
@@ -539,7 +567,8 @@ export default {
                 roomId: requestBill[y].roomId,
                 status: requestBill[y].status,
                 keyDeposit: requestBill[y].keyDeposit,
-                total: requestBill[y].total
+                total: requestBill[y].total,
+                pending: 0 
                 // balance: requestBill[y].balance,
                 // received: requestBill[y].received
               }
@@ -573,6 +602,7 @@ export default {
       var requestService = res.data.result
       for (var i = 0; i < requestService.length; i++){
         const addService = {
+          add: "false",
           id: requestService[i].id,
           name: requestService[i].name,
           rate: requestService[i].rate,
@@ -580,6 +610,7 @@ export default {
         }
         this.guestService.push(addService)
       }
+      // console.log(this.guestService)
     }).catch((err) => {
       console.log(err.response.data.message);
     });
