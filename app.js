@@ -343,8 +343,9 @@ app.post('/reservee', urlEncodedParser, (req, res)=>{
 })
 
 app.get('/reservee/:id', (req, res)=> {
-    connection.query('SELECT * FROM reservee WHERE id = '+req.params.id+'', (err, result) => {
+    connection.query('SELECT E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = '+req.params.id+'', (err, result) => {
         if(err) {
+            console.log(err);
             res.json({
                 message: "Reservee Id Required"
             });
@@ -357,7 +358,22 @@ app.get('/reservee/:id', (req, res)=> {
     })
 })
 
-app.post('/reservee/:id', urlEncodedParser, (req, res)=>{
+app.get('/reservee/checkin/:date', (req, res)=> {
+    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate ='+req.params.date+' AND R.status != 2', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Checkin Date Required"
+            });
+        } else {
+            res.json({
+                message: "Reservees Retrieved",
+                result
+            });
+        }
+    })
+})
+
+app.patch('/reservee/:id', urlEncodedParser, (req, res)=>{
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
@@ -379,7 +395,7 @@ app.post('/reservee/:id', urlEncodedParser, (req, res)=>{
     });
 })
 
-app.get('/reservee/delete/:id', (req, res)=> {
+app.delete('/reservee/:id', (req, res)=> {
     connection.query('DELETE FROM reservee WHERE id='+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -451,14 +467,14 @@ app.get('/reservation/id/:id', (req,res) => {
 });
 
 app.get('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id ORDER BY checkInDate', function(err, result){
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate', function(err, result){
         if(err) {
             console.log(err);
             res.json({
                 message: "Failed to Retrieve all Reservation"
             });
         } else {
-            connection.query('SELECT O.reservationId, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId', (err, room) => {
+            connection.query('SELECT O.reservationId, O.id, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId', (err, room) => {
                 var data = [];
                 for(var i = 0; i < room.length; i++){
                     for(var j = 0; j < result.length; j++){
@@ -499,20 +515,31 @@ app.get('/reservation', urlEncodedParser, (req,res) => {
     })
 });
 
-app.post('/reservation/:id', urlEncodedParser, (req, res) => {
+app.patch('/reservation/:id', urlEncodedParser, (req, res) => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
     
-    connection.query('UPDATE reservation SET reserveeId='+req.body.reserveeId+', accountId='+req.body.accountId+', type="'+req.body.type+'", status='+req.body.status+', checkInDate="'+req.body.checkInDate+'", checkOutDate="'+req.body.checkOutDate+'", noOfDays='+req.body.noOfDays+', noOfHead='+req.body.noOfHead+', confirmationNo='+req.body.confirmationNo+', reservationFee='+req.body.reservationFee+', updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
+    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="'+req.body.reservationType+'", R.status='+req.body.status+', R.checkInDate="'+req.body.checkInDate+'", R.checkOutDate="'+req.body.checkOutDate+'", R.noOfDays='+req.body.noOfDays+', R.noOfHead='+req.body.noOfHeads+', R.confirmationNo='+req.body.confirmationNo+', R.reservationFee='+req.body.reservationFee+', R.updatedAt="'+today+'", E.name="'+req.body.name+'", E.gender="'+req.body.gender+'", E.country="'+req.body.country+'", E.email="'+req.body.email+'", E.phoneNo="'+req.body.phone+'", E.updatedAt="'+today+'" WHERE R.id='+req.params.id+' ', (err, result) => {
         if(err){
+            console.log(err);
             res.json({
                 message: "Unable to update",
                 status: 400,
             })
         } else {
+            for(var i = 0; i < req.body.roomDetails.length; i++){
+                connection.query('UPDATE reserve_room SET roomType="'+req.body.roomDetails[i].type+'", noOfRoom="'+req.body.roomDetails[i].number+'" WHERE id='+req.body.roomDetails[i].id+'', (error, ress) => {
+                    if(error){
+                        res.json({
+                            message: "Reserve Room cannot update",
+                            status: 201,
+                        })
+                    }
+                })
+            }
             res.json({
                 message: "Reservation Updated",
                 status: 201,
@@ -521,7 +548,76 @@ app.post('/reservation/:id', urlEncodedParser, (req, res) => {
     });
 })
 
-app.get('/reservation/delete/:id', (req,res) => {
+app.patch('/reservation/cancel/:id', urlEncodedParser, (req, res) => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    
+    connection.query('UPDATE reservation SET status=0, updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
+        if(err){
+            console.log(err);
+            res.json({
+                message: "Unable to cancel",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Reservation Cancelled",
+                status: 201,
+            })
+        }
+    });
+})
+
+app.patch('/reservation/activate/:id', urlEncodedParser, (req, res) => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    
+    connection.query('UPDATE reservation SET status=1, updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
+        if(err){
+            console.log(err);
+            res.json({
+                message: "Unable to Activate",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Reservation Activated",
+                status: 201,
+            })
+        }
+    });
+})
+
+app.patch('/reservation/delete/:id', urlEncodedParser, (req, res) => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+    
+    connection.query('UPDATE reservation SET deletedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
+        if(err){
+            console.log(err);
+            res.json({
+                message: "Unable to Activate",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Reservation Activated",
+                status: 201,
+            })
+        }
+    });
+})
+
+app.delete('/reservation/:id', (req,res) => {
     connection.query('DELETE FROM reservation WHERE id='+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -637,6 +733,21 @@ app.get('/room-reserve/delete/:id', (req,res) => {
 /***********************************************     C H E C K   I N     ****************************************************/
 app.get('/checkin/:date', (req,res) => {
     connection.query('SELECT * FROM checkIn WHERE checkInDate = '+req.params.date+'', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Current Date Required"
+            });
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+                result
+            });
+        }
+    })
+});
+
+app.get('/checkout/:date', (req,res) => {
+    connection.query('SELECT * FROM checkIn WHERE checkOutDate = '+req.params.date+'', (err, result) => {
         if(err) {
             res.json({
                 message: "Current Date Required"
