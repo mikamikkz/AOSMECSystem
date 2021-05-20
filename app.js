@@ -710,6 +710,21 @@ app.get('/checkin/:date', (req,res) => {
     })
 });
 
+app.get('/checkout/:date', (req,res) => {
+    connection.query('SELECT * FROM checkIn WHERE checkOutDate = '+req.params.date+'', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Current Date Required"
+            });
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+                result
+            });
+        }
+    })
+});
+
 app.get('/checkin/id/:id', (req,res) => {
     connection.query('SELECT * FROM checkIn WHERE id = '+req.params.id+'', (err, result) => {
         if(err) {
