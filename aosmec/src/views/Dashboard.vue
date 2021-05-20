@@ -96,11 +96,13 @@
             </thead>
             <tbody>
               <tr
-                v-for="item in CheckOutGuests"
+                v-for="item in checkOutGuests"
                 :key="item.name"
               >
-                <td v-if="item.checkOutDate == today()">{{ item.name }}</td>
-                <td v-if="item.checkOutDate == today()">{{ item.roomNo }}</td>
+                <!-- <td v-if="item.checkOutDate == today()">{{ item.name }}</td>
+                <td v-if="item.checkOutDate == today()">{{ item.roomNo }}</td> -->
+                <td>{{ item.name }}</td>
+                <td>{{ item.roomNo }}</td>
               </tr>
             </tbody>
           </template>
@@ -162,7 +164,7 @@ export default {
         },
       ],
       arrivingGuests: [],
-      CheckOutGuests: []
+      checkOutGuests: []
     };
   },
   methods: {
@@ -291,7 +293,7 @@ export default {
               for(var q = 0; q < requestBillDetails.length; q++) {
                 if(requestBill[p].id == requestBillDetails[q].billId) {
                   for(var r = 0; r < requestService.length; r++) {
-                    if(requestService[r].id === requestBillDetails[q].serviceId) {
+                    if(requestService[r].id == requestBillDetails[q].serviceId) {
                       this.arrivingGuests[o].service.push(requestService[r].name)
                     }
                   }
@@ -306,6 +308,36 @@ export default {
       console.log(err.response.data.message);
     })
 
+    //Guests checking out today
+    const requestCheckOut = axios.get('http://localhost:3000/checkout/"'+today+'"');
+
+    axios
+    .all([requestCheckOut, requestGuest, requestRooms])
+    .then(axios.spread((...responses) => {
+      const requestCheckOut = responses[0].data.result
+      const requestGuest = responses[1].data.result
+      const requestRooms = responses[2].data.result
+
+      for(var i = 0; i < requestCheckOut.length; i++){
+        for(var j = 0; j < requestGuest.length; j++) {
+          if(requestCheckOut[i].id == requestGuest[j].checkInId) {
+            const addCheckOutGuests = {
+              name: requestGuest[j].fname + " " + requestGuest[j].lname,
+              roomNo: ""
+            }
+            this.checkOutGuests.push(addCheckOutGuests)
+            for(var k = 0; k < requestRooms.length; k++){
+              if(requestCheckOut[i].roomId == requestRooms[k].id) {
+                this.checkOutGuests[i].roomNo = requestRooms[k].roomNo
+              }
+            }
+          }
+        }
+      }
+
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
   }
 };
 </script>
