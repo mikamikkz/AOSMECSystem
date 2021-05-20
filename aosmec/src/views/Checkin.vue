@@ -18,11 +18,12 @@
                     v-model="input.reservee"
                     label="Reservee"
                     prepend-icon="mdi-tooltip-account"
-                    item-text="text"
+                    item-text="reservee"
                     item-value="value"
                     outlined
                     dense
                     color="green"
+                    v-on:change="fillReserveeDetails(input.reservee)"
                   ></v-select>
                 </v-col>
               </v-row>
@@ -38,6 +39,7 @@
                     outlined
                     dense
                     color="green"
+                    disabled
                   ></v-select>
                 </v-col>
               </v-row>
@@ -53,6 +55,7 @@
                     outlined
                     dense
                     color="green"
+                    disabled
                   ></v-select>
                 </v-col>
                 <v-col class="pa-0 pl-3" lg="4" md="4" xs="12">
@@ -102,6 +105,7 @@
                         dense
                         v-bind="attrs"
                         v-on="on"
+                        disabled
                         color="green"
                       ></v-text-field>
                     </template>
@@ -392,12 +396,14 @@
   </v-container>
 </template>
 <script>
+import axios from 'axios';
 import GuestForm from "../components/GuestForm";
 export default {
   components: { GuestForm },
   name: "CheckIn",
   data() {
     return {
+      today: "",
       input: {
         fname: "",
         lname: "",
@@ -474,6 +480,22 @@ export default {
     };
   },
   methods: {
+    fillReserveeDetails: function(reserveeId){
+      console.log(reserveeId);
+      axios
+      .get('http://localhost:3000/reservee/'+reserveeId)
+      .then((res) => {
+        var reserveeDetails = res.data.result[0];
+        this.input.reservationType = reserveeDetails.type
+        this.input.noOfHeads = reserveeDetails.noOfHead;
+        this.input.noOfDays = reserveeDetails.noOfDays;
+        this.input.checkOutDate = reserveeDetails.checkOutDate;
+        console.log(res.data.message);
+      })  
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+    },
     changeNoOfGuestForm: function (noOfHeads) {
       this.noOfGuestForm = parseInt(noOfHeads, 10);
     },
@@ -521,7 +543,22 @@ export default {
     }
   },
   beforeMount(){
-    
+    this.today = new Date().toISOString().slice(0,10);
+    axios
+      .get('http://localhost:3000/reservee/checkin/"'+this.today+'"')
+      .then((res) => {
+        var reservees = res.data.result;
+        for(var x = 0; x < reservees.length; x++){
+          var add = {
+            value: reservees[x].id,
+            reservee: reservees[x].name
+          }
+          this.reservee.push(add);
+        }
+      })  
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
   }
 };
 </script>

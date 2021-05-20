@@ -307,14 +307,30 @@ app.post('/reservee', urlEncodedParser, (req, res)=>{
 })
 
 app.get('/reservee/:id', (req, res)=> {
-    connection.query('SELECT * FROM reservee WHERE id = '+req.params.id+'', (err, result) => {
+    connection.query('SELECT E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = '+req.params.id+'', (err, result) => {
         if(err) {
+            console.log(err);
             res.json({
                 message: "Reservee Id Required"
             });
         } else {
             res.json({
                 message: "Reservee Retrieved",
+                result
+            });
+        }
+    })
+})
+
+app.get('/reservee/checkin/:date', (req, res)=> {
+    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate ='+req.params.date+' AND R.status != 2', (err, result) => {
+        if(err) {
+            res.json({
+                message: "Checkin Date Required"
+            });
+        } else {
+            res.json({
+                message: "Reservees Retrieved",
                 result
             });
         }
@@ -343,7 +359,7 @@ app.patch('/reservee/:id', urlEncodedParser, (req, res)=>{
     });
 })
 
-app.get('/reservee/delete/:id', (req, res)=> {
+app.delete('/reservee/:id', (req, res)=> {
     connection.query('DELETE FROM reservee WHERE id='+req.params.id+' ', (err, result) => {
         if(err){
             res.json({
@@ -415,7 +431,7 @@ app.get('/reservation/id/:id', (req,res) => {
 });
 
 app.get('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL ORDER BY checkInDate', function(err, result){
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate', function(err, result){
         if(err) {
             console.log(err);
             res.json({
@@ -518,6 +534,7 @@ app.patch('/reservation/cancel/:id', urlEncodedParser, (req, res) => {
         }
     });
 })
+
 app.patch('/reservation/activate/:id', urlEncodedParser, (req, res) => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
