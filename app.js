@@ -58,9 +58,21 @@ app.post("/room", urlEncodedParser, (req, res) => {
    });
 });
 
+//Retrieve all rooms:
+app.get("/rooms", (req, res) => {
+    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "All Rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
 //Retrieve 1st floor:
 app.get("/room/1", (req, res) => {
-    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
+    connection.query('SELECT r.id, r.roomTypeId, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
         // console.log(result);
         res.json({
             message: "1st floor Rooms",
@@ -95,36 +107,60 @@ app.get("/room/3", (req, res) => {
 });
 
 
-//Retrieve total # of clean rooms:
+//Retrieve total clean rooms:
 app.get("/room/clean", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "clean"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "clean"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of clean rooms",
+            message: "total clean rooms",
             status: 200,
             result
         })
     });
 });
 
-//Retrieve total # of dirty rooms:
+//Retrieve total dirty rooms:
 app.get("/room/dirty", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "dirty"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "dirty"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of dirty rooms",
+            message: "total dirty rooms",
             status: 200,
             result
         })
     });
 });
 
-//Retrieve total # of out-of-order:
+//Retrieve total out-of-order rooms:
 app.get("/room/out-of-order", (req, res) => {
-    connection.query('SELECT COUNT(*) FROM `room` WHERE status = "out-of-order"', (err, result) => {
+    connection.query('SELECT * FROM `room` WHERE status = "out-of-order"', (err, result) => {
         // console.log(result);
         res.json({
-            message: "total # of out-of-order rooms",
+            message: "total out-of-order rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve total # of occupied rooms:
+app.get("/room/occupied", (req, res) => {
+    connection.query('SELECT * FROM `room` WHERE occupied = 1', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "total occupied rooms",
+            status: 200,
+            result
+        })
+    });
+});
+
+//Retrieve total # of vacant rooms:
+app.get("/room/vacant", (req, res) => {
+    connection.query('SELECT * FROM `room` WHERE occupied = 0', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "total vacant rooms",
             status: 200,
             result
         })
@@ -134,7 +170,7 @@ app.get("/room/out-of-order", (req, res) => {
 //Update:
 app.get("/room/:id", (req, res) => {
     connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id="+req.params.id+" ", (err, result) => {
-        // console.log(result);
+        // console.log(err);
         res.json({
             message: "Room Update",
             status: 200,
@@ -143,8 +179,8 @@ app.get("/room/:id", (req, res) => {
     });
 });
 
-app.post("/room/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE room SET roomTypeId='+req.body.roomTypeId+',roomNo='+req.body.roomNo+', status="'+req.body.status+'", occupied= '+req.body.occupied+' WHERE id='+req.params.id+' ', (err, response) => {
+app.patch("/room/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE room SET roomNo='+req.body.roomNo+', status="'+req.body.status+'", occupied= '+req.body.occupied+' WHERE id='+req.params.id+' ', (err, response) => {
         // console.log(err);
         if(err){
             res.json({
@@ -222,6 +258,35 @@ app.get("/bill", (req, res) => {
             status: 200,
             result
         })
+    });
+});
+
+//Update:
+app.get("/bill/:id", (req, res) => {
+    connection.query("SELECT * FROM bill WHERE id="+req.params.id+" ", (err, result) => {
+        // console.log(err);
+        res.json({
+            message: "Room Update",
+            status: 200,
+            result
+        })
+    });
+});
+
+app.patch("/bill/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
+        // console.log(err);
+        if(err){
+            res.json({
+                message: "Room Not Updated",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Room Updated",
+                status: 200,
+            })
+        }
     });
 });
 
