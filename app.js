@@ -72,7 +72,7 @@ app.get("/rooms", (req, res) => {
 
 //Retrieve 1st floor:
 app.get("/room/1", (req, res) => {
-    connection.query('SELECT r.id, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
+    connection.query('SELECT r.id, r.roomTypeId, r.roomNo, r.status, r.occupied, rt.name, rt.rate, rt.totalNoOfRoom FROM `room` r INNER JOIN `room_type` rt ON r.roomTypeId = rt.id WHERE roomNo BETWEEN 101 AND 118', (err, result) => {
         // console.log(result);
         res.json({
             message: "1st floor Rooms",
@@ -170,7 +170,7 @@ app.get("/room/vacant", (req, res) => {
 //Update:
 app.get("/room/:id", (req, res) => {
     connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id="+req.params.id+" ", (err, result) => {
-        // console.log(result);
+        // console.log(err);
         res.json({
             message: "Room Update",
             status: 200,
@@ -179,8 +179,8 @@ app.get("/room/:id", (req, res) => {
     });
 });
 
-app.post("/room/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE room SET roomTypeId='+req.body.roomTypeId+',roomNo='+req.body.roomNo+', status="'+req.body.status+'", occupied= '+req.body.occupied+' WHERE id='+req.params.id+' ', (err, response) => {
+app.patch("/room/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE room SET roomNo='+req.body.roomNo+', status="'+req.body.status+'", occupied= '+req.body.occupied+' WHERE id='+req.params.id+' ', (err, response) => {
         // console.log(err);
         if(err){
             res.json({
@@ -258,6 +258,35 @@ app.get("/bill", (req, res) => {
             status: 200,
             result
         })
+    });
+});
+
+//Update:
+app.get("/bill/:id", (req, res) => {
+    connection.query("SELECT * FROM bill WHERE id="+req.params.id+" ", (err, result) => {
+        // console.log(err);
+        res.json({
+            message: "Room Update",
+            status: 200,
+            result
+        })
+    });
+});
+
+app.patch("/bill/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
+        // console.log(err);
+        if(err){
+            res.json({
+                message: "Room Not Updated",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Room Updated",
+                status: 200,
+            })
+        }
     });
 });
 

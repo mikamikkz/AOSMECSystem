@@ -253,6 +253,7 @@ export default {
       const requestBill = responses[4].data.result
       const requestBillDetails = responses[5].data.result
       const requestService = responses[6].data.result
+
       // console.log(responses)
 
       for(var i = 0; i < requestReservation.length; i++){
