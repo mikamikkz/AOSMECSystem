@@ -6,7 +6,7 @@
         <v-row>
           <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
             <v-text-field
-              v-model="input.fname"
+              v-model="guest.fname"
               label="First Name"
               prepend-icon="mdi-account"
               outlined
@@ -16,7 +16,7 @@
           </v-col>
           <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
             <v-text-field
-              v-model="input.lname"
+              v-model="guest.lname"
               label="Last Name"
               outlined
               dense
@@ -28,7 +28,7 @@
           <v-col class="pa-0 pr-2" lg="4" md="4" xs="12">
             <v-select
               v-bind:items="gender"
-              v-model="input.gender"
+              v-model="guest.gender"
               item-text="text"
               item-value="value"
               label="Gender"
@@ -39,13 +39,13 @@
             ></v-select>
           </v-col>
           <v-col class="pa-0 pl-8" lg="8" md="8" xs="12">
-            <NationalitySelect></NationalitySelect>
+            <NationalitySelect v-model="guest.nationality"></NationalitySelect>
           </v-col>
         </v-row>
         <v-row>
           <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
             <v-text-field
-              v-model="input.validId"
+              v-model="guest.validId"
               label="Valid ID"
               prepend-icon="mdi-passport"
               outlined
@@ -56,7 +56,7 @@
           <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
             <v-select
               v-bind:items="validIdType"
-              v-model="input.validIdType"
+              v-model="guest.validIdType"
               item-text="text"
               item-value="value"
               label="Valid Id Type"
@@ -67,11 +67,11 @@
           </v-col>
         </v-row>
         <v-row>
-          <CountrySelect></CountrySelect>
+          <CountrySelect v-model="guest.country"></CountrySelect>
         </v-row>
         <v-row>
           <v-text-field
-            v-model="input.address"
+            v-model="guest.address"
             label="Address"
             prepend-icon="mdi-map-marker"
             outlined
@@ -81,7 +81,7 @@
         </v-row>
         <v-row>
           <v-text-field
-            v-model="input.phoneNo"
+            v-model="guest.phoneNo"
             label="Contact Number"
             prepend-icon="mdi-phone"
             outlined
@@ -101,7 +101,7 @@ export default {
   components: { CountrySelect, NationalitySelect },
   data() {
     return {
-      input: [],
+      guest: [],
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },

@@ -307,17 +307,24 @@ app.post('/reservee', urlEncodedParser, (req, res)=>{
 })
 
 app.get('/reservee/:id', (req, res)=> {
-    connection.query('SELECT E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = '+req.params.id+'', (err, result) => {
+    connection.query('SELECT R.id, E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = '+req.params.id+'', (err, result1) => {
         if(err) {
             console.log(err);
             res.json({
                 message: "Reservee Id Required"
             });
         } else {
-            res.json({
-                message: "Reservee Retrieved",
-                result
-            });
+            var result = {
+                reservee: result1,
+                rooms: []  
+            };
+            connection.query('SELECT id, roomType, noOfRoom FROM reserve_room WHERE reservationId ='+result1[0].id+'', (error, result2) => {
+                result.rooms = result2;
+                res.json({
+                    message: "Reservee Retrieved",
+                    result
+                });
+            })
         }
     })
 })
@@ -431,7 +438,7 @@ app.get('/reservation/id/:id', (req,res) => {
 });
 
 app.get('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate', function(err, result){
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate ASC', function(err, result){
         if(err) {
             console.log(err);
             res.json({
@@ -784,14 +791,40 @@ app.get("/room-mgmt/all", (req, res) => {
     connection.query('SELECT * FROM room_type', (err, result) => {
         if(err){
             res.json({
-                message: "Rooms info was retrieved.",
-                status: 100,            
+                message: "Rooms info was not retrieved.",
+                status: 400,            
             })
         } else {
             res.json({
                 result,
                 message: "Rooms info was retrieved.",
-                status: 100,            
+                status: 210,            
+            })
+        }
+    });
+});
+
+//get room rate of given room
+app.get("/room-rate/:room/:num", (req, res) => {
+    connection.query('SELECT rate FROM room_type WHERE name = "'+req.params.room+'"', (err, result) => {
+        if(err){
+            console.log(err);
+            res.json({
+                message: "Cannot retrieve room rate.",
+                status: 400,            
+            })
+        } else {
+            var rate = result[0].rate;
+            var name = req.params.room;
+            var qty = parseInt(req.params.num);
+            var totalRate = result[0].rate * req.params.num;
+            res.json({
+                name,
+                rate,
+                totalRate,
+                qty,
+                message: "Room rate retrieved",
+                status: 210,            
             })
         }
     });
@@ -867,6 +900,23 @@ app.get("/service-mgmt", (req, res) => {
             res.json({
                 result,
                 message: "Services were retrieved.",
+                status: 200,            
+            })
+        }
+    });
+});
+
+app.get("/service/:id", (req, res) => {
+    connection.query('SELECT name, rate FROM service WHERE id ='+req.params.id+'', (err, result) => {
+        if(err){
+            res.json({
+                message: "Service not retrieved.",
+                status: 100,            
+            })
+        } else {
+            res.json({
+                result,
+                message: "Service retrieved.",
                 status: 200,            
             })
         }
