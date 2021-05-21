@@ -13,7 +13,7 @@
         <v-col lg="4" cols="sm" class="pb-2">
           <v-card class="bordered" height="167px">
             <div class="col pa-3 py-4 green--text">
-              <h4 class="text-truncate text-uppercase">Total Revenue</h4>
+              <h4 class="text-truncate text-uppercase">Total Daily Revenue</h4>
               <h1>{{ totalRevenue }}</h1>
             </div>
           </v-card>
@@ -121,7 +121,7 @@ export default {
   data() {
     return {
       date: "",
-      totalRevenue: "123456",
+      totalRevenue: 0,
       // room status
       clean: "0", dirty: "0", outOfOrder: "0", occupied: "0", vacant: "0",
       // tables
@@ -332,6 +332,25 @@ export default {
                 this.checkOutGuests[i].roomNo = requestRooms[k].roomNo
               }
             }
+          }
+        }
+      }
+
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
+
+    //Total Daily Revenue
+    axios
+    .all([requestBill, requestCheckin])
+    .then(axios.spread((...responses) => {
+      const requestBill = responses[0].data.result
+      const requestCheckin = responses[1].data.result
+
+      for(var i = 0; i < requestCheckin.length; i++){
+        for(var j = 0; j < requestBill.length; j++) {
+          if(requestCheckin[i].roomId == requestBill[j].roomId) {
+            this.totalRevenue += requestBill[j].total
           }
         }
       }
