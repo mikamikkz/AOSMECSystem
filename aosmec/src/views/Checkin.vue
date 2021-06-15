@@ -43,7 +43,11 @@
                   ></v-select>
                 </v-col>
               </v-row>
-              <ul v-for="rooms in input.roomDetails" :key="rooms.id" class="pa-0 ma-0">
+              <ul
+                v-for="rooms in input.roomDetails"
+                :key="rooms.id"
+                class="pa-0 ma-0"
+              >
                 <v-row v-for="noOfRoom in rooms.noOfRoom" :key="noOfRoom">
                   <v-col class="pa-0" lg="8" md="8" xs="12">
                     <v-select
@@ -190,8 +194,7 @@
                     dense
                     color="green"
                     prepend-icon="mdi-account-multiple"
-                    min = 1
-                    v-on:change="changeNoOfGuestForm(input.noOfHeads)"
+                    min="1"
                   >
                   </v-text-field>
                 </v-col>
@@ -266,7 +269,7 @@
                   item-value="value"
                   dense
                   outlined
-                  color = "green"
+                  color="green"
                 ></v-select>
               </v-col>
               <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
@@ -276,8 +279,8 @@
                   dense
                   outlined
                   type="number"
-                  min = 1
-                  color = "green"
+                  min="1"
+                  color="green"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -321,11 +324,7 @@
               </template>
             </v-simple-table>
             <v-card-actions class="d-flex justify-center">
-              <v-btn
-                color="success"
-                v-on:click="
-                  checkInModal(guestBillDetails)
-                "
+              <v-btn color="success" v-on:click="checkInModal(guestBillDetails)"
                 >Check In</v-btn
               >
             </v-card-actions>
@@ -402,7 +401,9 @@
                 <v-btn
                   color="light-green white--text"
                   class="px-5"
-                  v-on:click="checkInGuest(input, guestServices, guestBillDetails)"
+                  v-on:click="
+                    checkInGuest(input, guestServices, guestBillDetails)
+                  "
                 >
                   Check In
                 </v-btn>
@@ -412,32 +413,143 @@
         </v-card>
       </v-col>
     </v-row>
-    <v-row class="mt-5 pa-0">
-      <v-col
-        lg="6"
-        md="6"
-        sm="12"
-        d-flex
-        v-for="guest in noOfGuestForm"
-        :key="guest"
-      >
-        <GuestForm v-model="input.guest"></GuestForm>
-      </v-col>
+    
+    <v-row class="mt-6 mx-1">
+      <v-card>
+        <v-card-title class="green--text">Guest Details</v-card-title>
+        <v-card-text class="mt-3">
+          <v-form class="px-3">
+            <v-row>
+              <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
+                <v-text-field
+                  v-model="guest.fname"
+                  label="First Name"
+                  prepend-icon="mdi-account"
+                  outlined
+                  dense
+                  color="green"
+                ></v-text-field>
+              </v-col>
+              <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
+                <v-text-field
+                  v-model="guest.lname"
+                  label="Last Name"
+                  outlined
+                  dense
+                  color="green"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="pa-0 pr-2" lg="4" md="4" xs="12">
+                <v-select
+                  v-bind:items="gender"
+                  v-model="guest.gender"
+                  item-text="text"
+                  item-value="value"
+                  label="Gender"
+                  prepend-icon="mdi-gender-male-female"
+                  outlined
+                  dense
+                  color="green"
+                ></v-select>
+              </v-col>
+              <v-col class="pa-0 pl-8" lg="8" md="8" xs="12">
+                <NationalitySelect
+                  v-model="guest.nationality"
+                ></NationalitySelect>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
+                <v-text-field
+                  v-model="guest.validId"
+                  label="Valid ID"
+                  prepend-icon="mdi-passport"
+                  outlined
+                  dense
+                  color="green"
+                ></v-text-field>
+              </v-col>
+              <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
+                <v-select
+                  v-bind:items="validIdType"
+                  v-model="guest.validIdType"
+                  item-text="text"
+                  item-value="value"
+                  label="Valid Id Type"
+                  outlined
+                  dense
+                  color="green"
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row>
+              <CountrySelect v-model="guest.country"></CountrySelect>
+            </v-row>
+            <v-row>
+              <v-text-field
+                v-model="guest.address"
+                label="Address"
+                prepend-icon="mdi-map-marker"
+                outlined
+                dense
+                color="green"
+              ></v-text-field>
+            </v-row>
+            <v-row>
+              <v-text-field
+                v-model="guest.phoneNo"
+                label="Contact Number"
+                prepend-icon="mdi-phone"
+                outlined
+                dense
+                color="green"
+              ></v-text-field>
+            </v-row>
+          </v-form>
+          <v-card-actions class="d-flex justify-center pb-6">
+            <v-btn color="success" class="px-8" v-on:click="submitBtn(guest)">
+              Submit
+            </v-btn>
+          </v-card-actions>
+        </v-card-text>
+      </v-card>
     </v-row>
   </v-container>
 </template>
 <script>
 import axios from "axios";
-import GuestForm from "../components/GuestForm";
+import CountrySelect from "../components/CountrySelect";
+import NationalitySelect from "../components/NationalitySelect";
 export default {
-  components: { GuestForm },
+  components: { CountrySelect, NationalitySelect },
   name: "CheckIn",
   data() {
     return {
       today: "",
+      gender: [
+        { text: "Male", value: "Male" },
+        { text: "Female", value: "Female" },
+        { text: "Other", value: "Other" },
+      ],
+      validIdType: [
+        { text: "Passport", value: "Passport" },
+        { text: "Drivers License", value: "Drivers License" },
+        { text: "School ID", value: "School ID" },
+        { text: "Senior Citizen Card", value: "Senior Citizen Card" },
+        { text: "Voters Card", value: "Voters Card" },
+        { text: "Postal ID", value: "Postal ID" },
+        { text: "PWD ID", value: "PWD ID" },
+        { text: "PhilHealth ID", value: "PhilHealth ID" },
+        {
+          text: "SSS Unified Multipurpose ID",
+          value: "SSS Unified Multipurpose ID",
+        },
+        { text: "Other", value: "Other" },
+      ],
       input: {
-        fname: "",
-        lname: "",
+        guest: [],
         noOfHeads: "1",
         checkInDate: new Date().toISOString().substr(0, 10),
         checkOutDate: "",
@@ -470,6 +582,9 @@ export default {
       checkIn: false,
       checkOut: false,
       checkInDialog: false,
+      guestDetailDialog: false,
+      headCount: 0,
+      current: 0,
       date: "",
     };
   },
@@ -487,33 +602,45 @@ export default {
           this.input.noOfDays = reserveeDetails.noOfDays;
           this.input.checkOutDate = reserveeDetails.checkOutDate;
           this.input.roomDetails = rooms;
-          for(var i = 0, totalRate = 0, resType = reserveeDetails.type; i < rooms.length; i++){
+          for (
+            var i = 0, totalRate = 0, resType = reserveeDetails.type;
+            i < rooms.length;
+            i++
+          ) {
             axios
-            .get("http://localhost:3000/room-rate/"+rooms[i].roomType+"/"+rooms[i].noOfRoom)
-            .then((response) => {
-              var roomRate = response.data.rate;
-              var qty = response.data.qty;
-              totalRate += roomRate * qty;
-              var service = {
-                add: false,
-                name: response.data.name + " Room",
-                rate: roomRate ,
-                quantity: qty,
-                status: true
-              };
-              this.guestServices.push(service);
-              var add = [
-                {
-                  name: "Room Rate",
-                  total: totalRate,
-                  status: "Paid"
+              .get(
+                "http://localhost:3000/room-rate/" +
+                  rooms[i].roomType +
+                  "/" +
+                  rooms[i].noOfRoom
+              )
+              .then((response) => {
+                var roomRate = response.data.rate;
+                var qty = response.data.qty;
+                totalRate += roomRate * qty;
+                var service = {
+                  add: false,
+                  name: response.data.name + " Room",
+                  rate: roomRate,
+                  quantity: qty,
+                  status: true,
+                };
+                this.guestServices.push(service);
+                var add = [
+                  {
+                    name: "Room Rate",
+                    total: totalRate,
+                    status: "Paid",
+                  },
+                ];
+                if (
+                  resType.localeCompare("Booking.com") == 0 ||
+                  resType.localeCompare("Walkin") == 0
+                ) {
+                  add[0].status = "Pending";
                 }
-              ];
-              if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0){
-                add[0].status = "Pending";
-              }
-              this.guestBillDetails = add;
-            })
+                this.guestBillDetails = add;
+              });
           }
           console.log(res.data.message);
         })
@@ -521,34 +648,54 @@ export default {
           console.log(err.response.data.message);
         });
     },
-    changeNoOfGuestForm: function (noOfHeads) {
-      this.noOfGuestForm = parseInt(noOfHeads, 10);
+    guestDetailBtn: function (guestInput) {
+      this.guestDetailDialog = true;
+      this.headCount = parseInt(guestInput, 10) - 1;
+      if (this.input.guest.length == 0) {
+        var empty = {
+          fname: "",
+          lname: "",
+          gender: "",
+          nationality: "",
+          country: "",
+          address: "",
+          validId: "",
+          phoneNo: "",
+        };
+        this.input.guest.push(empty);
+      }
+      console.log(this.input.guest);
+    },
+    submitBtn: function (guestInput) {
+      this.input.guest.push(guestInput);
+      this.guestDetailDialog = false;
+      console.log(this.input.guest);
     },
     addToList: function (input) {
       axios
-      .get('http://localhost:3000/service/'+input.id)
-      .then((res) => {
-        var service = res.data.result[0];
-        var addData = {
-          add: true,
-          id: input.id,
-          name: service.name,
-          rate: service.rate,
-          quantity: input.qty,
-          status: false,
-        };
-        this.guestServices.push(addData);
-        var addBill = {
-          id: input.id,
-          name: service.name,
-          total: service.rate * input.qty,
-          status: "Pending",
-        };
-        this.guestBillDetails.push(addBill);
-      })
-      .catch((err) => {
-        console.log(err.response.data.message);
-      });
+        .get("http://localhost:3000/service/" + input.id)
+        .then((res) => {
+          var service = res.data.result[0];
+          var addData = {
+            add: true,
+            id: input.id,
+            name: service.name,
+            rate: service.rate,
+            quantity: input.qty,
+            status: false,
+          };
+          this.guestServices.push(addData);
+          var addBill = {
+            id: input.id,
+            name: service.name,
+            total: service.rate * input.qty,
+            status: "Pending",
+          };
+          this.guestBillDetails.push(addBill);
+        })
+        .catch((err) => {
+          console.log(err.response.data.message);
+        });
     },
     removeFromList: function (input) {
       var index = this.guestServices.indexOf(input.name);
@@ -566,9 +713,9 @@ export default {
       }
       this.guestBill.total = totalBill;
       this.guestBill.balance = balance;
-      console.log(this.input.guest)
+      console.log(this.input.guest);
     },
-    checkInGuest: function(input, guestServices, guestBillDetails) {
+    checkInGuest: function (input, guestServices, guestBillDetails) {
       this.checkInDialog = false;
       console.log(input);
       console.log(guestServices);
@@ -618,8 +765,8 @@ export default {
         for (var x = 0; x < service.length; x++) {
           var add = {
             value: service[x].id,
-            text: service[x].name
-          }
+            text: service[x].name,
+          };
           this.services.push(add);
         }
       })

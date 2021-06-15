@@ -61,7 +61,7 @@
                 Total Renevue
               </p>
               <p class="text-left my-0" style="font-size: 28px; color: #eff3fc">
-                14000
+                {{monthlyRevenue}}
               </p>
             </v-col>
           </v-row>
@@ -80,7 +80,7 @@
                 Total Guests
               </p>
               <p class="text-left my-0" style="font-size: 28px; color: #f2fcef">
-                30
+                {{monthlyGuest}}
               </p>
             </v-col>
           </v-row>
@@ -129,6 +129,7 @@
 }
 </style>
 <script>
+import axios from "axios";
 import BarChart from "../components/BarChart";
 import PieChart from "../components/PieChart";
 export default {
@@ -136,6 +137,8 @@ export default {
   components: { BarChart, PieChart },
   data() {
     return {
+      month: "",
+      year: "",
       menu: false,
       // dateReport: new Date().toISOString().substr(0, 10),
       dateReport: new Date().toISOString().substr(0, 7),
@@ -226,8 +229,13 @@ export default {
       resTypeTableHeader: [
         { text: 'Type', value: 'type' },
         { text: 'Revenue', value: 'total' },
-        { text: 'Commission Check(15%)', value: 'commission' },
-      ]
+        { text: 'Commission to Site(15%)', value: 'commission' },
+      ],
+      resTypeTableBody: [
+        { type: 'Agoda', total: '1000', commission: '150' }
+      ],
+      monthlyRevenue: 0,
+      monthlyGuest: 0,
     };
   },
   methods: {
@@ -235,6 +243,38 @@ export default {
       this.$refs.menu.save(date);
       console.log(input);
     },
+  },
+  beforeMount() {
+    var today = new Date().toISOString().slice(0, 10);
+    var dateSplit = today.split('-', 3);
+    this.year = dateSplit[0];
+    this.month = dateSplit[1];
+
+    axios
+      .get('http://localhost:3000/monthly-guest/'+this.month+'/'+this.year+'')
+      .then((res) => {
+        this.monthlyGuest = res.data.count;
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+    axios
+      .get('http://localhost:3000/monthly-revenue/'+this.month+'/'+this.year+'')
+      .then((res) => {
+        this.monthlyRevenue = res.data.revenue;
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
+    axios
+      .get('http://localhost:3000/monthly-checkin/'+this.month+'/'+this.year+'')
+      .then((res) => {
+        this.checkIn = res.data.monthly;
+        console.log(this.checkIn)
+      })
+      .catch((err) => {
+        console.log(err.response.data.message);
+      });
   },
 };
 </script>
