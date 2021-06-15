@@ -261,42 +261,6 @@ app.get("/bill", (req, res) => {
     });
 });
 
-app.get("/monthly-revenue/:month/:year", (req, res) => {
-    connection.query('SELECT SUM(total) FROM bill WHERE status = "paid" AND YEAR(createdAt) = "' + req.params.year + '" AND MONTH(createdAt) = "' + req.params.month + '" ', (err, result) => {
-        if (err) {
-            console.log(err);
-            res.json({
-                message: "Month and Year Required"
-            });
-        } else {
-            var x = result[0]
-            var revenue = x['SUM(total)'];
-            res.json({
-                message: "Monthly Revenue Retrieved",
-                revenue
-            });
-        }
-    })
-});
-
-app.get("/monthly-commissions/:month/:year", (req, res) => {
-    connection.query('SELECT SUM(total) FROM bill WHERE status = "paid" AND YEAR(createdAt) = "' + req.params.year + '" AND MONTH(createdAt) = "' + req.params.month + '" ', (err, result) => {
-        if (err) {
-            console.log(err);
-            res.json({
-                message: "Month and Year Required"
-            });
-        } else {
-            var x = result[0]
-            var revenue = x['SUM(total)'];
-            res.json({
-                message: "Monthly Revenue Retrieved",
-                revenue
-            });
-        }
-    })
-});
-
 //Update:
 app.get("/bill/:id", (req, res) => {
     connection.query("SELECT * FROM bill WHERE id=" + req.params.id + " ", (err, result) => {
@@ -848,77 +812,6 @@ app.get('/checkin/id/:id', (req, res) => {
     })
 });
 
-app.get('/monthly-guest/:month/:year', (req, res) => {
-    connection.query('SELECT id FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" ', (err, result) => {
-        if (err) {
-            console.log(err);
-            res.json({
-                message: "Month and Year Required"
-            });
-        } else {
-            var count = result.length;
-            res.json({
-                message: "No of Guest Check in Retrieved",
-                count
-            });
-        }
-    })
-});
-
-app.get('/monthly-checkin/:month/:year', (req, res) => {
-    connection.query('SELECT DAY(checkInDate), COUNT(*) FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" GROUP BY DAY(checkInDate) ASC', (err, checkIn) => {
-        if (err) {
-            console.log(err);
-            res.json({
-                message: "Date Required"
-            });
-        } else {
-            var month = req.params.month;
-            var endOfMonth = 0;
-
-            if (month = 02) {
-                endOfMonth = 28;
-            } else if (month == 01 || month == 03 || month == 05 || month == 07 || month == 09 || month == 12) {
-                endOfMonth = 31;
-            } else {
-                endOfMonth = 30;
-            }
-
-            connection.query('SELECT DAY(checkOutDate), COUNT(*) FROM checkIn WHERE YEAR(checkOutDate) = "' + req.params.year + '" AND MONTH(checkOutDate) = "' + req.params.month + '" GROUP BY DAY(checkOutDate) ASC', (err, checkOut) => {
-                var original1, original2;
-                var monthly = [];
-                var inputCheckIn, inputCheckOut;
-                for (var day = 1, i = c1 = c2 = 0; day < endOfMonth && (c1 < checkIn.length || c2 < checkOut.length); day++, i++) {
-                    original1 = checkIn[c1]
-                    if (c1 < checkIn.length && original1['DAY(checkInDate)'] == day) {
-                        inputCheckIn = original1['COUNT(*)'];
-                        c1++;
-                    } else {
-                        inputCheckIn = 0;
-                    }
-
-                    original2 = checkOut[c2]
-                    if (c2 < checkOut.length && original2['DAY(checkOutDate)'] == day) {
-                        inputCheckOut = original2['COUNT(*)'];
-                        c2++;
-                    } else {
-                        inputCheckOut = 0;
-                    }
-                    monthly[i] = {
-                        date: day.toString(),
-                        totalCheckIn: inputCheckIn.toString(),
-                        totalCheckOut: inputCheckOut.toString()
-                    }
-                };
-                res.json({
-                    message: "Check in Retrieved",
-                    monthly
-                });
-            })
-        }
-    })
-});
-
 app.post('/checkin', urlEncodedParser, (req, res) => {
     connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES (' + req.body.reservationId + ',' + req.body.accountId + ',' + req.body.roomId + ',"' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ',' + req.body.noOfHead + ')', (err, result) => {
         if (err) {
@@ -1241,5 +1134,191 @@ app.get('/report', (req, res) => {
     res.render('report');
 });
 
+app.get('/monthly-guest/:month/:year', (req, res) => {
+    connection.query('SELECT id FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" ', (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            var count = result.length;
+            res.json({
+                message: "No of Guest Check in Retrieved",
+                count
+            });
+        }
+    })
+});
+
+app.get('/monthly-checkin/:month/:year', (req, res) => {
+    connection.query('SELECT DAY(checkInDate), COUNT(*) FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" GROUP BY DAY(checkInDate) ASC', (err, checkIn) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Date Required"
+            });
+        } else {
+            var month = req.params.month;
+            var endOfMonth = 0;
+
+            if (month == 02) {
+                endOfMonth = 28;
+            } else if (month == 01 || month == 03 || month == 05 || month == 07 || month == 09 || month == 12) {
+                endOfMonth = 31;
+            } else {
+                endOfMonth = 30;
+            }
+
+            connection.query('SELECT DAY(checkOutDate), COUNT(*) FROM checkIn WHERE YEAR(checkOutDate) = "' + req.params.year + '" AND MONTH(checkOutDate) = "' + req.params.month + '" GROUP BY DAY(checkOutDate) ASC', (err, checkOut) => {
+                var original1, original2;
+                var monthly = [];
+                var inputCheckIn, inputCheckOut;
+                var i;
+                for (var day = 1, i = c1 = c2 = 0; day < endOfMonth && (c1 < checkIn.length || c2 < checkOut.length); day++, i++) {
+                    original1 = checkIn[c1]
+                    if (c1 < checkIn.length && original1['DAY(checkInDate)'] == day) {
+                        inputCheckIn = original1['COUNT(*)'];
+                        c1++;
+                    } else {
+                        inputCheckIn = 0;
+                    }
+
+                    original2 = checkOut[c2]
+                    if (c2 < checkOut.length && original2['DAY(checkOutDate)'] == day) {
+                        inputCheckOut = original2['COUNT(*)'];
+                        c2++;
+                    } else {
+                        inputCheckOut = 0;
+                    }
+                    monthly[i] = {
+                        date: day.toString(),
+                        totalCheckIn: inputCheckIn.toString(),
+                        totalCheckOut: inputCheckOut.toString()
+                    }
+                };
+                for (var j = day; j <= endOfMonth; j++) {
+                    inputCheckIn = 0;
+                    inputCheckOut = 0;
+                    var add = {
+                        date: j.toString(),
+                        totalCheckIn: inputCheckIn.toString(),
+                        totalCheckOut: inputCheckOut.toString()
+                    }
+                    monthly.push(add);
+                };
+                res.json({
+                    message: "Check in Retrieved",
+                    monthly
+                });
+            })
+        }
+    })
+});
+
+app.get("/monthly-revenue/:month/:year", (req, res) => {
+    connection.query('SELECT SUM(total) FROM bill WHERE status = "paid" AND YEAR(createdAt) = "' + req.params.year + '" AND MONTH(createdAt) = "' + req.params.month + '" ', (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            var x = result[0]
+            var revenue = x['SUM(total)'];
+            if (revenue == null){
+                revenue = 0;
+            }
+            res.json({
+                message: "Monthly Revenue Retrieved",
+                revenue
+            });
+        }
+    })
+});
+
+app.get("/monthly-commissions/:month/:year", (req, res) => {
+    connection.query('SELECT R.id, R.type, R.noOfDays, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" AND R.deletedAt IS NULL AND R.status != 0', (err, reservation) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            connection.query('SELECT name, rate FROM room_type', (err, rate) => {
+                var totalBook = totalAgoda = totalExp = totalAir = 0;
+                for(var i = 0; i < reservation.length; i++){
+                    for(var j = 0; j < rate.length && rate[j].name != reservation[i].roomType; j++){}
+
+                    if(reservation[i].type == "Booking.com"){
+                        totalBook += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Agoda"){
+                        totalAgoda += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Expedia"){
+                        totalExp += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Airbnb") {
+                        totalAir += rate[j].rate * reservation[i].noOfRoom
+                    }
+                }
+                var comBook = totalBook * 0.15;
+                var comAgoda = totalAgoda * 0.15;
+                var comExp = totalExp * 0.15;
+                var comAir = totalAir * 0.15;
+
+                var saleBook = totalBook - comBook;
+                var saleAgoda = totalAgoda - comAgoda;
+                var saleExp = totalExp - comExp;
+                var saleAir = totalAir - comAir;
+
+                var result = [
+                    {type: "Booking.com", total: totalBook, commission: comBook, sale: saleBook},
+                    {type: "Agoda", total: totalAgoda, commission: comAgoda, sale: saleAgoda},
+                    {type: "Expedia", total: totalExp, commission: comExp, sale: saleExp},
+                    {type: "AirBnb", total: totalAir, commission: comAir, sale: saleAir},
+                ]
+                res.json({
+                    message: "Monthly Revenue Retrieved",
+                    result
+                });
+            })
+        }
+    })
+});
+
+app.get("/monthly-reservations/:month/:year", (req, res) => {
+    connection.query('SELECT id, type FROM reservation WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" AND deletedAt IS NULL AND status != 0', (err, types) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            for(var i = book = walk = air = ago = exp = 0; i < types.length; i++){
+                if(types[i].type == "Booking.com"){
+                    book++;
+                } else if(types[i].type == "Agoda"){
+                    ago++;
+                } else if(types[i].type == "Expedia"){
+                    exp++;
+                } else if(types[i].type == "Airbnb") {
+                    air++;
+                } else {
+                    walk++;
+                }
+            }
+            var result = [
+                {name: "Booking.com", total: book},
+                {name: "Agoda", total: ago},
+                {name: "Expedia", total: exp},
+                {name: "AirBnb", total: air},
+                {name: "Walkin", total: walk},
+            ];
+            res.json({
+                message: "Monthly Revenue Retrieved",
+                result
+            });
+        }
+    })
+});
 app.listen(3000);
 console.log("Server is up in port 3000");
