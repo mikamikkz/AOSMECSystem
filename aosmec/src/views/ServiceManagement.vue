@@ -211,9 +211,9 @@
      
       editedIndex: -1,
       editedItem: {
-        name: "",
-        rate: "",
-        pricing: ""
+        name: null,
+        rate: null,
+        pricing: null
       },
     }),
 
@@ -283,15 +283,19 @@
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
-          axios.patch("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, this.editedItem)
-        } else {
-          this.addAService()
-          this.service_mgmt.push(this.editedItem)
-        }
-        console.log(this.editedItem)
-        this.close()
+        
+          if (this.editedIndex > -1) {
+            Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
+            axios.patch("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, this.editedItem)
+          } else if (this.editedItem.name != null && this.editedItem.rate != null && this.editedItem.pricing != null) {
+            this.addAService()
+            this.service_mgmt.push(this.editedItem)
+            console.log(this.editedItem)
+            this.close()
+          } else if (this.editedItem.name == null || this.editedItem.rate == null || this.editedItem.pricing == null) {
+            alert("Please fill all of the fields before saving.")
+          }    
+
       },
 
     },
