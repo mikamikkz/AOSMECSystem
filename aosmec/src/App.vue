@@ -1,5 +1,8 @@
 <template>
   <v-app>
+    <!-- <Login v-if="this.$store.state.status == 0"></Login> -->
+    <!-- <Navigation v-if="this.$store.state.status == 1"></Navigation> -->
+    <!-- <v-main style="background: #f9fcfb" v-if="this.$store.state.status == 1"> -->
     <Navigation></Navigation>
     <v-main style="background: #f9fcfb">
       <router-view></router-view>
@@ -8,14 +11,16 @@
 </template>
 
 <script>
+// import Login from "./views/Login.vue";
 import Navigation from "./components/Navigation.vue";
 
 export default {
   name: "App",
   components: {
-    Navigation,
+    // Login,
+    Navigation
   },
-  data: () => ({}),
+  data: () => ({})
 };
 </script>
 

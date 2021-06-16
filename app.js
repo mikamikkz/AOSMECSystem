@@ -38,6 +38,78 @@ connection.connect((err) => {
     console.log("Database Connected");
 });
 
+/*****************************************       LOGIN      ************************************************/
+// app.get("/login", (req,res)=>{
+//     // res.render('App');
+// })
+
+app.post("/login", urlEncodedParser, (req, res) => {
+    connection.query("SELECT * FROM account WHERE username = ?", [req.body.username], (error, results)=>{
+        if (error){
+            res.json({
+                message: "Account was not retrieved.",
+                status: 404,
+            })
+        }
+        if(!(results.length>0)){
+            // res.redirect('/login');
+            this.$store.state.status = 0
+        }else if(req.body.password != results[0].password){
+            // res.redirect('/login');
+            this.$store.state.status = 0
+        }else{
+            req.session.loggedin = true;
+            req.session.username = req.body.username;
+            this.$store.state.status = 1
+            // res.redirect('/noteslist');
+            console.log("LOGIN SUCCESS")
+        }
+        res.json({
+            results,
+            message: "Account was retrieved.",
+            status: 100,
+        })
+        console.log(results)
+    })
+})
+
+// app.get('/login', (req, res) => {
+//     connection.query('SELECT * FROM account', (err, result) => {
+//         if((err)){
+//             res.json({
+//                 message: "Account was not retrieved.",
+//                 status: 404,
+//             })
+//         }
+//         res.json({
+//             result,
+//             message: "Account was retrieved.",
+//             status: 100,
+//         })
+//         console.log(result)
+//     });
+// });
+
+/*****************************************       LANDING/AUTH      ************************************************/
+app.get("/", (req,res)=>{
+    if(req.session.loggedin){
+        // res.redirect("/noteslist");
+        console.log("LANDING")
+    }else{
+        res.render("App");
+    }
+})
+
+/*****************************************       LOGOUT      ************************************************/
+app.get("/logout", (req,res)=>{
+    if(req.session.loggedin){
+        req.session.destroy();
+        res.redirect('/');
+    }else{
+        // res.render("App");
+    }
+})
+
 /*****************************************       R O O M ( C R U )      ************************************************/
 
 //Create:
@@ -266,7 +338,7 @@ app.get("/bill/:id", (req, res) => {
     connection.query("SELECT * FROM bill WHERE id="+req.params.id+" ", (err, result) => {
         // console.log(err);
         res.json({
-            message: "Room Update",
+            message: "Bill Update",
             status: 200,
             result
         })
@@ -274,16 +346,16 @@ app.get("/bill/:id", (req, res) => {
 });
 
 app.patch("/bill/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
+    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
         // console.log(err);
         if(err){
             res.json({
-                message: "Room Not Updated",
+                message: "Bill Not Updated",
                 status: 400
             })
         } else {
             res.json({
-                message: "Room Updated",
+                message: "Bill Updated",
                 status: 200,
             })
         }
@@ -294,7 +366,7 @@ app.patch("/bill/:id", urlEncodedParser, (req, res) => {
 
 //Create:
 app.post("/bill-details", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, total, status) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.total+', "'+req.body.status+'")', (err, result) => {
+    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.total+', "'+req.body.status+'")', (err, result) => {
     //    console.log(result);
        if(err){
            res.json({
@@ -322,19 +394,20 @@ app.get("/bill-details", (req, res) => {
     });
 });
 
+
 //Update:
 app.get("/bill-details/:id/:ip", (req, res) => {
-    connection.query("SELECT billId, serviceId, quantity, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
+    connection.query("SELECT billId, serviceId, quantity, pending, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
         // console.log(result);
         res.json({
-            message: "Bill Details Update1",
+            message: "Bill Details Update",
             status: 200,
             result
         })
     });
 });
-app.post("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
-    connection.query("UPDATE `bill_detail` SET `quantity`='+req.body.quantity+',`total`='+req.body.total+',`status`='"+req.body.status+"' WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
+app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
         // console.log(result);
            if(err){
                res.json({

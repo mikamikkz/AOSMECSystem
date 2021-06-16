@@ -16,8 +16,12 @@ const store = new Vuex.Store({
   plugins: [createPersistedState({
     storage: window.sessionStorage,
   })],
-  state:{
-    //
+  state:{ 
+    //global variables - access: this.$store.state.<id>
+    status: 0,
+    //0 - not logged in ; 1 - logged in
+    user: 0
+    //0 - front desk ; 1 - admin
   }
 })
 
