@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const urlEncodedParser = bodyParser.urlencoded({extended: true});
+const urlEncodedParser = bodyParser.urlencoded({ extended: true });
 const app = express();
 const ejs = require("ejs");
 const bcrpyt = require("bcrypt");
@@ -34,7 +34,7 @@ app.use(session({
 }));
 
 connection.connect((err) => {
-    if(err) throw err;
+    if (err) throw err;
     console.log("Database Connected");
 });
 
@@ -114,20 +114,20 @@ app.get("/logout", (req,res)=>{
 
 //Create:
 app.post("/room", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO room (roomTypeId, roomNo, status, occupied) VALUES ('+req.body.roomTypeId+','+req.body.roomNo+',"'+req.body.status+'", '+req.body.occupied+')', (err, result) => {
-    //    console.log(result);
-       if(err){
-           res.json({
-               message: "Room Not Added",
-               status: 400
-           })
-       } else {
-           res.json({
-               message: "Room Added",
-               status: 200,
-           })
-       }
-   });
+    connection.query('INSERT INTO room (roomTypeId, roomNo, status, occupied) VALUES (' + req.body.roomTypeId + ',' + req.body.roomNo + ',"' + req.body.status + '", ' + req.body.occupied + ')', (err, result) => {
+        //    console.log(result);
+        if (err) {
+            res.json({
+                message: "Room Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Room Added",
+                status: 200,
+            })
+        }
+    });
 });
 
 //Retrieve all rooms:
@@ -241,7 +241,7 @@ app.get("/room/vacant", (req, res) => {
 
 //Update:
 app.get("/room/:id", (req, res) => {
-    connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id="+req.params.id+" ", (err, result) => {
+    connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id=" + req.params.id + " ", (err, result) => {
         // console.log(err);
         res.json({
             message: "Room Update",
@@ -252,9 +252,9 @@ app.get("/room/:id", (req, res) => {
 });
 
 app.patch("/room/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE room SET roomNo='+req.body.roomNo+', status="'+req.body.status+'", occupied= '+req.body.occupied+' WHERE id='+req.params.id+' ', (err, response) => {
+    connection.query('UPDATE room SET roomNo=' + req.body.roomNo + ', status="' + req.body.status + '", occupied= ' + req.body.occupied + ' WHERE id=' + req.params.id + ' ', (err, response) => {
         // console.log(err);
-        if(err){
+        if (err) {
             res.json({
                 message: "Room Not Updated",
                 status: 400
@@ -273,20 +273,20 @@ app.patch("/room/:id", urlEncodedParser, (req, res) => {
 
 //Create:
 app.post("/guest", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO guest (checkInId, fname, lname, gender, country, nationality, address, validId, validIdType, phoneNo) VALUES ('+req.body.checkInId+',"'+req.body.fname+'","'+req.body.lname+'", "'+req.body.gender+'","'+req.body.country+'","'+req.body.nationality+'", "'+req.body.address+'", '+req.body.validId+', "'+req.body.validIdType+'", '+req.body.phoneNo+')', (err, result) => {
-    //    console.log(result);
-       if(err){
-           res.json({
-               message: "Guess Not Added",
-               status: 400
-           })
-       } else {
-           res.json({
-               message: "Guess Added",
-               status: 200,
-           })
-       }
-   });
+    connection.query('INSERT INTO guest (checkInId, fname, lname, gender, country, nationality, address, validId, validIdType, phoneNo) VALUES (' + req.body.checkInId + ',"' + req.body.fname + '","' + req.body.lname + '", "' + req.body.gender + '","' + req.body.country + '","' + req.body.nationality + '", "' + req.body.address + '", ' + req.body.validId + ', "' + req.body.validIdType + '", ' + req.body.phoneNo + ')', (err, result) => {
+        //    console.log(result);
+        if (err) {
+            res.json({
+                message: "Guess Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Guess Added",
+                status: 200,
+            })
+        }
+    });
 });
 
 //Retrieve:
@@ -305,20 +305,20 @@ app.get("/guest", (req, res) => {
 
 //Create:
 app.post("/bill", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO bill (roomId, status, keyDeposit, total) VALUES ('+req.body.roomId+', "'+req.body.status+'", '+req.body.keyDeposit+', '+req.body.total+')', (err, result) => {
-    //    console.log(result);
-       if(err){
-           res.json({
-               message: "Bill Not Added",
-               status: 400
-           })
-       } else {
-           res.json({
-               message: "Bill Added",
-               status: 200,
-           })
-       }
-   });
+    connection.query('INSERT INTO bill (roomId, status, keyDeposit, total) VALUES (' + req.body.roomId + ', "' + req.body.status + '", ' + req.body.keyDeposit + ', ' + req.body.total + ')', (err, result) => {
+        //    console.log(result);
+        if (err) {
+            res.json({
+                message: "Bill Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Bill Added",
+                status: 200,
+            })
+        }
+    });
 });
 
 //Retrieve:
@@ -335,7 +335,7 @@ app.get("/bill", (req, res) => {
 
 //Update:
 app.get("/bill/:id", (req, res) => {
-    connection.query("SELECT * FROM bill WHERE id="+req.params.id+" ", (err, result) => {
+    connection.query("SELECT * FROM bill WHERE id=" + req.params.id + " ", (err, result) => {
         // console.log(err);
         res.json({
             message: "Bill Update",
@@ -346,9 +346,13 @@ app.get("/bill/:id", (req, res) => {
 });
 
 app.patch("/bill/:id", urlEncodedParser, (req, res) => {
+<<<<<<< HEAD
     connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
+=======
+    connection.query('UPDATE bill SET status="' + req.body.status + '", keyDeposit=' + req.body.keyDeposit + ', total= ' + req.body.total + ' WHERE id=' + req.params.id + ' ', (err, response) => {
+>>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
         // console.log(err);
-        if(err){
+        if (err) {
             res.json({
                 message: "Bill Not Updated",
                 status: 400
@@ -366,6 +370,7 @@ app.patch("/bill/:id", urlEncodedParser, (req, res) => {
 
 //Create:
 app.post("/bill-details", urlEncodedParser, (req, res) => {
+<<<<<<< HEAD
     connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.total+', "'+req.body.status+'")', (err, result) => {
     //    console.log(result);
        if(err){
@@ -380,6 +385,22 @@ app.post("/bill-details", urlEncodedParser, (req, res) => {
            })
        }
    });
+=======
+    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, total, status) VALUES (' + req.body.billId + ', ' + req.body.serviceId + ', ' + req.body.quantity + ', ' + req.body.total + ', "' + req.body.status + '")', (err, result) => {
+        //    console.log(result);
+        if (err) {
+            res.json({
+                message: "Bill Details Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Bill Details Added",
+                status: 200,
+            })
+        }
+    });
+>>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
 });
 
 //Retrieve:
@@ -397,7 +418,11 @@ app.get("/bill-details", (req, res) => {
 
 //Update:
 app.get("/bill-details/:id/:ip", (req, res) => {
+<<<<<<< HEAD
     connection.query("SELECT billId, serviceId, quantity, pending, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
+=======
+    connection.query("SELECT billId, serviceId, quantity, total, status FROM `bill_detail` WHERE billId='" + req.params.id + "' AND serviceId='" + req.params.ip + "' ", (err, result) => {
+>>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
         // console.log(result);
         res.json({
             message: "Bill Details Update",
@@ -406,20 +431,25 @@ app.get("/bill-details/:id/:ip", (req, res) => {
         })
     });
 });
+<<<<<<< HEAD
 app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
     connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
+=======
+app.post("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
+    connection.query("UPDATE `bill_detail` SET `quantity`='+req.body.quantity+',`total`='+req.body.total+',`status`='" + req.body.status + "' WHERE billId='" + req.params.id + "' AND serviceId='" + req.params.ip + "' ", (err, result) => {
+>>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
         // console.log(result);
-           if(err){
-               res.json({
-                   message: "Bill Details Not Added",
-                   status: 400
-               })
-           } else {
-               res.json({
-                   message: "Bill Details Added",
-                   status: 200,
-               })
-           }
+        if (err) {
+            res.json({
+                message: "Bill Details Not Added",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Bill Details Added",
+                status: 200,
+            })
+        }
     });
 });
 
@@ -428,9 +458,9 @@ app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
 
 /********************************************     R E S E R V A T I O N     *************************************************/
 /*RESERVEE TABLE*/
-app.post('/reservee', urlEncodedParser, (req, res)=>{
-    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("'+req.body.name+'", "'+req.body.gender+'", "'+req.body.gender+'","'+req.body.email+'",'+req.body.phoneNo+')', (err, result) => {
-        if(err){
+app.post('/reservee', urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("' + req.body.name + '", "' + req.body.gender + '", "' + req.body.gender + '","' + req.body.email + '",' + req.body.phoneNo + ')', (err, result) => {
+        if (err) {
             res.json({
                 message: "Reservee Failed",
                 status: 400,
@@ -444,25 +474,32 @@ app.post('/reservee', urlEncodedParser, (req, res)=>{
     });
 })
 
-app.get('/reservee/:id', (req, res)=> {
-    connection.query('SELECT E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = '+req.params.id+'', (err, result) => {
-        if(err) {
+app.get('/reservee/:id', (req, res) => {
+    connection.query('SELECT R.id, E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = ' + req.params.id + '', (err, result1) => {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Reservee Id Required"
             });
         } else {
-            res.json({
-                message: "Reservee Retrieved",
-                result
-            });
+            var result = {
+                reservee: result1,
+                rooms: []
+            };
+            connection.query('SELECT id, roomType, noOfRoom FROM reserve_room WHERE reservationId =' + result1[0].id + '', (error, result2) => {
+                result.rooms = result2;
+                res.json({
+                    message: "Reservee Retrieved",
+                    result
+                });
+            })
         }
     })
 })
 
-app.get('/reservee/checkin/:date', (req, res)=> {
-    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate ='+req.params.date+' AND R.status != 2', (err, result) => {
-        if(err) {
+app.get('/reservee/checkin/:date', (req, res) => {
+    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status != 2', (err, result) => {
+        if (err) {
             res.json({
                 message: "Checkin Date Required"
             });
@@ -475,15 +512,15 @@ app.get('/reservee/checkin/:date', (req, res)=> {
     })
 })
 
-app.patch('/reservee/:id', urlEncodedParser, (req, res)=>{
+app.patch('/reservee/:id', urlEncodedParser, (req, res) => {
     var today = new Date();
     var dd = String(today.getDate()).padStart(2, '0');
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE reservee SET name="'+req.body.name+'", gender="'+req.body.gender+'", country="'+req.body.country+'", email="'+req.body.email+'", phoneNo="'+req.body.phoneNo+'", updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+    connection.query('UPDATE reservee SET name="' + req.body.name + '", gender="' + req.body.gender + '", country="' + req.body.country + '", email="' + req.body.email + '", phoneNo="' + req.body.phoneNo + '", updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Reservee Update Failed",
                 status: 400,
@@ -497,9 +534,9 @@ app.patch('/reservee/:id', urlEncodedParser, (req, res)=>{
     });
 })
 
-app.delete('/reservee/:id', (req, res)=> {
-    connection.query('DELETE FROM reservee WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+app.delete('/reservee/:id', (req, res) => {
+    connection.query('DELETE FROM reservee WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Reservee Delete Failed",
                 status: 400,
@@ -515,15 +552,15 @@ app.delete('/reservee/:id', (req, res)=> {
 
 /*RESERVATION TABLE*/
 
-app.post('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("'+req.body.name+'","'+req.body.gender+'","'+req.body.country+'","'+req.body.email+'","'+req.body.phone+'")', (err, result1) => {
-        connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES ('+result1.insertId+','+req.body.accountId+',"'+req.body.reservationType+'", '+req.body.status+', "'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHeads+',"'+req.body.confirmationNo+'",'+req.body.reservationFee+')', (error, reservation_result) => {
+app.post('/reservation', urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("' + req.body.name + '","' + req.body.gender + '","' + req.body.country + '","' + req.body.email + '","' + req.body.phone + '")', (err, result1) => {
+        connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES (' + result1.insertId + ',' + req.body.accountId + ',"' + req.body.reservationType + '", ' + req.body.status + ', "' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ',' + req.body.noOfHeads + ',"' + req.body.confirmationNo + '",' + req.body.reservationFee + ')', (error, reservation_result) => {
             console.log(reservation_result.insertId);
-            for(var i = 0; i < req.body.roomDetails.length; i++){
-                connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES ('+reservation_result.insertId+',"'+req.body.roomDetails[i].type+'", '+req.body.roomDetails[i].number+')', (error2, result) => {
+            for (var i = 0; i < req.body.roomDetails.length; i++) {
+                connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES (' + reservation_result.insertId + ',"' + req.body.roomDetails[i].type + '", ' + req.body.roomDetails[i].number + ')', (error2, result) => {
                 });
             }
-            if(error){
+            if (error) {
                 res.json({
                     message: "Reservation Failed",
                     status: 400,
@@ -538,9 +575,9 @@ app.post('/reservation', urlEncodedParser, (req,res) => {
     })
 });
 
-app.get('/reservation/:date', (req,res) => {
-    connection.query('SELECT * FROM reservation WHERE checkInDate = '+req.params.date+'', (err, result) => {
-        if(err) {
+app.get('/reservation/:date', (req, res) => {
+    connection.query('SELECT * FROM reservation WHERE checkInDate = ' + req.params.date + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Current Date Required"
             });
@@ -553,9 +590,9 @@ app.get('/reservation/:date', (req,res) => {
     })
 });
 
-app.get('/reservation/id/:id', (req,res) => {
-    connection.query('SELECT * FROM reservation WHERE id = '+req.params.id+'', (err, result) => {
-        if(err) {
+app.get('/reservation/id/:id', (req, res) => {
+    connection.query('SELECT * FROM reservation WHERE id = ' + req.params.id + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Reservation Id Required"
             });
@@ -568,9 +605,9 @@ app.get('/reservation/id/:id', (req,res) => {
     })
 });
 
-app.get('/reservation', urlEncodedParser, (req,res) => {
-    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate', function(err, result){
-        if(err) {
+app.get('/reservation', urlEncodedParser, (req, res) => {
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate DESC', function (err, result) {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Failed to Retrieve all Reservation"
@@ -578,27 +615,27 @@ app.get('/reservation', urlEncodedParser, (req,res) => {
         } else {
             connection.query('SELECT O.reservationId, O.id, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId', (err, room) => {
                 var data = [];
-                for(var i = 0; i < room.length; i++){
-                    for(var j = 0; j < result.length; j++){
-                        if(room[i].reservationId == result[j].id){
+                for (var i = 0; i < room.length; i++) {
+                    for (var j = 0; j < result.length; j++) {
+                        if (room[i].reservationId == result[j].id) {
                             var temp = {
                                 roomDetails: [],
                                 reserve: []
                             }
                             var check = false;
-                            if(isEmpty(data)){
+                            if (isEmpty(data)) {
                                 temp.roomDetails.push(room[i])
                                 temp.reserve = result[j]
                                 data.push(temp);
                             } else {
-                                for(var k = 0; k < data.length; k++){
-                                    if(room[i].reservationId == data[k].reserve.id){
+                                for (var k = 0; k < data.length; k++) {
+                                    if (room[i].reservationId == data[k].reserve.id) {
                                         data[k].roomDetails.push(room[i]);
                                         check = true;
                                         break
                                     }
                                 }
-                                if(check == false) {
+                                if (check == false) {
                                     temp.roomDetails.push(room[i])
                                     temp.reserve = result[j]
                                     data.push(temp);
@@ -623,18 +660,18 @@ app.patch('/reservation/:id', urlEncodedParser, (req, res) => {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
-    
-    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="'+req.body.reservationType+'", R.status='+req.body.status+', R.checkInDate="'+req.body.checkInDate+'", R.checkOutDate="'+req.body.checkOutDate+'", R.noOfDays='+req.body.noOfDays+', R.noOfHead='+req.body.noOfHeads+', R.confirmationNo='+req.body.confirmationNo+', R.reservationFee='+req.body.reservationFee+', R.updatedAt="'+today+'", E.name="'+req.body.name+'", E.gender="'+req.body.gender+'", E.country="'+req.body.country+'", E.email="'+req.body.email+'", E.phoneNo="'+req.body.phone+'", E.updatedAt="'+today+'" WHERE R.id='+req.params.id+' ', (err, result) => {
-        if(err){
+
+    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=' + req.body.confirmationNo + ', R.reservationFee=' + req.body.reservationFee + ', R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Unable to update",
                 status: 400,
             })
         } else {
-            for(var i = 0; i < req.body.roomDetails.length; i++){
-                connection.query('UPDATE reserve_room SET roomType="'+req.body.roomDetails[i].type+'", noOfRoom="'+req.body.roomDetails[i].number+'" WHERE id='+req.body.roomDetails[i].id+'', (error, ress) => {
-                    if(error){
+            for (var i = 0; i < req.body.roomDetails.length; i++) {
+                connection.query('UPDATE reserve_room SET roomType="' + req.body.roomDetails[i].type + '", noOfRoom="' + req.body.roomDetails[i].number + '" WHERE id=' + req.body.roomDetails[i].id + '', (error, ress) => {
+                    if (error) {
                         res.json({
                             message: "Reserve Room cannot update",
                             status: 201,
@@ -656,9 +693,9 @@ app.patch('/reservation/cancel/:id', urlEncodedParser, (req, res) => {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
-    
-    connection.query('UPDATE reservation SET status=0, updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+
+    connection.query('UPDATE reservation SET status=0, updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Unable to cancel",
@@ -679,9 +716,9 @@ app.patch('/reservation/activate/:id', urlEncodedParser, (req, res) => {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
-    
-    connection.query('UPDATE reservation SET status=1, updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+
+    connection.query('UPDATE reservation SET status=1, updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Unable to Activate",
@@ -702,9 +739,9 @@ app.patch('/reservation/delete/:id', urlEncodedParser, (req, res) => {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
-    
-    connection.query('UPDATE reservation SET deletedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+
+    connection.query('UPDATE reservation SET deletedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             console.log(err);
             res.json({
                 message: "Unable to Activate",
@@ -719,9 +756,9 @@ app.patch('/reservation/delete/:id', urlEncodedParser, (req, res) => {
     });
 })
 
-app.delete('/reservation/:id', (req,res) => {
-    connection.query('DELETE FROM reservation WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+app.delete('/reservation/:id', (req, res) => {
+    connection.query('DELETE FROM reservation WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Reservation Delete Failed",
                 status: 400,
@@ -737,9 +774,9 @@ app.delete('/reservation/:id', (req,res) => {
 
 /*RESERVE_ROOM TABLE*/
 
-app.get('/room-reserve/:reservationId', (req,res) => {
-    connection.query('SELECT * FROM reserve_room WHERE reservationId = '+req.params.reservationId+' ', (err, result) => {
-        if(err) {
+app.get('/room-reserve/:reservationId', (req, res) => {
+    connection.query('SELECT * FROM reserve_room WHERE reservationId = ' + req.params.reservationId + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Current Date Required"
             });
@@ -752,9 +789,9 @@ app.get('/room-reserve/:reservationId', (req,res) => {
     })
 });
 
-app.get('/room-reserve/id/:id', (req,res) => {
-    connection.query('SELECT * FROM reserve_room WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err) {
+app.get('/room-reserve/id/:id', (req, res) => {
+    connection.query('SELECT * FROM reserve_room WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Room Reservation Id Required"
             });
@@ -767,9 +804,9 @@ app.get('/room-reserve/id/:id', (req,res) => {
     })
 });
 
-app.get('/room-reserve', (req,res) => {
+app.get('/room-reserve', (req, res) => {
     connection.query('SELECT * FROM reserve_room', (err, result) => {
-        if(err) {
+        if (err) {
             res.json({
                 message: "Failed to Retrieve all Reservation"
             });
@@ -782,9 +819,9 @@ app.get('/room-reserve', (req,res) => {
     })
 });
 
-app.post('/room-reserve', urlEncodedParser, (req,res) => {
-    connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES ('+req.body.reservationId+',"'+req.body.roomType+'", '+req.body.noOfRoom+')', (err, result) => {
-        if(err){
+app.post('/room-reserve', urlEncodedParser, (req, res) => {
+    connection.query('INSERT INTO reserve_room(reservationId, roomType, noOfRoom) VALUES (' + req.body.reservationId + ',"' + req.body.roomType + '", ' + req.body.noOfRoom + ')', (err, result) => {
+        if (err) {
             res.json({
                 message: "Room Reservation Failed",
                 status: 400,
@@ -798,9 +835,9 @@ app.post('/room-reserve', urlEncodedParser, (req,res) => {
     });
 });
 
-app.post('/room-reserve/:id', urlEncodedParser, (req,res) => {
-    connection.query('UPDATE reserve_room SET reservationId='+req.body.reservationId+', roomType="'+req.body.roomType+'", noOfRoom = '+req.body.noOfRoom+' WHERE id='+req.params.id+'', (err, result) => {
-        if(err){
+app.post('/room-reserve/:id', urlEncodedParser, (req, res) => {
+    connection.query('UPDATE reserve_room SET reservationId=' + req.body.reservationId + ', roomType="' + req.body.roomType + '", noOfRoom = ' + req.body.noOfRoom + ' WHERE id=' + req.params.id + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Update Room Reservation Failed",
                 status: 400,
@@ -816,9 +853,9 @@ app.post('/room-reserve/:id', urlEncodedParser, (req,res) => {
     });
 });
 
-app.get('/room-reserve/delete/:id', (req,res) => {
-    connection.query('DELETE FROM reserve_room WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+app.get('/room-reserve/delete/:id', (req, res) => {
+    connection.query('DELETE FROM reserve_room WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Room Reservation Delete Failed",
                 status: 400,
@@ -833,9 +870,9 @@ app.get('/room-reserve/delete/:id', (req,res) => {
 });
 
 /***********************************************     C H E C K   I N     ****************************************************/
-app.get('/checkin/:date', (req,res) => {
-    connection.query('SELECT * FROM checkIn WHERE checkInDate = '+req.params.date+'', (err, result) => {
-        if(err) {
+app.get('/checkin/:date', (req, res) => {
+    connection.query('SELECT * FROM checkIn WHERE checkInDate = ' + req.params.date + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Current Date Required"
             });
@@ -848,9 +885,9 @@ app.get('/checkin/:date', (req,res) => {
     })
 });
 
-app.get('/checkout/:date', (req,res) => {
-    connection.query('SELECT * FROM checkIn WHERE checkOutDate = '+req.params.date+'', (err, result) => {
-        if(err) {
+app.get('/checkout/:date', (req, res) => {
+    connection.query('SELECT * FROM checkIn WHERE checkOutDate = ' + req.params.date + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Current Date Required"
             });
@@ -863,9 +900,9 @@ app.get('/checkout/:date', (req,res) => {
     })
 });
 
-app.get('/checkin/id/:id', (req,res) => {
-    connection.query('SELECT * FROM checkIn WHERE id = '+req.params.id+'', (err, result) => {
-        if(err) {
+app.get('/checkin/id/:id', (req, res) => {
+    connection.query('SELECT * FROM checkIn WHERE id = ' + req.params.id + '', (err, result) => {
+        if (err) {
             res.json({
                 message: "Check in ID Required"
             });
@@ -879,8 +916,8 @@ app.get('/checkin/id/:id', (req,res) => {
 });
 
 app.post('/checkin', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES ('+req.body.reservationId+','+req.body.accountId+','+req.body.roomId+',"'+req.body.checkInDate+'","'+req.body.checkOutDate+'", '+req.body.noOfDays+','+req.body.noOfHead+')', (err, result) => {
-        if(err){
+    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES (' + req.body.reservationId + ',' + req.body.accountId + ',' + req.body.roomId + ',"' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ',' + req.body.noOfHead + ')', (err, result) => {
+        if (err) {
             res.json({
                 message: "CheckIn Failed",
                 status: 400,
@@ -900,9 +937,9 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
     var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
-    
-    connection.query('UPDATE checkin SET reservationId='+req.body.reservationId+', accountId='+req.body.accountId+', roomId='+req.body.roomId+', checkInDate="'+req.body.checkInDate+'", checkOutDate="'+req.body.checkOutDate+'", noOfDays='+req.body.noOfDays+', noOfHead='+req.body.noOfHead+', updatedAt="'+today+'" WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+
+    connection.query('UPDATE checkin SET reservationId=' + req.body.reservationId + ', accountId=' + req.body.accountId + ', roomId=' + req.body.roomId + ', checkInDate="' + req.body.checkInDate + '", checkOutDate="' + req.body.checkOutDate + '", noOfDays=' + req.body.noOfDays + ', noOfHead=' + req.body.noOfHead + ', updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Unable to update",
                 status: 400,
@@ -920,16 +957,42 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
 //retrieve
 app.get("/room-mgmt/all", (req, res) => {
     connection.query('SELECT * FROM room_type', (err, result) => {
-        if(err){
+        if (err) {
             res.json({
-                message: "Rooms info was retrieved.",
-                status: 100,            
+                message: "Rooms info was not retrieved.",
+                status: 400,
             })
         } else {
             res.json({
                 result,
                 message: "Rooms info was retrieved.",
-                status: 100,            
+                status: 210,
+            })
+        }
+    });
+});
+
+//get room rate of given room
+app.get("/room-rate/:room/:num", (req, res) => {
+    connection.query('SELECT rate FROM room_type WHERE name = "' + req.params.room + '"', (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Cannot retrieve room rate.",
+                status: 400,
+            })
+        } else {
+            var rate = result[0].rate;
+            var name = req.params.room;
+            var qty = parseInt(req.params.num);
+            var totalRate = result[0].rate * req.params.num;
+            res.json({
+                name,
+                rate,
+                totalRate,
+                qty,
+                message: "Room rate retrieved",
+                status: 210,
             })
         }
     });
@@ -937,8 +1000,8 @@ app.get("/room-mgmt/all", (req, res) => {
 
 //create
 app.post("/room-mgmt/all", (req, res) => {
-    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.totalNoOfRoom+'") ', (err, result) => {
-        if(err){
+    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ("' + req.body.name + '","' + req.body.rate + '","' + req.body.totalNoOfRoom + '") ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Room was not added.",
                 status: 404,
@@ -955,14 +1018,14 @@ app.post("/room-mgmt/all", (req, res) => {
 
 //update
 app.patch("/room-mgmt/all/update/:id", (req, res) => {
-    connection.query('UPDATE room_type SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", totalNoOfRoom = "'+req.body.totalNoOfRoom+'" WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+    connection.query('UPDATE room_type SET name = "' + req.body.name + '", rate = "' + req.body.rate + '", totalNoOfRoom = "' + req.body.totalNoOfRoom + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Room was not added.",
                 status: 404,
             })
-        } else{ 
-           res.json({
+        } else {
+            res.json({
                 message: "Room was added.",
                 status: 100,
             })
@@ -972,8 +1035,8 @@ app.patch("/room-mgmt/all/update/:id", (req, res) => {
 
 //delete
 app.delete("/room-mgmt/all/delete/:id", (req, res) => {
-    connection.query('DELETE FROM room_type WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+    connection.query('DELETE FROM room_type WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Rooms Info was not deleted.",
                 status: 404,
@@ -996,16 +1059,33 @@ app.delete("/room-mgmt/all/delete/:id", (req, res) => {
 //retrieve
 app.get("/service-mgmt", (req, res) => {
     connection.query('SELECT * FROM service', (err, result) => {
-        if(err){
+        if (err) {
             res.json({
                 message: "Services were not retrieved.",
-                status: 100,            
+                status: 100,
             })
         } else {
             res.json({
                 result,
                 message: "Services were retrieved.",
-                status: 200,            
+                status: 200,
+            })
+        }
+    });
+});
+
+app.get("/service/:id", (req, res) => {
+    connection.query('SELECT name, rate FROM service WHERE id =' + req.params.id + '', (err, result) => {
+        if (err) {
+            res.json({
+                message: "Service not retrieved.",
+                status: 100,
+            })
+        } else {
+            res.json({
+                result,
+                message: "Service retrieved.",
+                status: 200,
             })
         }
     });
@@ -1013,8 +1093,8 @@ app.get("/service-mgmt", (req, res) => {
 
 //create
 app.post("/service-mgmt", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO service (name, rate, pricing) VALUES ("'+req.body.name+'","'+req.body.rate+'","'+req.body.pricing+'")', (err, result) => {
-        if(err){
+    connection.query('INSERT INTO service (name, rate, pricing) VALUES ("' + req.body.name + '","' + req.body.rate + '","' + req.body.pricing + '")', (err, result) => {
+        if (err) {
             res.json({
                 message: "Insertion of Service has failed.",
                 status: 400,
@@ -1032,8 +1112,8 @@ app.post("/service-mgmt", urlEncodedParser, (req, res) => {
 
 //update
 app.patch("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE service SET name = "'+req.body.name+'", rate = "'+req.body.rate+'", pricing = "'+req.body.pricing+'" WHERE id='+req.params.id+' ',(err, result) => {
-        if(err){
+    connection.query('UPDATE service SET name = "' + req.body.name + '", rate = "' + req.body.rate + '", pricing = "' + req.body.pricing + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Update of Service has failed.",
                 status: 400,
@@ -1048,9 +1128,9 @@ app.patch("/service-mgmt/update/:id", urlEncodedParser, (req, res) => {
 })
 
 //delete
-app.delete("/service-mgmt/delete/:id", (req,res) => {
-    connection.query('DELETE FROM service WHERE id='+req.params.id+' ', (err, result) => {
-        if(err){
+app.delete("/service-mgmt/delete/:id", (req, res) => {
+    connection.query('DELETE FROM service WHERE id=' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Service Deletion Failed",
                 status: 400,
@@ -1064,11 +1144,11 @@ app.delete("/service-mgmt/delete/:id", (req,res) => {
         }
     });
 });
-/*************************************     A C C O U N T   M A N A G E M E N T     ******************************************/ 
+/*************************************     A C C O U N T   M A N A G E M E N T     ******************************************/
 //retrieve
 app.get('/account-mgmt', (req, res) => {
     connection.query('SELECT * FROM account', (err, result) => {
-        if((err)){
+        if ((err)) {
             res.json({
                 message: "Account was not retrieved.",
                 status: 404,
@@ -1084,8 +1164,8 @@ app.get('/account-mgmt', (req, res) => {
 });
 
 app.get('/account-mgmt/:id', (req, res) => {
-    connection.query('SELECT * FROM account WHERE id = '+req.params.id+' ', (err, result) => {
-        if((err)){
+    connection.query('SELECT * FROM account WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if ((err)) {
             res.json({
                 message: "Account was not retrieved.",
                 status: 404,
@@ -1101,8 +1181,8 @@ app.get('/account-mgmt/:id', (req, res) => {
 
 //create
 app.post('/account-mgmt', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ("'+req.body.username+'","'+req.body.password+'","'+req.body.fname+'","'+req.body.mname+'","'+req.body.lname+'","'+req.body.birthdate+'","'+req.body.gender+'")', (err, result) => {
-        if(err){
+    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ("' + req.body.username + '","' + req.body.password + '","' + req.body.fname + '","' + req.body.mname + '","' + req.body.lname + '","' + req.body.birthdate + '","' + req.body.gender + '")', (err, result) => {
+        if (err) {
             res.json({
                 message: "Insertion of Account has failed.",
                 status: 400,
@@ -1119,8 +1199,8 @@ app.post('/account-mgmt', urlEncodedParser, (req, res) => {
 
 //delete
 app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
-    connection.query('DELETE FROM account WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+    connection.query('DELETE FROM account WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Deletion of Account has failed.",
                 status: 400,
@@ -1137,8 +1217,8 @@ app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
 
 //update
 app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE account SET username = "'+req.body.username+'", password = "'+req.body.password+'", fname = "'+req.body.fname+'", mname = "'+req.body.mname+'", lname = "'+req.body.lname+'", birthdate = "'+req.body.birthdate+'", gender = "'+req.body.gender+'" WHERE id = '+req.params.id+' ', (err, result) => {
-        if(err){
+    connection.query('UPDATE account SET username = "' + req.body.username + '", password = "' + req.body.password + '", fname = "' + req.body.fname + '", mname = "' + req.body.mname + '", lname = "' + req.body.lname + '", birthdate = "' + req.body.birthdate + '", gender = "' + req.body.gender + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
+        if (err) {
             res.json({
                 message: "Update of Account has failed.",
                 status: 400,
@@ -1153,9 +1233,195 @@ app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
 })
 
 /***********************************************       R E P O R T       ****************************************************/
-app.get('/report', (req,res) => {
+app.get('/report', (req, res) => {
     res.render('report');
 });
 
+app.get('/monthly-guest/:month/:year', (req, res) => {
+    connection.query('SELECT id FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" ', (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            var count = result.length;
+            res.json({
+                message: "No of Guest Check in Retrieved",
+                count
+            });
+        }
+    })
+});
+
+app.get('/monthly-checkin/:month/:year', (req, res) => {
+    connection.query('SELECT DAY(checkInDate), COUNT(*) FROM checkIn WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" GROUP BY DAY(checkInDate) ASC', (err, checkIn) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Date Required"
+            });
+        } else {
+            var month = req.params.month;
+            var endOfMonth = 0;
+
+            if (month == 02) {
+                endOfMonth = 28;
+            } else if (month == 01 || month == 03 || month == 05 || month == 07 || month == 09 || month == 12) {
+                endOfMonth = 31;
+            } else {
+                endOfMonth = 30;
+            }
+
+            connection.query('SELECT DAY(checkOutDate), COUNT(*) FROM checkIn WHERE YEAR(checkOutDate) = "' + req.params.year + '" AND MONTH(checkOutDate) = "' + req.params.month + '" GROUP BY DAY(checkOutDate) ASC', (err, checkOut) => {
+                var original1, original2;
+                var monthly = [];
+                var inputCheckIn, inputCheckOut;
+                var i;
+                for (var day = 1, i = c1 = c2 = 0; day < endOfMonth && (c1 < checkIn.length || c2 < checkOut.length); day++, i++) {
+                    original1 = checkIn[c1]
+                    if (c1 < checkIn.length && original1['DAY(checkInDate)'] == day) {
+                        inputCheckIn = original1['COUNT(*)'];
+                        c1++;
+                    } else {
+                        inputCheckIn = 0;
+                    }
+
+                    original2 = checkOut[c2]
+                    if (c2 < checkOut.length && original2['DAY(checkOutDate)'] == day) {
+                        inputCheckOut = original2['COUNT(*)'];
+                        c2++;
+                    } else {
+                        inputCheckOut = 0;
+                    }
+                    monthly[i] = {
+                        date: day.toString(),
+                        totalCheckIn: inputCheckIn.toString(),
+                        totalCheckOut: inputCheckOut.toString()
+                    }
+                };
+                for (var j = day; j <= endOfMonth; j++) {
+                    inputCheckIn = 0;
+                    inputCheckOut = 0;
+                    var add = {
+                        date: j.toString(),
+                        totalCheckIn: inputCheckIn.toString(),
+                        totalCheckOut: inputCheckOut.toString()
+                    }
+                    monthly.push(add);
+                };
+                res.json({
+                    message: "Check in Retrieved",
+                    monthly
+                });
+            })
+        }
+    })
+});
+
+app.get("/monthly-revenue/:month/:year", (req, res) => {
+    connection.query('SELECT SUM(total) FROM bill WHERE status = "paid" AND YEAR(createdAt) = "' + req.params.year + '" AND MONTH(createdAt) = "' + req.params.month + '" ', (err, result) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            var x = result[0]
+            var revenue = x['SUM(total)'];
+            if (revenue == null){
+                revenue = 0;
+            }
+            res.json({
+                message: "Monthly Revenue Retrieved",
+                revenue
+            });
+        }
+    })
+});
+
+app.get("/monthly-commissions/:month/:year", (req, res) => {
+    connection.query('SELECT R.id, R.type, R.noOfDays, O.roomType, O.noOfRoom FROM reservation R JOIN reserve_room O ON R.id = O.reservationId WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" AND R.deletedAt IS NULL AND R.status != 0', (err, reservation) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            connection.query('SELECT name, rate FROM room_type', (err, rate) => {
+                var totalBook = totalAgoda = totalExp = totalAir = 0;
+                for(var i = 0; i < reservation.length; i++){
+                    for(var j = 0; j < rate.length && rate[j].name != reservation[i].roomType; j++){}
+
+                    if(reservation[i].type == "Booking.com"){
+                        totalBook += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Agoda"){
+                        totalAgoda += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Expedia"){
+                        totalExp += rate[j].rate * reservation[i].noOfRoom
+                    } else if(reservation[i].type == "Airbnb") {
+                        totalAir += rate[j].rate * reservation[i].noOfRoom
+                    }
+                }
+                var comBook = totalBook * 0.15;
+                var comAgoda = totalAgoda * 0.15;
+                var comExp = totalExp * 0.15;
+                var comAir = totalAir * 0.15;
+
+                var saleBook = totalBook - comBook;
+                var saleAgoda = totalAgoda - comAgoda;
+                var saleExp = totalExp - comExp;
+                var saleAir = totalAir - comAir;
+
+                var result = [
+                    {type: "Booking.com", total: totalBook, commission: comBook, sale: saleBook},
+                    {type: "Agoda", total: totalAgoda, commission: comAgoda, sale: saleAgoda},
+                    {type: "Expedia", total: totalExp, commission: comExp, sale: saleExp},
+                    {type: "AirBnb", total: totalAir, commission: comAir, sale: saleAir},
+                ]
+                res.json({
+                    message: "Monthly Revenue Retrieved",
+                    result
+                });
+            })
+        }
+    })
+});
+
+app.get("/monthly-reservations/:month/:year", (req, res) => {
+    connection.query('SELECT id, type FROM reservation WHERE YEAR(checkInDate) = "' + req.params.year + '" AND MONTH(checkInDate) = "' + req.params.month + '" AND deletedAt IS NULL AND status != 0', (err, types) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Month and Year Required"
+            });
+        } else {
+            for(var i = book = walk = air = ago = exp = 0; i < types.length; i++){
+                if(types[i].type == "Booking.com"){
+                    book++;
+                } else if(types[i].type == "Agoda"){
+                    ago++;
+                } else if(types[i].type == "Expedia"){
+                    exp++;
+                } else if(types[i].type == "Airbnb") {
+                    air++;
+                } else {
+                    walk++;
+                }
+            }
+            var result = [
+                {name: "Booking.com", total: book},
+                {name: "Agoda", total: ago},
+                {name: "Expedia", total: exp},
+                {name: "AirBnb", total: air},
+                {name: "Walkin", total: walk},
+            ];
+            res.json({
+                message: "Monthly Revenue Retrieved",
+                result
+            });
+        }
+    })
+});
 app.listen(3000);
 console.log("Server is up in port 3000");

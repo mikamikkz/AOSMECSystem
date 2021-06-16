@@ -211,9 +211,9 @@
 
       editedIndex: -1,
       editedItem: {
-        name: "",
-        rate: "",
-        totalNoOfRoom: "",
+        name: null,
+        rate: null,
+        totalNoOfRoom: null,
       },
     }),
 
@@ -286,12 +286,13 @@
         if (this.editedIndex > -1) {
           Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/room-mgmt/all/update/" + this.room_mgmt[this.editedIndex].id, this.editedItem)
-
-        } else {
+        } else if (this.editedItem.name != null && this.editedItem.rate != null && this.editedItem.totalNoOfRoom != null) {
           this.addARoom()
           this.room_mgmt.push(this.editedItem)
-        }
-        this.close()
+          this.close()
+        } else if (this.editedItem.name == null || this.editedItem.rate == null || this.editedItem.totalNoOfRoom == null) {
+          alert("Please fill all of the fields before saving.")
+        }    
       },
     },
 

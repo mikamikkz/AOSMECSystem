@@ -139,11 +139,11 @@
                         ref="menu"
                         v-model="editedItem.menu"
                         :close-on-content-click="false"
+                        :return-value.sync="date"
                         transition="scale-transition"
                         offset-y
                         min-width="auto"
                       >
-      
                         <template v-slot:activator="{ on, attrs }">
                           <v-text-field
                             v-model="editedItem.birthdate"
@@ -295,13 +295,13 @@
 
       editedIndex: -1,
       editedItem: {
-        username: "",
-        password: "",
-        fname: "",
-        mname: "",
-        lname: "",
-        birthdate: "",
-        gender: ""
+        username: null,
+        password: null,
+        fname: null,
+        mname: null,
+        lname: null,
+        birthdate: null,
+        gender: null
       },
     }),
 
@@ -379,12 +379,14 @@
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
-        } else {
+        } else if (this.editedItem.username != null && this.editedItem.password != null && this.editedItem.fname != null && this.editedItem.lname != null && this.editedItem.mname != null && this.editedItem.birthdate != null && this.editedItem.gender != null) {
           this.addAnAccount()
           this.acc_mgmt.push(this.editedItem)
-        }
-        this.$refs.menu.save(date)
-        this.close()
+          this.$refs.menu.save(date)
+          this.close()
+        } else if (this.editedItem == null || this.editedItem.username == null || this.editedItem.password == null || this.editedItem.fname == null || this.editedItem.lname == null || this.editedItem.mname == null || this.editedItem.birthdate == null || this.editedItem.gender == null) {
+          alert("Please fill all of the fields before saving.")
+        }     
       },
     },
 

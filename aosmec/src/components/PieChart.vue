@@ -17,21 +17,31 @@ export default {
       type: Array,
     },
   },
-  mounted() {
-    const total = this.chartData.map((d) => d.total);
-    const name = this.chartData.map((d) => d.name);
-    this.renderChart(
-      {
-        labels: name,
-        datasets: [
-          {
-            data: total,
-            backgroundColor: this.backgroundColor,
-          },
-        ],
-      },
-      this.options
-    );
+  watch:{
+    chartData:function(){
+        this.updateChart();
+    },
+  },
+  mounted(){
+    this.updateChart();
+  },
+  methods: {
+    updateChart(){
+      const total = this.chartData.map((d) => d.total);
+      const name = this.chartData.map((d) => d.name);
+      this.renderChart(
+        {
+          labels: name,
+          datasets: [
+            {
+              data: total,
+              backgroundColor: this.backgroundColor,
+            },
+          ],
+        },
+        this.options
+      );
+    }
   },
 };
 </script>

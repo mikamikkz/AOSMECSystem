@@ -339,6 +339,7 @@
           :expanded.sync="expanded"
           item-key="reservationId"
           show-expand
+          ref="table"
           :search="search"
           :custom-filter="filter"
           class="elevation-1"
@@ -631,7 +632,7 @@
                 <v-row>
                   <v-col class="pa-0" lg="6" md="6" xs="12">
                     <v-menu
-                      ref="checkIn"
+                      ref="checkInEdit"
                       v-model="checkInEdit"
                       :close-on-content-click="false"
                       :return-value.sync="date"
@@ -678,7 +679,7 @@
                   </v-col>
                   <v-col class="pa-0 pl-3" lg="6" md="6" xs="12">
                     <v-menu
-                      ref="checkOut"
+                      ref="checkOutEdit"
                       v-model="checkOutEdit"
                       :close-on-content-click="false"
                       :return-value.sync="date"
@@ -1144,6 +1145,7 @@ export default {
             { type: "", number: "" },
           ],
       }
+      location.reload();
     },
   },
   beforeMount(){
