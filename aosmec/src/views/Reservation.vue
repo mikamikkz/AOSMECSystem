@@ -339,7 +339,6 @@
           :expanded.sync="expanded"
           item-key="reservationId"
           show-expand
-          ref="table"
           :search="search"
           :custom-filter="filter"
           class="elevation-1"

@@ -193,6 +193,7 @@
                     outlined
                     dense
                     color="green"
+                    v-on:change="addGuestNumber(input.noOfHeads)"
                     prepend-icon="mdi-account-multiple"
                     min="1"
                   >
@@ -413,117 +414,36 @@
         </v-card>
       </v-col>
     </v-row>
-    
-    <v-row class="mt-6 mx-1">
-      <v-card>
-        <v-card-title class="green--text">Guest Details</v-card-title>
-        <v-card-text class="mt-3">
-          <v-form class="px-3">
-            <v-row>
-              <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
-                <v-text-field
-                  v-model="guest.fname"
-                  label="First Name"
-                  prepend-icon="mdi-account"
-                  outlined
-                  dense
-                  color="green"
-                ></v-text-field>
-              </v-col>
-              <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
-                <v-text-field
-                  v-model="guest.lname"
-                  label="Last Name"
-                  outlined
-                  dense
-                  color="green"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2" lg="4" md="4" xs="12">
-                <v-select
-                  v-bind:items="gender"
-                  v-model="guest.gender"
-                  item-text="text"
-                  item-value="value"
-                  label="Gender"
-                  prepend-icon="mdi-gender-male-female"
-                  outlined
-                  dense
-                  color="green"
-                ></v-select>
-              </v-col>
-              <v-col class="pa-0 pl-8" lg="8" md="8" xs="12">
-                <NationalitySelect
-                  v-model="guest.nationality"
-                ></NationalitySelect>
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col class="pa-0 pr-2" lg="6" md="6" xs="12">
-                <v-text-field
-                  v-model="guest.validId"
-                  label="Valid ID"
-                  prepend-icon="mdi-passport"
-                  outlined
-                  dense
-                  color="green"
-                ></v-text-field>
-              </v-col>
-              <v-col class="pa-0 pl-1" lg="6" md="6" xs="12">
-                <v-select
-                  v-bind:items="validIdType"
-                  v-model="guest.validIdType"
-                  item-text="text"
-                  item-value="value"
-                  label="Valid Id Type"
-                  outlined
-                  dense
-                  color="green"
-                ></v-select>
-              </v-col>
-            </v-row>
-            <v-row>
-              <CountrySelect v-model="guest.country"></CountrySelect>
-            </v-row>
-            <v-row>
-              <v-text-field
-                v-model="guest.address"
-                label="Address"
-                prepend-icon="mdi-map-marker"
-                outlined
-                dense
-                color="green"
-              ></v-text-field>
-            </v-row>
-            <v-row>
-              <v-text-field
-                v-model="guest.phoneNo"
-                label="Contact Number"
-                prepend-icon="mdi-phone"
-                outlined
-                dense
-                color="green"
-              ></v-text-field>
-            </v-row>
-          </v-form>
-          <v-card-actions class="d-flex justify-center pb-6">
-            <v-btn color="success" class="px-8" v-on:click="submitBtn(guest)">
-              Submit
-            </v-btn>
-          </v-card-actions>
-        </v-card-text>
-      </v-card>
-    </v-row>
+    <v-dialog v-model="guestDetailDialog" width="600" persistent>
+      <GuestForm class="pt-3" v-bind:guest="guestDetail" v-on:submitBtn="submitBtn($event)" v-on:closeBtn="closeBtn()" ></GuestForm>
+    </v-dialog>
+    <v-data-table
+      :headers="guestHeaders"
+      :items="guestInput"
+      class="mt-5 elevation-1"
+      :items-per-page="5"
+      rounded
+    >
+      <template v-slot:item.controls="guestInfo">
+        <v-btn
+          color="light-green"
+          small
+          rounded
+          class="white--text"
+          v-on:click="editGuestBtn(guestInfo)"
+          elevation="0"
+        >
+          <v-icon small>mdi-pencil</v-icon>
+        </v-btn>
+      </template>
+    </v-data-table>
   </v-container>
 </template>
 <script>
 import axios from "axios";
-import CountrySelect from "../components/CountrySelect";
-import NationalitySelect from "../components/NationalitySelect";
+import GuestForm from "../components/GuestForm";
 export default {
-  components: { CountrySelect, NationalitySelect },
+  components: { GuestForm },
   name: "CheckIn",
   data() {
     return {
@@ -549,12 +469,10 @@ export default {
         { text: "Other", value: "Other" },
       ],
       input: {
-        guest: [],
         noOfHeads: "1",
         checkInDate: new Date().toISOString().substr(0, 10),
         checkOutDate: "",
       },
-      noOfGuestForm: 1,
       reservee: [],
       roomType: [],
       roomNo: [],
@@ -563,7 +481,6 @@ export default {
         name: "",
         qty: "",
       },
-      guest: [],
       guestServices: [],
       guestBillDetails: [],
       guestBill: {
@@ -579,12 +496,60 @@ export default {
         { text: "AirBnB", value: "AirBnB" },
         { text: "Expedia", value: "Expedia" },
       ],
+      guestHeaders: [
+        {
+          text: "Name",
+          value: "name",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Gender",
+          value: "gender",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Country",
+          value: "country",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Nationality",
+          value: "nationality",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Address",
+          value: "address",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Valid Id",
+          value: "validId",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Id Type",
+          value: "validIdType",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Contact",
+          value: "phoneNo",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "",
+          value: "controls",
+          sortable: false,
+          class: "green--text darken-4 title",
+        },
+      ],
+      guestInput: [],
       checkIn: false,
       checkOut: false,
       checkInDialog: false,
       guestDetailDialog: false,
-      headCount: 0,
-      current: 0,
+      guestDetail: {},
       date: "",
     };
   },
@@ -602,18 +567,29 @@ export default {
           this.input.noOfDays = reserveeDetails.noOfDays;
           this.input.checkOutDate = reserveeDetails.checkOutDate;
           this.input.roomDetails = rooms;
-          for (
-            var i = 0, totalRate = 0, resType = reserveeDetails.type;
-            i < rooms.length;
-            i++
-          ) {
+
+          if(this.guestInput.length != 0) {
+            this.guestInput.splice(0, this.guestInput.length);
+          }
+          var add = {
+            name: "",
+            gender: "",
+            country: "",
+            nationality: "",
+            address: "",
+            validId: "",
+            validIdType: "",
+            phoneNo: "",
+          }
+
+          for(var j = 0; j < reserveeDetails.noOfHead; j++){
+            this.guestInput.push(add);
+          }
+
+          var totalRate;
+          for (var i = totalRate = 0, resType = reserveeDetails.type; i < rooms.length; i++ ) {
             axios
-              .get(
-                "http://localhost:3000/room-rate/" +
-                  rooms[i].roomType +
-                  "/" +
-                  rooms[i].noOfRoom
-              )
+              .get("http://localhost:3000/room-rate/"+rooms[i].roomType +"/"+rooms[i].noOfRoom)
               .then((response) => {
                 var roomRate = response.data.rate;
                 var qty = response.data.qty;
@@ -648,28 +624,66 @@ export default {
           console.log(err.response.data.message);
         });
     },
-    guestDetailBtn: function (guestInput) {
-      this.guestDetailDialog = true;
-      this.headCount = parseInt(guestInput, 10) - 1;
-      if (this.input.guest.length == 0) {
-        var empty = {
-          fname: "",
-          lname: "",
+    addGuestNumber: function(num) {
+      if(num > this.guestInput.length){
+        var add = {
+          name: "",
           gender: "",
-          nationality: "",
           country: "",
+          nationality: "",
           address: "",
           validId: "",
+          validIdType: "",
           phoneNo: "",
-        };
-        this.input.guest.push(empty);
+        }
+        for(var i = this.guestInput.length; i < num; i++){
+          this.guestInput.push(add);
+        }
+      } else {
+        for(var j = this.guestInput.length; j > num; j--){
+          this.guestInput.pop();
+        }
       }
-      console.log(this.input.guest);
     },
-    submitBtn: function (guestInput) {
-      this.input.guest.push(guestInput);
+    editGuestBtn: function(data) {
+      var current = data.item;
+      var fname = "", lname = "";
+      if(current.name) {
+        var name = current.name.split(' ', 2);
+        fname = name[0];
+        lname = name[1];
+      }
+
+      this.guestDetail = {
+        index: data.index,
+        fname: fname,
+        lname: lname,
+        gender: current.gender,
+        country: current.country,
+        nationality: current.nationality,
+        address: current.address,
+        validId: current.validId,
+        validIdType: current.validIdType,
+        phoneNo: current.phoneNo,
+      }
+      this.guestDetailDialog = true;
+    },
+    submitBtn: function (data) {
       this.guestDetailDialog = false;
-      console.log(this.input.guest);
+  
+      this.$set(this.guestInput, data.index, {
+        name: data.fname + " " + data.lname,
+        gender: data.gender,
+        country: data.country,
+        nationality: data.nationality,
+        address: data.address,
+        validId: data.validId,
+        validIdType: data.validIdType,
+        phoneNo: data.phoneNo,
+      })
+    },
+    closeBtn: function () {
+      this.guestDetailDialog = false;
     },
     addToList: function (input) {
       axios
@@ -698,8 +712,10 @@ export default {
         });
     },
     removeFromList: function (input) {
-      var index = this.guestServices.indexOf(input.name);
+      var index = this.guestServices.findIndex(index => index.name === input.name);
+      var billIndex = this.guestServices.findIndex(index => index.name === input.name);
       this.guestServices.splice(index, 1);
+      this.guestBillDetails.splice(billIndex, 1);
     },
     checkInModal: function (bill) {
       this.checkInDialog = true;
