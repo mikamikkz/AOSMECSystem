@@ -347,7 +347,7 @@
             itemsPerPageOptions: [10, 30, 50, -1],
           }"
         >
-          <template v-slot:item.controls="props">
+          <template v-slot:[item.controls]="props">
             <v-btn
               color="amber darken-2"
               small
@@ -892,7 +892,7 @@
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f8f8f8;
+  background:#f8f8f8;
 }
 >>> .v-data-table thead span {
   font-weight: bolder;
@@ -1144,6 +1144,7 @@ export default {
             { type: "", number: "" },
           ],
       }
+      location.reload();
     },
   },
   beforeMount(){

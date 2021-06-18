@@ -1,5 +1,8 @@
 <template>
   <v-card>
+    <v-btn icon v-on:click="closeBtn()" class="mr-3 mt-3" style="float: right">
+      <v-icon>mdi-close</v-icon>
+    </v-btn>
     <v-card-title class="green--text">Guest Details</v-card-title>
     <v-card-text class="mt-3">
       <v-form class="px-3">
@@ -90,6 +93,15 @@
           ></v-text-field>
         </v-row>
       </v-form>
+      <v-card-actions class="d-flex justify-center pb-6">
+        <v-btn
+          color="success"
+          class="px-8"
+          v-on:click="submitBtn(guest)"
+        >
+          Submit
+        </v-btn>
+      </v-card-actions>
     </v-card-text>
   </v-card>
 </template>
@@ -101,7 +113,6 @@ export default {
   components: { CountrySelect, NationalitySelect },
   data() {
     return {
-      guest: [],
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
@@ -116,10 +127,26 @@ export default {
         { text: "Postal ID", value: "Postal ID" },
         { text: "PWD ID", value: "PWD ID" },
         { text: "PhilHealth ID", value: "PhilHealth ID" },
-        { text: "SSS Unified Multipurpose ID", value: "SSS Unified Multipurpose ID" },
+        {
+          text: "SSS Unified Multipurpose ID",
+          value: "SSS Unified Multipurpose ID",
+        },
         { text: "Other", value: "Other" },
       ],
     };
   },
+  props: {
+    guest: {
+      type: Object,
+    }
+  },
+  methods: {
+    submitBtn: function (data) {
+      this.$emit("submitBtn", data);
+    },
+    closeBtn: function () {
+      this.$emit("closeBtn");
+    },
+  }
 };
 </script>

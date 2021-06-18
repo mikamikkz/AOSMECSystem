@@ -24,8 +24,7 @@
             <v-divider></v-divider>
             <v-card-actions :class="{ 'pa-3': $vuetify.breakpoint.smAndUp }">
               <v-spacer></v-spacer>
-              <v-btn to="/register" color="primary" :large="$vuetify.breakpoint.smAndUp">Register</v-btn>
-              <v-btn to="/dashboard" @click="login()" color="success" :large="$vuetify.breakpoint.smAndUp">Login</v-btn>
+              <v-btn @click="login()" color="success" :large="$vuetify.breakpoint.smAndUp">Login</v-btn>
             </v-card-actions>
           </v-card>
         </v-flex>
@@ -35,6 +34,7 @@
 </template>
 
 <script>
+// import axios from "axios";
 export default {
   name: "Login",
   components: {},
@@ -48,10 +48,39 @@ export default {
     };
   },
   methods: {
-    login() {
-      console.log(this.username)
-      console.log(this.password)
-    },
+    // async login() {
+    //   // console.log(this.username)
+    //   // console.log(this.password)
+    //   //Account Mgmt
+    //   // axios
+    //   // .get("http://localhost:3000/account-mgmt")
+    //   // .then((res) => {
+    //   //   var requestAccounts = res.data.result
+    //   //   console.log(requestAccounts)
+    //   //   for(var i = 0, flag = 0; i < requestAccounts.length && flag == 0; i++){
+    //   //     if(this.username === requestAccounts[i].username && this.password === requestAccounts[i].password){
+    //   //       this.$store.state.status = 1
+    //   //       flag = 1
+    //   //       console.log("Logged in")
+    //   //     }
+    //   //   }
+    //   // }).catch((err) => {
+    //   //   console.log(err.response.data.message);
+    //   // });
+    //   try {
+    //     const response = await axios.post('http://localhost:3000/login', {
+    //       // username: this.username,
+    //       // password: this.password
+    //     });
+    //     console.log(response.data)
+    //   }catch(err) {
+    //     console.log(err);
+    //   }
+
+    // },
+  },
+  beforeMount(){
+    
   }
 };
 </script>
