@@ -43,15 +43,9 @@
                   ></v-select>
                 </v-col>
               </v-row>
-              <ul
-                v-for="rooms in input.roomDetails"
-                :key="rooms.id"
-                class="pa-0 ma-0"
-              >
-                <v-row v-for="noOfRoom in rooms.noOfRoom" :key="noOfRoom">
+                <v-row v-for="rooms in input.roomDetails" :key="rooms.key">
                   <v-col class="pa-0" lg="8" md="8" xs="12">
-                    <v-select
-                      :items="roomType"
+                    <v-text-field
                       v-model="rooms.roomType"
                       label="Room Type"
                       prepend-icon="mdi-bed"
@@ -59,22 +53,21 @@
                       dense
                       color="green"
                       disabled
-                    ></v-select>
+                    ></v-text-field>
                   </v-col>
                   <v-col class="pa-0 pl-3" lg="4" md="4" xs="12">
                     <v-select
-                      :items="roomNo"
-                      v-model="rooms.num"
+                      :items="roomNo[rooms.roomType]"
+                      v-model="rooms.roomNum"
                       label="Room No"
-                      item-text="text"
-                      item-value="id"
+                      item-text="room"
+                      item-value="room"
                       outlined
                       dense
                       color="green"
                     ></v-select>
                   </v-col>
                 </v-row>
-              </ul>
               <v-row>
                 <v-col class="pa-0">
                   <v-text-field
@@ -193,6 +186,7 @@
                     outlined
                     dense
                     color="green"
+                    disabled
                     v-on:change="addGuestNumber(input.noOfHeads)"
                     prepend-icon="mdi-account-multiple"
                     min="1"
@@ -240,7 +234,7 @@
                     <td>{{ service.rate }}</td>
                     <td>{{ service.quantity }}</td>
                     <td>
-                      <v-btn icon small v-if="!service.add">
+                      <v-btn icon small v-if="service.status">
                         <v-icon color="green lighten-3"
                           >mdi-checkbox-marked</v-icon
                         >
@@ -402,12 +396,8 @@
                 <v-btn
                   color="light-green white--text"
                   class="px-5"
-                  v-on:click="
-                    checkInGuest(input, guestServices, guestBillDetails)
-                  "
-                >
-                  Check In
-                </v-btn>
+                  v-on:click="checkInGuest(input, guestServices, guestBillDetails, guestInput)"
+                > Check In </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -415,28 +405,60 @@
       </v-col>
     </v-row>
     <v-dialog v-model="guestDetailDialog" width="600" persistent>
-      <GuestForm class="pt-3" v-bind:guest="guestDetail" v-on:submitBtn="submitBtn($event)" v-on:closeBtn="closeBtn()" ></GuestForm>
+      <GuestForm
+        class="pt-3"
+        v-bind:guest="guestDetail" 
+        v-bind:roomNo="input.roomDetails"
+        v-on:submitBtn="submitBtn($event)"
+        v-on:closeBtn="closeBtn()"
+      ></GuestForm>
     </v-dialog>
-    <v-data-table
-      :headers="guestHeaders"
-      :items="guestInput"
-      class="mt-5 elevation-1"
-      :items-per-page="5"
-      rounded
-    >
-      <template v-slot:item.controls="guestInfo">
-        <v-btn
-          color="light-green"
-          small
-          rounded
-          class="white--text"
-          v-on:click="editGuestBtn(guestInfo)"
-          elevation="0"
-        >
-          <v-icon small>mdi-pencil</v-icon>
-        </v-btn>
-      </template>
-    </v-data-table>
+    <ul class="ma-0 pa-0 mt-5" v-for="rooms in input.roomDetails" :key="rooms.key">
+      <v-card width="170">
+        <v-card-title class="py-2 green--text">Room {{ rooms.roomNum }}</v-card-title>
+      </v-card>
+      <v-btn
+        v-on:click="removeGuestInRoom(rooms.roomNum)"
+        icon
+        outlined
+        elevation="3"
+        color="red"
+        class="mr-8 pa-2"
+        style="float: right;"
+      >
+        <v-icon>mdi-minus</v-icon>
+      </v-btn>
+      <v-btn
+        v-on:click="addGuestInRoom(rooms.roomNum)"
+        icon
+        elevation="3"
+        class="mr-2 white--text pa-2"
+        style="float: right; background: #13b150"
+      >
+        <v-icon>mdi-plus</v-icon>
+      </v-btn>
+      <v-data-table
+        :headers="guestHeaders"
+        :items="guestInput[rooms.roomNum]"
+        class="mt-5 elevation-1"
+        :items-per-page="5"
+        rounded
+      >
+        <template v-slot:item.controls="guestInfo">
+          <v-btn
+            color="amber darken-1"
+            small
+            rounded
+            outlined
+            class="white--text"
+            v-on:click="editGuestBtn(guestInfo)"
+            elevation="0"
+          >
+            <v-icon small>mdi-pencil</v-icon>
+          </v-btn>
+        </template>
+      </v-data-table>
+    </ul>
   </v-container>
 </template>
 <script>
@@ -472,6 +494,7 @@ export default {
         noOfHeads: "1",
         checkInDate: new Date().toISOString().substr(0, 10),
         checkOutDate: "",
+        roomDetails: [],
       },
       reservee: [],
       roomType: [],
@@ -498,8 +521,13 @@ export default {
       ],
       guestHeaders: [
         {
-          text: "Name",
-          value: "name",
+          text: "First Name",
+          value: "fname",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Last Name",
+          value: "lname",
           class: "green--text darken-4 title",
         },
         {
@@ -518,21 +546,6 @@ export default {
           class: "green--text darken-4 title",
         },
         {
-          text: "Address",
-          value: "address",
-          class: "green--text darken-4 title",
-        },
-        {
-          text: "Valid Id",
-          value: "validId",
-          class: "green--text darken-4 title",
-        },
-        {
-          text: "Id Type",
-          value: "validIdType",
-          class: "green--text darken-4 title",
-        },
-        {
           text: "Contact",
           value: "phoneNo",
           class: "green--text darken-4 title",
@@ -541,10 +554,11 @@ export default {
           text: "",
           value: "controls",
           sortable: false,
+          align: 'end',
           class: "green--text darken-4 title",
         },
       ],
-      guestInput: [],
+      guestInput: {},
       checkIn: false,
       checkOut: false,
       checkInDialog: false,
@@ -566,24 +580,27 @@ export default {
           this.input.noOfHeads = reserveeDetails.noOfHead;
           this.input.noOfDays = reserveeDetails.noOfDays;
           this.input.checkOutDate = reserveeDetails.checkOutDate;
-          this.input.roomDetails = rooms;
 
-          if(this.guestInput.length != 0) {
-            this.guestInput.splice(0, this.guestInput.length);
+          if(this.input.roomDetails.length != 0) {
+            this.input.roomDetails.splice(0, this.input.roomDetails.length);
           }
-          var add = {
-            name: "",
-            gender: "",
-            country: "",
-            nationality: "",
-            address: "",
-            validId: "",
-            validIdType: "",
-            phoneNo: "",
-          }
-
-          for(var j = 0; j < reserveeDetails.noOfHead; j++){
-            this.guestInput.push(add);
+          for(var r = 0, k = 0; r < rooms.length; r++, k++){
+            var numRoom = rooms[r].noOfRoom;
+            var addRoom = {
+              key: k,
+              roomType: rooms[r].roomType,
+            }
+            if(numRoom > 1){
+              for(var num = 1; num <= numRoom; num++, k++){
+                var addRoom2 = {
+                  key: k,
+                  roomType: rooms[r].roomType,
+                }
+                this.input.roomDetails.push(addRoom2);
+              }
+            } else {
+              this.input.roomDetails.push(addRoom);
+            }
           }
 
           var totalRate;
@@ -593,7 +610,9 @@ export default {
               .then((response) => {
                 var roomRate = response.data.rate;
                 var qty = response.data.qty;
-                totalRate += roomRate * qty;
+                var initialTotal = roomRate * qty * reserveeDetails.noOfDays;
+                totalRate += initialTotal;
+
                 var service = {
                   add: false,
                   name: response.data.name + " Room",
@@ -601,6 +620,10 @@ export default {
                   quantity: qty,
                   status: true,
                 };
+
+                if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
+                  service.status = false;
+                }
                 this.guestServices.push(service);
                 var add = [
                   {
@@ -609,16 +632,22 @@ export default {
                     status: "Paid",
                   },
                 ];
-                if (
-                  resType.localeCompare("Booking.com") == 0 ||
-                  resType.localeCompare("Walkin") == 0
-                ) {
+                if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
                   add[0].status = "Pending";
                 }
                 this.guestBillDetails = add;
               });
           }
-          console.log(res.data.message);
+
+          axios
+          .get('http://localhost:3000/vacant-rooms')
+          .then((roomsDB) => {
+            var roomTypes = roomsDB.data.roomNo;
+            this.roomNo = roomTypes;
+          })
+          .catch((err) => {
+            console.log(err.response.data.message);
+          });
         })
         .catch((err) => {
           console.log(err.response.data.message);
@@ -627,7 +656,8 @@ export default {
     addGuestNumber: function(num) {
       if(num > this.guestInput.length){
         var add = {
-          name: "",
+          fname: "",
+          lname: "",
           gender: "",
           country: "",
           nationality: "",
@@ -645,19 +675,33 @@ export default {
         }
       }
     },
+    addGuestInRoom: function(roomNum) {
+      if(this.guestInput[roomNum] === undefined){
+        this.guestInput[roomNum] = [];
+      }
+      var add = {
+        fname: "",
+        lname: "",
+        gender: "",
+        country: "",
+        nationality: "",
+        address: "",
+        validId: "",
+        validIdType: "",
+        phoneNo: "",
+      }
+      this.guestInput[roomNum].push(add);
+      console.log(this.guestInput);
+    },
+    removeGuestInRoom: function(roomNum) {
+      this.guestInput[roomNum].pop();
+    },
     editGuestBtn: function(data) {
       var current = data.item;
-      var fname = "", lname = "";
-      if(current.name) {
-        var name = current.name.split(' ', 2);
-        fname = name[0];
-        lname = name[1];
-      }
-
       this.guestDetail = {
         index: data.index,
-        fname: fname,
-        lname: lname,
+        fname: current.fname,
+        lname: current.lname,
         gender: current.gender,
         country: current.country,
         nationality: current.nationality,
@@ -672,7 +716,8 @@ export default {
       this.guestDetailDialog = false;
   
       this.$set(this.guestInput, data.index, {
-        name: data.fname + " " + data.lname,
+        fname: data.fname,
+        lname: data.lname,
         gender: data.gender,
         country: data.country,
         nationality: data.nationality,
@@ -729,13 +774,13 @@ export default {
       }
       this.guestBill.total = totalBill;
       this.guestBill.balance = balance;
-      console.log(this.input.guest);
     },
-    checkInGuest: function (input, guestServices, guestBillDetails) {
+    checkInGuest: function (input, guestServices, guestBillDetails, guestInput) {
       this.checkInDialog = false;
       console.log(input);
       console.log(guestServices);
       console.log(guestBillDetails);
+      console.log(guestInput);
     },
     addKeyDeposit: function () {
       if (this.guestBill.keyDeposit) {
@@ -757,17 +802,6 @@ export default {
             reservee: reservees[x].name,
           };
           this.reservee.push(add);
-        }
-      })
-      .catch((err) => {
-        console.log(err.response.data.message);
-      });
-    axios
-      .get("http://localhost:3000/room-mgmt/all")
-      .then((res) => {
-        var rooms = res.data.result;
-        for (var x = 0; x < rooms.length; x++) {
-          this.roomType.push(rooms[x].name);
         }
       })
       .catch((err) => {
