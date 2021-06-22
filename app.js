@@ -346,11 +346,7 @@ app.get("/bill/:id", (req, res) => {
 });
 
 app.patch("/bill/:id", urlEncodedParser, (req, res) => {
-<<<<<<< HEAD
-    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
-=======
-    connection.query('UPDATE bill SET status="' + req.body.status + '", keyDeposit=' + req.body.keyDeposit + ', total= ' + req.body.total + ' WHERE id=' + req.params.id + ' ', (err, response) => {
->>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
+    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+', updatedAt="'+req.body.updatedAt+'" WHERE id='+req.params.id+' ', (err, response) => {
         // console.log(err);
         if (err) {
             res.json({
@@ -370,8 +366,7 @@ app.patch("/bill/:id", urlEncodedParser, (req, res) => {
 
 //Create:
 app.post("/bill-details", urlEncodedParser, (req, res) => {
-<<<<<<< HEAD
-    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.total+', "'+req.body.status+'")', (err, result) => {
+    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status, createdAt) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.pending+', '+req.body.total+', "'+req.body.status+'", "'+req.body.createdAt+'")', (err, result) => {
     //    console.log(result);
        if(err){
            res.json({
@@ -385,22 +380,6 @@ app.post("/bill-details", urlEncodedParser, (req, res) => {
            })
        }
    });
-=======
-    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, total, status) VALUES (' + req.body.billId + ', ' + req.body.serviceId + ', ' + req.body.quantity + ', ' + req.body.total + ', "' + req.body.status + '")', (err, result) => {
-        //    console.log(result);
-        if (err) {
-            res.json({
-                message: "Bill Details Not Added",
-                status: 400
-            })
-        } else {
-            res.json({
-                message: "Bill Details Added",
-                status: 200,
-            })
-        }
-    });
->>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
 });
 
 //Retrieve:
@@ -418,11 +397,7 @@ app.get("/bill-details", (req, res) => {
 
 //Update:
 app.get("/bill-details/:id/:ip", (req, res) => {
-<<<<<<< HEAD
     connection.query("SELECT billId, serviceId, quantity, pending, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
-=======
-    connection.query("SELECT billId, serviceId, quantity, total, status FROM `bill_detail` WHERE billId='" + req.params.id + "' AND serviceId='" + req.params.ip + "' ", (err, result) => {
->>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
         // console.log(result);
         res.json({
             message: "Bill Details Update",
@@ -431,22 +406,17 @@ app.get("/bill-details/:id/:ip", (req, res) => {
         })
     });
 });
-<<<<<<< HEAD
 app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
-=======
-app.post("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
-    connection.query("UPDATE `bill_detail` SET `quantity`='+req.body.quantity+',`total`='+req.body.total+',`status`='" + req.body.status + "' WHERE billId='" + req.params.id + "' AND serviceId='" + req.params.ip + "' ", (err, result) => {
->>>>>>> 81b7a8a183f37c19f4439dfc543ac720fe3881bb
+    connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'", updatedAt="'+req.body.updatedAt+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
         // console.log(result);
         if (err) {
             res.json({
-                message: "Bill Details Not Added",
+                message: "Bill Details Not Updated",
                 status: 400
             })
         } else {
             res.json({
-                message: "Bill Details Added",
+                message: "Bill Details Updated",
                 status: 200,
             })
         }
