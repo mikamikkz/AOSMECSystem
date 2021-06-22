@@ -239,6 +239,50 @@ app.get("/room/vacant", (req, res) => {
     });
 });
 
+//vacant rooms
+app.get("/vacant-rooms", (req, res) => {
+    connection.query('SELECT id, roomNo, status, roomTypeId FROM room WHERE occupied = 0', (err, vacantDB) => {
+        if (err) {
+            console.log(err);
+            res.json({
+                message: "Error in getting vacant rooms",
+                status: 400,
+            })
+        } else {
+            connection.query('SELECT id, name FROM room_type', (err, roomTypeDB) => {
+                if (err) {
+                    // res.sendStatus(500)
+                    // return
+                    res.json({
+                        message: "Cannot get room name",
+                        status: 400,
+                    })
+                } else {
+                    var roomNo = {};
+                    for (var i = 0; i < vacantDB.length; i++) {
+                        var add = {
+                          value: vacantDB[i].id,
+                          room: vacantDB[i].roomNo,
+                          status: vacantDB[i].status,
+                        };
+                        for(var j = 0; vacantDB[i].roomTypeId != roomTypeDB[j].id && j < roomTypeDB.length; j++){}
+                        var name = roomTypeDB[j].name;
+                        if(roomNo[name] === undefined){
+                            roomNo[name] = [];
+                        }
+                        roomNo[name].push(add);
+                    }
+                    res.json({
+                        roomNo,
+                        message: "Room Name retrieved retrieved.",
+                        status: 210,
+                    })
+                }
+            });
+        }
+    });
+});
+
 //Update:
 app.get("/room/:id", (req, res) => {
     connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id=" + req.params.id + " ", (err, result) => {
@@ -361,9 +405,7 @@ app.patch("/bill/:id", urlEncodedParser, (req, res) => {
         }
     });
 });
-
 /*******************************     B I L L  D E T A I L S  ( C R U )     *******************************/
-
 //Create:
 app.post("/bill-details", urlEncodedParser, (req, res) => {
     connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status, createdAt) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.pending+', '+req.body.total+', "'+req.body.status+'", "'+req.body.createdAt+'")', (err, result) => {
@@ -381,7 +423,6 @@ app.post("/bill-details", urlEncodedParser, (req, res) => {
        }
    });
 });
-
 //Retrieve:
 app.get("/bill-details", (req, res) => {
     connection.query('SELECT * FROM `bill_detail`', (err, result) => {
@@ -393,8 +434,6 @@ app.get("/bill-details", (req, res) => {
         })
     });
 });
-
-
 //Update:
 app.get("/bill-details/:id/:ip", (req, res) => {
     connection.query("SELECT billId, serviceId, quantity, pending, total, status FROM `bill_detail` WHERE billId='"+req.params.id+"' AND serviceId='"+req.params.ip+"' ", (err, result) => {
@@ -468,7 +507,7 @@ app.get('/reservee/:id', (req, res) => {
 })
 
 app.get('/reservee/checkin/:date', (req, res) => {
-    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status != 2', (err, result) => {
+    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status = 1', (err, result) => {
         if (err) {
             res.json({
                 message: "Checkin Date Required"
@@ -886,7 +925,7 @@ app.get('/checkin/id/:id', (req, res) => {
 });
 
 app.post('/checkin', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays, noOfHead) VALUES (' + req.body.reservationId + ',' + req.body.accountId + ',' + req.body.roomId + ',"' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ',' + req.body.noOfHead + ')', (err, result) => {
+    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays) VALUES (' + req.body.reservationId + ',' + req.body.accountId + ',' + req.body.roomId + ',"' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ')', (err, result) => {
         if (err) {
             res.json({
                 message: "CheckIn Failed",
@@ -908,7 +947,7 @@ app.post('/checkin/:id', urlEncodedParser, (req, res) => {
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE checkin SET reservationId=' + req.body.reservationId + ', accountId=' + req.body.accountId + ', roomId=' + req.body.roomId + ', checkInDate="' + req.body.checkInDate + '", checkOutDate="' + req.body.checkOutDate + '", noOfDays=' + req.body.noOfDays + ', noOfHead=' + req.body.noOfHead + ', updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE checkin SET reservationId=' + req.body.reservationId + ', accountId=' + req.body.accountId + ', roomId=' + req.body.roomId + ', checkInDate="' + req.body.checkInDate + '", checkOutDate="' + req.body.checkOutDate + '", noOfDays=' + req.body.noOfDays + ', updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
         if (err) {
             res.json({
                 message: "Unable to update",

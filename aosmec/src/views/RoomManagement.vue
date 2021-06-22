@@ -71,15 +71,14 @@
                       sm="6"
                       md="6"
                     >
-                      <v-select 
-                      v-bind:items="name"
+                      <v-text-field 
                       v-model="editedItem.name"
                       item-text="text"
                       item-value="value"
                       label="Room Type"
                       outlined                      
                       color="green"
-                  ></v-select>
+                  ></v-text-field>
                     </v-col>
                     <v-col
                       cols="12"
@@ -201,13 +200,6 @@
       room_mgmt: [
 
       ],
-
-      name: [
-        { text: "Single", value: "Single" },
-        { text: "Double", value: "Double" },
-        { text: "Family Room", value: "Family Room" },
-      ],
-
 
       editedIndex: -1,
       editedItem: {

@@ -339,8 +339,8 @@
           :expanded.sync="expanded"
           item-key="reservationId"
           show-expand
-          ref="table"
           :search="search"
+          sort-by="checkIn"
           :custom-filter="filter"
           class="elevation-1"
           :footer-props="{
@@ -893,7 +893,7 @@
 <style scoped>
 >>> .v-data-table__expanded.v-data-table__expanded__content {
   box-shadow: none !important;
-  background: #f8f8f8;
+  background:#f8f8f8;
 }
 >>> .v-data-table thead span {
   font-weight: bolder;
