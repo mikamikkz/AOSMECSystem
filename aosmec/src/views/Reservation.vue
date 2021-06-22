@@ -348,7 +348,7 @@
             itemsPerPageOptions: [10, 30, 50, -1],
           }"
         >
-          <template v-slot:[item.controls]="props">
+          <template v-slot:item.controls="props">
             <v-btn
               color="amber darken-2"
               small
