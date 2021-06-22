@@ -507,7 +507,7 @@ app.get('/reservee/:id', (req, res) => {
 })
 
 app.get('/reservee/checkin/:date', (req, res) => {
-    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status != 2', (err, result) => {
+    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status = 1', (err, result) => {
         if (err) {
             res.json({
                 message: "Checkin Date Required"

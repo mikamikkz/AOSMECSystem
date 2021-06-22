@@ -340,6 +340,7 @@
           item-key="reservationId"
           show-expand
           :search="search"
+          sort-by="checkIn"
           :custom-filter="filter"
           class="elevation-1"
           :footer-props="{
