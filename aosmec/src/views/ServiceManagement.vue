@@ -74,7 +74,7 @@
                       md="4"
                     >
                     
-                    <v-select
+                    <v-text-field
                       v-bind:items="name"
                       v-model="editedItem.name"
                       item-text="text"
@@ -82,7 +82,7 @@
                       label="Service"
                       outlined
                       color="green"
-                  ></v-select>
+                  ></v-text-field>
                       
                     </v-col>
                     <v-col
@@ -203,12 +203,6 @@
         
       ],
 
-      name: [
-        { text: "Airport Shuttle", value: "Airport Shuttle" },
-        { text: "Extra Bed", value: "Extra Bed" },
-      ],
-
-     
       editedIndex: -1,
       editedItem: {
         name: null,
