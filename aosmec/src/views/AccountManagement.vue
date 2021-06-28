@@ -379,6 +379,7 @@
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
+          this.close()
         } else if (this.editedItem.username != null && this.editedItem.password != null && this.editedItem.fname != null && this.editedItem.lname != null && this.editedItem.mname != null && this.editedItem.birthdate != null && this.editedItem.gender != null) {
           this.addAnAccount()
           this.acc_mgmt.push(this.editedItem)

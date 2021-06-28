@@ -75,7 +75,6 @@
                     >
                     
                     <v-text-field
-                      v-bind:items="name"
                       v-model="editedItem.name"
                       item-text="text"
                       item-value="value"
@@ -185,10 +184,11 @@
 
 
 <script>
+
   import axios from "axios";
-  
   export default {
     data: () => ({
+
       addServiceDialog: false,
       dialogDelete: false,
       headers: [
@@ -207,7 +207,7 @@
       editedItem: {
         name: null,
         rate: null,
-        pricing: null
+        pricing: null,
       },
     }),
 
@@ -281,6 +281,7 @@
           if (this.editedIndex > -1) {
             Object.assign(this.service_mgmt[this.editedIndex], this.editedItem)
             axios.patch("http://localhost:3000/service-mgmt/update/" + this.service_mgmt[this.editedIndex].id, this.editedItem)
+            this.close()
           } else if (this.editedItem.name != null && this.editedItem.rate != null && this.editedItem.pricing != null) {
             this.addAService()
             this.service_mgmt.push(this.editedItem)
@@ -308,11 +309,7 @@
             }
             this.service_mgmt.push(retrievedData);  
           }
-          console.log(res.data);
         })
-        .catch((err) => {
-          console.log(err.res.data.message);
-        });
     }
   }
 </script>
