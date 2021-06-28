@@ -3,14 +3,15 @@
     <v-container class="mt-10 pt-10">
       <v-layout wrap>
         <v-flex sm12 md6 offset-md3>
-          <v-card elevation="4" dark tag="section">
+          <v-card elevation="4" style="border-left: 10px solid green" tag="section">
             <v-card-title>
               <v-layout align-center justify-space-between>
-                    <h3 class="font-weight-medium text-uppercase">Login</h3>
+                    <!-- <h3 class="font-weight-medium text-uppercase">Login</h3>
                     <v-spacer></v-spacer>
                     <v-flex>
                       <v-img contain height="100px" width="200px" src="../../public/logo.png" style="float: right;"></v-img>
-                    </v-flex>
+                    </v-flex> -->
+                    <v-img contain height="100px" width="200px" src="../../public/logo.png" style="float: right;"></v-img>
               </v-layout>
             </v-card-title>
             <v-divider></v-divider>
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
 export default {
   name: "Login",
   components: {},
@@ -48,39 +49,37 @@ export default {
     };
   },
   methods: {
-    // async login() {
-    //   // console.log(this.username)
-    //   // console.log(this.password)
-    //   //Account Mgmt
-    //   // axios
-    //   // .get("http://localhost:3000/account-mgmt")
-    //   // .then((res) => {
-    //   //   var requestAccounts = res.data.result
-    //   //   console.log(requestAccounts)
-    //   //   for(var i = 0, flag = 0; i < requestAccounts.length && flag == 0; i++){
-    //   //     if(this.username === requestAccounts[i].username && this.password === requestAccounts[i].password){
-    //   //       this.$store.state.status = 1
-    //   //       flag = 1
-    //   //       console.log("Logged in")
-    //   //     }
-    //   //   }
-    //   // }).catch((err) => {
-    //   //   console.log(err.response.data.message);
-    //   // });
-    //   try {
-    //     const response = await axios.post('http://localhost:3000/login', {
-    //       // username: this.username,
-    //       // password: this.password
-    //     });
-    //     console.log(response.data)
-    //   }catch(err) {
-    //     console.log(err);
-    //   }
-
-    // },
+    login: function(){
+      let account = { username: this.username, password: this.password}
+      axios
+      .post("http://localhost:3000/login", account)
+      .then((response) =>{
+        if(response.status == 200){
+          if(this.username == "admin"){
+            this.$store.state.status = 1
+            localStorage.status = 1
+          }else{
+            this.$store.state.status = 2
+            localStorage.status = 2
+          }
+          this.$router.push('/dashboard');
+        }
+        if(response.status == 400){
+          this.$router.go(-1);
+        }
+      })
+      // .catch(err => {
+      //   console.log(err.response.data.message);
+      // });
+      console.log(this.username)
+      console.log(this.password)
+    }
   },
-  beforeMount(){
-    
+  mounted() {
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
   }
 };
 </script>
