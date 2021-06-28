@@ -113,7 +113,7 @@
       <v-dialog persistent v-model="showPayment" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
-            Payment
+            Payment Details
           </v-card-title>
           <v-card-text class="mt-3">
             
@@ -121,29 +121,54 @@
               <template v-slot:default>
                 <span v-for="bill in guestBill" :key="bill.id">
                   <span v-if="bill.id === chosenGuest.id && bill.status == 'unpaid'">
-                    <thead>
-                      <tr>
-                        <th class="text-left pa-0 pl-10">Payment Details</th>
-                        <th class="text-left pl-0 pr-0">Amount to Pay</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
-                        <span v-if="billDetails.billId === chosenGuest.id">
+                    
+                    <!-- alt plan if di makaya nga mag table -->
+                    <!-- <span class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                      <span v-if="billDetails.billId === chosenGuest.id">
                           <span v-for="serviceName in guestService" :key="serviceName.id">
                             <span v-if="serviceName.id == billDetails.serviceId && billDetails.status == 'unpaid' ">
-                              <td class="pa-0 pt-5"> 
-                                <li>Service: {{ serviceName.name }}</li> 
-                                <li>Quantity: {{ billDetails.quantity }}</li>
-                              </td>
-                              <td class="text-right pr-0 pl-15">Php {{ billDetails.pending }}</td>
+                              <ul class="pa-0 pt-2"> 
+                                <li><strong>Service:</strong> {{ serviceName.name }}</li> 
+                                <li><strong>Quantity:</strong> {{ billDetails.quantity }}</li>
+                                <li><strong>Amount to Pay:</strong> Php {{ billDetails.pending }}</li>
+                              </ul>
+
                             </span>
                           </span>
                         </span>
+                      </span>
+                    </span>
+                  </span> -->
+
+                    <thead>
+                      <tr>
+                        <th class="text-left pa-0 pl-15 pr-5">Payment Details</th>
+                        <th class="text-right pa-0 pr-15 pl-5">Pending Amount to Pay</th>
                       </tr>
+                    </thead>
+                    <tbody>
+                      <!-- mobalik2 ang content if i-open nasad ang modal -->
+                      <tr v-for="service in guestPayService" :key="service.id">
+                        <td class="text-left pa-0 pl-10 pt-2"><li>Service: {{service.name}}</li></td>
+                        <td class="text-left pa-0 pl-15 pt-2">Php{{service.pending}}</td>
+                      </tr>
+
+                      <!-- maguba ang format -->
+                      <!-- <tr v-for="billDetails in guestBillDetails" :key="billDetails.id">
+                        <span v-for="serviceName in guestService" :key="serviceName.id">
+                          <span v-if="billDetails.billId === chosenGuest.id && serviceName.id == billDetails.serviceId && billDetails.status == 'unpaid' ">
+                            <td class="pa-0 pt-2"> 
+                              <li>{{ serviceName.name }}</li>
+                            </td>
+                            <td class="text-right pr-0 pl-15">Php {{ billDetails.pending }}</td>
+                          </span>
+                        </span>
+                      </tr> -->
+
                     </tbody>
                   </span>
                 </span>
+
               </template>
             </v-simple-table>
 
@@ -239,7 +264,7 @@
                           <td>{{ service.rate }}</td>
                           <td>{{ service.quantity }}</td>
                           <td>
-                            <v-btn icon small v-if="!service.add">
+                            <v-btn icon small v-if="billDetails.status == 'paid'">
                               <v-icon color="green lighten-3">mdi-checkbox-marked</v-icon>
                             </v-btn>
                           </td>
@@ -537,17 +562,23 @@ export default {
               if(this.chosenGuest.id == requestBillDetails[j].billId && requestBillDetails[j].serviceId == requestService[i].id && requestBillDetails[j].status == "unpaid") {
                 const addService = {
                   id: requestService[i].id,
-                  name: requestService[i].name
+                  name: requestService[i].name,
+                  rate: requestService[i].rate,
+                  quantity: requestBillDetails[j].quantity,
+                  pending: requestBillDetails[j].pending,
+                  total: requestBillDetails[j].total
                 }
                 this.guestPayService.push(addService)
               }
             }
           }
+          console.log(this.guestPayService)
       })).catch(err => {
           console.log(err.response.data.message);
       })
     },
     paymentClose: function () {
+      this.guestPayService = []
       this.showPayment = false
     },
     paid() {
@@ -809,6 +840,10 @@ export default {
   },
   mounted(){
     this.date = new Date().toISOString().slice(0,10);
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
   },
   beforeMount(){
     var date = new Date().toISOString().slice(0,10);
