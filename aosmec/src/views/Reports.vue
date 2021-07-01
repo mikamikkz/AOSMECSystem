@@ -250,7 +250,6 @@ export default {
 
   },
   mounted() {
-    this.today();
     if(localStorage.status){
       this.$store.state.status = localStorage.status
     }
