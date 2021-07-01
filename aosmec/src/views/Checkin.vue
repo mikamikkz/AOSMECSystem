@@ -907,6 +907,13 @@ export default {
       }
     },
   },
+  mounted() {
+    this.today();
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
+  },
   beforeMount() {
     this.today = new Date().toISOString().slice(0, 10);
     axios
