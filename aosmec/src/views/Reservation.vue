@@ -1148,6 +1148,12 @@ export default {
       location.reload();
     },
   },
+  mounted() {
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
+  },
   beforeMount(){
     axios
       .get("http://localhost:3000/reservation")

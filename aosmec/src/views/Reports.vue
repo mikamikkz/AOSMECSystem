@@ -249,6 +249,12 @@ export default {
     },
 
   },
+  mounted() {
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
+  },
   beforeMount() {
     var today = new Date().toISOString().slice(0, 10);
     var dateSplit = today.split('-', 3);

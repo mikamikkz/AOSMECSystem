@@ -74,7 +74,7 @@
                       outlined
                       dense
                       v-on:click="storeOldRoom(rooms.roomNum)"
-                      v-on:change="renameKey(rooms.roomNum)"
+                      v-on:change="renameKey(rooms.roomNum, rooms.roomType)"
                       color="green"
                     ></v-select>
                   </v-col>
@@ -212,7 +212,7 @@
       <v-col lg="6" md="6" sm="12" d-flex>
         <v-card>
           <v-card-title class="mb-0 pb-0 green--text"
-            >Payment Details</v-card-title
+            >Payment Summary</v-card-title
           >
           <v-card-text>
             <v-simple-table fixed-header height="305px">
@@ -247,13 +247,190 @@
                 </tbody>
               </template>
             </v-simple-table>
-            <v-card-actions class="d-flex justify-center">
-              <v-btn color="success" v-on:click="checkInModal(guestBillDetails)"
-                >Check In</v-btn
-              >
-            </v-card-actions>
           </v-card-text>
-          <v-dialog v-model="checkInDialog" persistent width="450">
+        </v-card>
+      </v-col>
+    </v-row>
+
+
+    <v-dialog v-model="guestDetailDialog" width="600" persistent>
+      <GuestForm
+        class="pt-3"
+        v-bind:guest="guestDetail" 
+        v-on:submitBtn="submitBtn($event)"
+        v-on:closeBtn="closeBtn()"
+      ></GuestForm>
+    </v-dialog>
+
+
+    <ul class="pa-0 mt-2"  v-for="rooms in input.roomDetails" :key="rooms.key">
+      <v-row class="pa-0" v-if="input.roomDetails[rooms.key].roomNum">
+        <v-col lg="7" md="7" sm="12">
+          <v-row class="pa-0">
+            <v-col lg="10" md="10" sm="12">
+            <v-card width="170">
+              <v-card-title class="py-2 green--text">Room {{ rooms.roomNum }}</v-card-title>
+            </v-card>
+            </v-col>
+            <v-col lg="2" md="2" sm="12" class="pt-5"> 
+            <v-btn
+              v-on:click="removeGuestInRoom(rooms.roomNum)"
+              icon
+              outlined
+              elevation="3"
+              color="red"
+              class="mr-2 pa-2"
+            >
+              <v-icon>mdi-minus</v-icon>
+            </v-btn>
+            <v-btn
+              v-on:click="addGuestInRoom(rooms.roomNum)"
+              icon
+              elevation="3"
+              class="mr-0 white--text pa-2 float-end"
+              style="background: #13b150"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+            </v-col>
+          </v-row>
+          <v-data-table
+            :headers="guestHeaders"
+            :items="checkInRoom[rooms.roomNum].guest"
+            class="mt-5 elevation-1"
+            :hide-default-footer="true"
+            rounded
+          >
+            <template v-slot:item.controls="guestInfo">
+              <v-btn
+                color="amber darken-1"
+                small
+                rounded
+                outlined
+                class="white--text"
+                v-on:click="editGuestBtn(guestInfo, rooms.roomNum)"
+                elevation="0"
+              >
+                <v-icon small>mdi-pencil</v-icon>
+              </v-btn>
+            </template>
+          </v-data-table>
+        </v-col>
+
+  
+        <v-col lg="5" md="5" sm="12" v-if="input.roomDetails[rooms.key].roomNum">
+          <v-card>
+            <v-card-title class="mb-0 pb-0 green--text"
+              >Payment Details</v-card-title
+            >
+            <v-card-text class="mt-0 pt-0">
+              <v-simple-table fixed-header height="200px">
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="ma-0 pa-0"></th>
+                      <th class="text-left pl-1" style="width: 45%;">Name</th>
+                      <th class="text-left" style="width: 15%;">Rate</th>
+                      <th class="text-left" style="width: 10%;">Qty</th>
+                      <th class="text-left" style="width: 15%;">Total</th>
+                      <th class="text-left" style="width: 15%;">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="service in checkInRoom[rooms.roomNum].service" :key="service.name">
+                      <td class="pa-0 ma-0">
+                        <v-btn
+                          icon
+                          small
+                          v-if="service.add"
+                          class="pt-0 mt-0"
+                          v-on:click="removeFromList(service, rooms.roomNum)"
+                        >
+                          <v-icon small color="red lighten-2"
+                            >mdi-minus-circle</v-icon
+                          >
+                        </v-btn>
+                      </td>
+                      <td class="pl-1">{{ service.name }}</td>
+                      <td>{{ service.rate }}</td>
+                      <td>{{ service.quantity }}</td>
+                      <td>{{ service.total }}</td>
+                      <td>
+                        <v-chip
+                          small
+                          outlined
+                          color="green"
+                          v-if="service.status == 'Paid'"
+                        >
+                          Paid
+                        </v-chip>
+                        <v-chip small v-else color="yellow darken-1">
+                          Pending
+                        </v-chip>
+                      </td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+
+
+              <v-row v-if="addServiceForm" class="mt-2">
+                <v-col lg="6" md="6" sm="12" class="pr-1">
+                  <v-select
+                    :items="services"
+                    v-model="addToService.id"
+                    label="Service Name"
+                    item-text="text"
+                    item-value="value"
+                    dense
+                    height="10"
+                    outlined
+                    color="green"
+                    class="ml-2"
+                    small
+                  ></v-select>
+                </v-col>
+                <v-col lg="2" md="2" sm="12" class="pl-1 pr-2">
+                  <v-text-field
+                    v-model="addToService.qty"
+                    label="Qty"
+                    dense
+                    outlined
+                    type="number"
+                    min="1"
+                    color="green"
+                  ></v-text-field>
+                </v-col>
+                <v-col lg="4" md="4" sm="12" class="ma-0 px-0">
+                  <v-btn
+                    class="white--text"
+                    color="green"
+                    dense
+                    outlined
+                    v-on:click="addToList(addToService, rooms.roomNum)"
+                  >
+                    Add
+                  </v-btn>
+                  <v-btn
+                    class="ml-1 pa-0"
+                    dense
+                    outlined
+                    v-on:click="addServiceForm = false"
+                  >
+                    Back
+                  </v-btn>
+                </v-col>
+              </v-row>
+
+              <v-card-actions v-else-if="checkInRoom[rooms.roomNum].status == false" class="d-flex justify-center">
+                <v-btn color="success" outlined small v-on:click="addServiceForm = true">Add Service</v-btn>
+                <v-btn color="success" outlined small v-on:click="checkInModal(checkInRoom[rooms.roomNum].service, rooms.roomNum)">Check In</v-btn>
+              </v-card-actions>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        
+        <v-dialog v-model="checkInDialog" persistent width="450">
             <v-card>
               <v-card-title> </v-card-title>
               <v-card-text>
@@ -325,166 +502,12 @@
                 <v-btn
                   color="light-green white--text"
                   class="px-5"
-                  v-on:click="checkInGuest(input, guestServices, guestBillDetails, checkInRoom)"
+                  v-on:click="checkInGuest(input, guestBill, checkInRoom[checkInRoomNumber], checkInRoomNumber)"
                 > Check In </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-card>
-      </v-col>
-    </v-row>
 
-
-    <v-dialog v-model="guestDetailDialog" width="600" persistent>
-      <GuestForm
-        class="pt-3"
-        v-bind:guest="guestDetail" 
-        v-on:submitBtn="submitBtn($event)"
-        v-on:closeBtn="closeBtn()"
-      ></GuestForm>
-    </v-dialog>
-
-
-    <ul class="pa-0 mt-2"  v-for="rooms in input.roomDetails" :key="rooms.key">
-      <v-row class="pa-0" v-if="input.roomDetails[rooms.key].roomNum">
-        <v-col lg="7" md="7" sm="12">
-          <v-row class="pa-0">
-            <v-col lg="10" md="10" sm="12">
-            <v-card width="170">
-              <v-card-title class="py-2 green--text">Room {{ rooms.roomNum }}</v-card-title>
-            </v-card>
-            </v-col>
-            <v-col lg="2" md="2" sm="12" class="pt-5"> 
-            <v-btn
-              v-on:click="removeGuestInRoom(rooms.roomNum)"
-              icon
-              outlined
-              elevation="3"
-              color="red"
-              class="mr-2 pa-2"
-            >
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-            <v-btn
-              v-on:click="addGuestInRoom(rooms.roomNum)"
-              icon
-              elevation="3"
-              class="mr-2 white--text pa-2 float-end"
-              style="background: #13b150"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-            </v-col>
-          </v-row>
-          <v-data-table
-            :headers="guestHeaders"
-            :items="checkInRoom[rooms.roomNum].guest"
-            class="mt-5 elevation-1"
-            :hide-default-footer="true"
-            rounded
-          >
-            <template v-slot:item.controls="guestInfo">
-              <v-btn
-                color="amber darken-1"
-                small
-                rounded
-                outlined
-                class="white--text"
-                v-on:click="editGuestBtn(guestInfo, rooms.roomNum)"
-                elevation="0"
-              >
-                <v-icon small>mdi-pencil</v-icon>
-              </v-btn>
-            </template>
-          </v-data-table>
-        </v-col>
-
-  
-        <v-col lg="5" md="5" sm="12" v-if="input.roomDetails[rooms.key].roomNum">
-          <v-card>
-            <v-card-title class="mb-0 pb-0 green--text"
-              >Additional Service</v-card-title
-            >
-            <v-card-text class="mt-0 pt-0">
-              <v-simple-table fixed-header height="200px">
-                <template v-slot:default>
-                  <thead>
-                    <tr>
-                      <th class="ma-0 pa-0"></th>
-                      <th class="text-left pl-1" style="width: 55%;">Name</th>
-                      <th class="text-left" style="width: 25%;">Rate</th>
-                      <th class="text-left" style="width: 5%;">Qty</th>
-                      <th class="text-left" style="width: 15%;">Paid</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="service in checkInRoom[rooms.roomNum].service" :key="service.name">
-                      <td class="pa-0 ma-0">
-                        <v-btn
-                          icon
-                          small
-                          v-if="service.add"
-                          class="pt-0 mt-0"
-                          v-on:click="removeFromList(service)"
-                        >
-                          <v-icon small color="red lighten-2"
-                            >mdi-minus-circle</v-icon
-                          >
-                        </v-btn>
-                      </td>
-                      <td class="pl-1">{{ service.name }}</td>
-                      <td>{{ service.rate }}</td>
-                      <td>{{ service.quantity }}</td>
-                      <td>
-                        <v-btn icon small v-if="service.status">
-                          <v-icon color="green lighten-3"
-                            >mdi-checkbox-marked</v-icon
-                          >
-                        </v-btn>
-                      </td>
-                    </tr>
-                  </tbody>
-                </template>
-              </v-simple-table>
-              <v-row class="mt-2">
-                <v-col lg="1" md="1" sm="12" d-flex class="mr-1">
-                  <v-btn
-                    icon
-                    small
-                    class="mt-2"
-                    v-on:click="addToList(addToService)"
-                  >
-                    <v-icon color="green lighten-2">mdi-plus-circle</v-icon>
-                  </v-btn>
-                </v-col>
-                <v-col lg="7" md="" sm="12" d-flex class="pr-1">
-                  <v-select
-                    :items="services"
-                    v-model="addToService.id"
-                    label="Service Name"
-                    item-text="text"
-                    item-value="value"
-                    dense
-                    outlined
-                    color="green"
-                  ></v-select>
-                </v-col>
-                <v-col lg="3" md="3" sm="12" d-flex class="pl-1">
-                  <v-text-field
-                    v-model="addToService.qty"
-                    label="Qty"
-                    dense
-                    outlined
-                    type="number"
-                    min="1"
-                    color="green"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        
       </v-row>
     </ul>
   </v-container>
@@ -532,7 +555,6 @@ export default {
         name: "",
         qty: "",
       },
-      guestServices: [],
       guestBillDetails: [],
       guestBill: {
         roomNo: "101",
@@ -591,6 +613,10 @@ export default {
       alert: false,
       displayAlert: "",
       oldRoomKey: "",
+      addServiceForm: false,
+      checkInRoomNumber: "",
+      totalReserve: 0,
+      noOfCheckIn: 0,
     };
   },
   methods: {
@@ -602,13 +628,13 @@ export default {
       }, 5000)
     },
     fillReserveeDetails: function (reserveeId) {
-      this.guestServices.splice(0, this.guestServices.length);
       this.guestBillDetails.splice(0, this.guestBillDetails.length);
       axios
         .get("http://localhost:3000/reservee/" + reserveeId)
         .then((res) => {
           var reserveeDetails = res.data.result.reservee[0];
           var rooms = res.data.result.rooms;
+          this.input.id = reserveeDetails.id;
           this.input.reservationType = reserveeDetails.type;
           this.input.noOfHeads = reserveeDetails.noOfHead;
           this.input.noOfDays = reserveeDetails.noOfDays;
@@ -617,24 +643,30 @@ export default {
           if(this.input.roomDetails.length != 0) {
             this.input.roomDetails.splice(0, this.input.roomDetails.length);
           }
-          for(var r = 0, k = 0; r < rooms.length; r++, k++){
+          var k = 0;
+          for(var r = 0; r < rooms.length; r++, k++){
             var numRoom = rooms[r].noOfRoom;
             var addRoom = {
               key: k,
               roomType: rooms[r].roomType,
+              roomNum: "",
             }
             if(numRoom > 1){
               for(var num = 1; num <= numRoom; num++, k++){
                 var addRoom2 = {
                   key: k,
                   roomType: rooms[r].roomType,
+                  roomNum: "",
                 }
                 this.input.roomDetails.push(addRoom2);
               }
+              k--;
             } else {
               this.input.roomDetails.push(addRoom);
             }
           }
+
+          this.totalReserve = k;
 
           var totalRate, totalQty = 0;
           for (var i = totalRate = 0, resType = reserveeDetails.type; i < rooms.length; i++ ) {
@@ -646,18 +678,6 @@ export default {
                 var initialTotal = roomRate * qty * reserveeDetails.noOfDays;
                 totalRate += initialTotal;
                 totalQty += qty;
-                var service = {
-                  add: false,
-                  name: response.data.name + " Room",
-                  rate: roomRate,
-                  quantity: qty,
-                  status: true,
-                };
-
-                if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
-                  service.status = false;
-                }
-                this.guestServices.push(service);
                 var add = [
                   {
                     name: "Room",
@@ -692,7 +712,7 @@ export default {
         this.oldRoomKey = old;
       }
     },
-    renameKey: function(newKey){
+    renameKey: function(newKey, roomType){
       newKey = newKey.toString();
       if(Object.prototype.hasOwnProperty.call(this.checkInRoom, newKey)){
         this.showAlert("Warning! Room is already taken");
@@ -702,18 +722,36 @@ export default {
           delete this.checkInRoom[this.oldRoomKey];
 
           this.oldRoomKey = undefined;
-          // var temp = this.checkInRoom;
-          // this.$set(this.checkInRoom, temp)
-
+          // var temp1 = this.checkInRoom;
+          // this.$set(this.checkInRoom, temp1)
+          console.log(this.checkInRoom)
         } else {
-          var temp2 = {
+          var temp = {
             guest: [],
             service: [],
+            status: false,
           };
-          this.$set(this.checkInRoom, newKey, temp2);
+          this.$set(this.checkInRoom, newKey, temp);
+          axios
+            .get("http://localhost:3000/room-rate/"+roomType+"/"+1)
+            .then((response) => {
+              var roomRate = response.data.rate;
+              var room = {
+                add: false,
+                name: "Room Rate",
+                rate: roomRate,
+                quantity: 1,
+                total: roomRate,
+                status: "Paid",
+              };
+              var resType = this.input.reservationType;
+              if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
+                room.status = "Unpaid";
+              }
+              this.$set(this.checkInRoom[newKey].service, 0, room);
+            });
         }
       }
-      console.log(this.checkInRoom);
     },
     addGuestInRoom: function(roomNum) {
       if(roomNum === undefined){
@@ -772,57 +810,94 @@ export default {
     closeBtn: function () {
       this.guestDetailDialog = false;
     },
-    addToList: function (input) {
+    addToList: function (input, key) {
       axios
         .get("http://localhost:3000/service/" + input.id)
         .then((res) => {
           var service = res.data.result[0];
-          var addData = {
-            add: true,
-            id: input.id,
-            name: service.name,
-            rate: service.rate,
-            quantity: input.qty,
-            status: false,
-          };
-          this.guestServices.push(addData);
-          var addBill = {
-            id: input.id,
-            name: service.name,
-            total: service.rate * input.qty,
-            status: "Pending",
-          };
-          this.guestBillDetails.push(addBill);
+          
+          var servId = this.checkInRoom[key].service.findIndex(service => service.id === input.id);
+          if(servId > 0){
+            this.checkInRoom[key].service[servId].quantity += parseInt(input.qty);
+            this.checkInRoom[key].service[servId].total += service.rate * input.qty;
+          } else {
+            var addData = {
+              add: true,
+              id: input.id,
+              name: service.name,
+              rate: service.rate,
+              quantity: parseInt(input.qty),
+              total: service.rate * input.qty,
+              status: "Unpaid",
+            };
+            this.checkInRoom[key].service.push(addData);
+          }
+        
+          var serviceId = this.guestBillDetails.findIndex(guestBill => guestBill.id === input.id);
+          if(serviceId > 0){
+            this.guestBillDetails[serviceId].qty += parseInt(input.qty);
+            this.guestBillDetails[serviceId].total += service.rate * input.qty;
+          } else {
+            var addBill = {
+              id: input.id,
+              name: service.name,
+              qty: parseInt(input.qty),
+              total: service.rate * input.qty,
+              status: "Unpaid",
+            };
+            this.guestBillDetails.push(addBill);
+          }
         })
         .catch((err) => {
           console.log(err.response.data.message);
         });
     },
-    removeFromList: function (input) {
-      var index = this.guestServices.findIndex(index => index.name === input.name);
-      var billIndex = this.guestServices.findIndex(index => index.name === input.name);
-      this.guestServices.splice(index, 1);
-      this.guestBillDetails.splice(billIndex, 1);
+    removeFromList: function (input, key) {
+      var index = this.checkInRoom[key].service.findIndex(index => index.name === input.name);
+      var billIndex = this.checkInRoom[key].service.findIndex(index => index.name === input.name);
+      this.checkInRoom[key].service.splice(index, 1);
+
+      if(this.guestBillDetails[billIndex].qty == parseInt(input.quantity)){
+        this.guestBillDetails.splice(billIndex, 1);
+      } else {
+        this.guestBillDetails[billIndex].qty -= parseInt(input.quantity);
+      }
     },
-    checkInModal: function (bill) {
+    checkInModal: function (bill, roomNum) {
       this.checkInDialog = true;
       var totalBill = 0;
       var balance = 0;
+      this.guestBill.roomNo = roomNum;
       for (var i = 0; i < bill.length; i++) {
         totalBill += parseInt(bill[i].total);
-        if (bill[i].status == "Pending") {
+        if (bill[i].status == "Unpaid") {
           balance += parseInt(bill[i].total);
         }
       }
       this.guestBill.total = totalBill;
       this.guestBill.balance = balance;
+      this.checkInRoomNumber = roomNum;
     },
-    checkInGuest: function (input, guestServices, guestBillDetails, checkInRoom) {
+    checkInGuest: function (input, totalBill, checkIn, roomNum) {
       this.checkInDialog = false;
       console.log(input);
-      console.log(guestServices);
-      console.log(guestBillDetails);
-      console.log(checkInRoom);
+      console.log(checkIn);
+      console.log(totalBill);
+      var services = checkIn.service;
+
+      console.log(roomNum)
+      console.log(services);
+      for (var i = 0; i < services.length; i++) {
+        if (services[i].status == "Unpaid") {
+          this.checkInRoom[roomNum].service[i].status = "Paid";
+        }
+      }
+      this.noOfCheckIn++;
+
+      this.checkInRoom[roomNum].status = true;
+      if(this.totalReserve == this.noOfCheckIn){
+        location.reload();
+      }
     },
     addKeyDeposit: function () {
       if (this.guestBill.keyDeposit) {
@@ -831,6 +906,12 @@ export default {
         this.guestBill.balance = parseInt(this.guestBill.balance) - 200;
       }
     },
+  },
+  mounted() {
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
   },
   beforeMount() {
     this.today = new Date().toISOString().slice(0, 10);
