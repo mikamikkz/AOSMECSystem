@@ -278,6 +278,7 @@
         if (this.editedIndex > -1) {
           Object.assign(this.room_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/room-mgmt/all/update/" + this.room_mgmt[this.editedIndex].id, this.editedItem)
+          this.close()
         } else if (this.editedItem.name != null && this.editedItem.rate != null && this.editedItem.totalNoOfRoom != null) {
           this.addARoom()
           this.room_mgmt.push(this.editedItem)
@@ -302,7 +303,6 @@
             }
             this.room_mgmt.push(addData);
           }
-          console.log(res.data);
         })
     }
   }

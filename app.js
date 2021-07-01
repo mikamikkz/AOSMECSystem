@@ -39,76 +39,50 @@ connection.connect((err) => {
 });
 
 /*****************************************       LOGIN      ************************************************/
-// app.get("/login", (req,res)=>{
-//     // res.render('App');
-// })
-
 app.post("/login", urlEncodedParser, (req, res) => {
-    connection.query("SELECT * FROM account WHERE username = ?", [req.body.username], (error, results)=>{
-        if (error){
-            res.json({
-                message: "Account was not retrieved.",
-                status: 404,
-            })
+    connection.query('SELECT id, username, password FROM account WHERE username ="'+req.body.username+'"', (err, results)=> {
+        if (err){
+            console.log(err)
+            res.json({message: "Account was not retrieved."})
         }
+        console.log(results)
         if(!(results.length>0)){
-            // res.redirect('/login');
-            this.$store.state.status = 0
+            res.json({message:"Account does not exist"});
         }else if(req.body.password != results[0].password){
-            // res.redirect('/login');
-            this.$store.state.status = 0
-        }else{
+            res.status(400).json({message:"Incorrect Password"});
+        }else if(req.body.password == results[0].password){
             req.session.loggedin = true;
-            req.session.username = req.body.username;
-            this.$store.state.status = 1
-            // res.redirect('/noteslist');
+            if(req.body.username === "admin"){
+                console.log("admin")
+                res.json({userid: results[0].id, message: "Account retrieved."})
+            }else{
+                console.log("frontdesk")
+                res.json({userid: results[0].id, message: "Account retrieved."})
+            }
             console.log("LOGIN SUCCESS")
         }
-        res.json({
-            results,
-            message: "Account was retrieved.",
-            status: 100,
-        })
-        console.log(results)
     })
 })
 
-// app.get('/login', (req, res) => {
-//     connection.query('SELECT * FROM account', (err, result) => {
-//         if((err)){
-//             res.json({
-//                 message: "Account was not retrieved.",
-//                 status: 404,
-//             })
-//         }
-//         res.json({
-//             result,
-//             message: "Account was retrieved.",
-//             status: 100,
-//         })
-//         console.log(result)
-//     });
-// });
-
 /*****************************************       LANDING/AUTH      ************************************************/
-app.get("/", (req,res)=>{
-    if(req.session.loggedin){
-        // res.redirect("/noteslist");
-        console.log("LANDING")
-    }else{
-        res.render("App");
-    }
-})
+// app.get("/", (req,res)=>{
+//     if(req.session.loggedin){
+//         // res.redirect("/noteslist");
+//         console.log("LANDING")
+//     }else{
+//         res.render("App");
+//     }
+// })
 
-/*****************************************       LOGOUT      ************************************************/
-app.get("/logout", (req,res)=>{
-    if(req.session.loggedin){
-        req.session.destroy();
-        res.redirect('/');
-    }else{
-        // res.render("App");
-    }
-})
+// /*****************************************       LOGOUT      ************************************************/
+// app.get("/logout", (req,res)=>{
+//     if(req.session.loggedin){
+//         req.session.destroy();
+//         res.redirect('/');
+//     }else{
+//         // res.render("App");
+//     }
+// })
 
 /*****************************************       R O O M ( C R U )      ************************************************/
 
@@ -390,7 +364,7 @@ app.get("/bill/:id", (req, res) => {
 });
 
 app.patch("/bill/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+' WHERE id='+req.params.id+' ', (err, response) => {
+    connection.query('UPDATE bill SET status="'+req.body.status+'", keyDeposit='+req.body.keyDeposit+', pending='+req.body.pending+', total= '+req.body.total+', updatedAt="'+req.body.updatedAt+'" WHERE id='+req.params.id+' ', (err, response) => {
         // console.log(err);
         if (err) {
             res.json({
@@ -408,7 +382,7 @@ app.patch("/bill/:id", urlEncodedParser, (req, res) => {
 /*******************************     B I L L  D E T A I L S  ( C R U )     *******************************/
 //Create:
 app.post("/bill-details", urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.total+', "'+req.body.status+'")', (err, result) => {
+    connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status, createdAt) VALUES ('+req.body.billId+', '+req.body.serviceId+', '+req.body.quantity+', '+req.body.pending+', '+req.body.total+', "'+req.body.status+'", "'+req.body.createdAt+'")', (err, result) => {
     //    console.log(result);
        if(err){
            res.json({
@@ -446,16 +420,16 @@ app.get("/bill-details/:id/:ip", (req, res) => {
     });
 });
 app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
+    connection.query('UPDATE `bill_detail` SET `quantity`='+req.body.quantity+', pending='+req.body.pending+', `total`='+req.body.total+', `status`="'+req.body.status+'", updatedAt="'+req.body.updatedAt+'" WHERE `billId`='+req.params.id+' AND `serviceId`='+req.params.ip+' ', (err, result) => {
         // console.log(result);
         if (err) {
             res.json({
-                message: "Bill Details Not Added",
+                message: "Bill Details Not Updated",
                 status: 400
             })
         } else {
             res.json({
-                message: "Bill Details Added",
+                message: "Bill Details Updated",
                 status: 200,
             })
         }

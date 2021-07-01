@@ -179,6 +179,10 @@ export default {
   },
   mounted() {
     this.today();
+    if(localStorage.status){
+      this.$store.state.status = localStorage.status
+    }
+    console.log(localStorage.status)
   },
   beforeMount(){
     //Room Status
