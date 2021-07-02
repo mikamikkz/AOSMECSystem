@@ -59,8 +59,8 @@ export default {
             this.$store.state.status = 1
             localStorage.status = 1
           }else{
-            this.$store.state.status = 2
-            localStorage.status = 2
+            this.$store.state.status = response.data.userid;
+            localStorage.status = response.data.userid;
           }
           this.$router.push('/dashboard');
         }

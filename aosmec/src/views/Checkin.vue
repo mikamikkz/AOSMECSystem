@@ -1,5 +1,12 @@
 <template>
-  <v-container class="px-10">
+  <v-container id="checkInContainer" class="px-10">
+    <v-overlay :value="loader">
+      <v-progress-circular
+        indeterminate
+        :size="70"
+        :width="7"
+      ></v-progress-circular>
+    </v-overlay>
     <v-alert
       color="red"
       dismissible
@@ -272,26 +279,26 @@
               <v-card-title class="py-2 green--text">Room {{ rooms.roomNum }}</v-card-title>
             </v-card>
             </v-col>
-            <v-col lg="2" md="2" sm="12" class="pt-5"> 
-            <v-btn
-              v-on:click="removeGuestInRoom(rooms.roomNum)"
-              icon
-              outlined
-              elevation="3"
-              color="red"
-              class="mr-2 pa-2"
-            >
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-            <v-btn
-              v-on:click="addGuestInRoom(rooms.roomNum)"
-              icon
-              elevation="3"
-              class="mr-0 white--text pa-2 float-end"
-              style="background: #13b150"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
+            <v-col lg="2" md="2" sm="12" class="pt-5" v-if="checkInRoom[rooms.roomNum].status == false"> 
+              <v-btn
+                v-on:click="removeGuestInRoom(rooms.roomNum)"
+                icon
+                outlined
+                elevation="3"
+                color="red"
+                class="mr-2 pa-2"
+              >
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
+              <v-btn
+                v-on:click="addGuestInRoom(rooms.roomNum)"
+                icon
+                elevation="3"
+                class="mr-0 white--text pa-2 float-end"
+                style="background: #13b150"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
           <v-data-table
@@ -617,6 +624,7 @@ export default {
       checkInRoomNumber: "",
       totalReserve: 0,
       noOfCheckIn: 0,
+      loader:false,
     };
   },
   methods: {
@@ -885,19 +893,65 @@ export default {
       console.log(totalBill);
       var services = checkIn.service;
 
-      console.log(roomNum)
-      console.log(services);
       for (var i = 0; i < services.length; i++) {
         if (services[i].status == "Unpaid") {
           this.checkInRoom[roomNum].service[i].status = "Paid";
         }
       }
       this.noOfCheckIn++;
-
+      
       this.checkInRoom[roomNum].status = true;
-      if(this.totalReserve == this.noOfCheckIn){
-        location.reload();
-      }
+      
+      axios
+      .get("http://localhost:3000/roomId/"+roomNum)
+      .then((rId) => {
+        var toDB = {
+          checkIn: {
+            reservationId: input.id,
+            accountId: parseInt(this.$store.state.status),
+            roomId: rId.data.id,
+            checkInDate: input.checkInDate,
+            checkOutDate: input.checkOutDate,
+            noOfDays: input.noOfDays
+          },
+          guest: checkIn.guest,
+          bill: {
+            roomId: rId.data.id,
+            status: "paid",
+            keyDeposit: totalBill.keyDeposit,
+            total: totalBill.total,
+            pending: totalBill.balance - totalBill.received
+          },
+          details: [],
+        };
+        
+        for(var i = 1; i < checkIn.service.length; i++){
+          var add = {
+            serviceId: checkIn.service[i].id,
+            quantity: checkIn.service[i].quantity,
+            pending: 0,
+            total: checkIn.service[i].total,
+            status: "paid"
+          }
+          toDB.details.push(add);
+        }
+        this.loader = true;
+        console.log(toDB);
+
+        axios
+        .post("http://localhost:3000/checkin", toDB)
+        .then((res) => {
+          console.log(res);
+          this.checkInRoom[roomNum].status = true;
+
+          if(this.totalReserve == this.noOfCheckIn){
+            console.log("here")
+            location.reload();
+          } else {
+            this.loader = false;
+          }
+        })
+      })
     },
     addKeyDeposit: function () {
       if (this.guestBill.keyDeposit) {
@@ -911,7 +965,7 @@ export default {
     if(localStorage.status){
       this.$store.state.status = localStorage.status
     }
-    console.log(localStorage.status)
+    console.log(this.$store.state.status)
   },
   beforeMount() {
     this.today = new Date().toISOString().slice(0, 10);
