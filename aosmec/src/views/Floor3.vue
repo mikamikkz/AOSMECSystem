@@ -113,7 +113,7 @@
       <v-dialog persistent v-model="showPayment" width="500">
         <v-card>
           <v-card-title class="headline green lighten-2">
-            Payment
+            Payment Details
           </v-card-title>
           <v-card-text class="mt-3">
             
@@ -123,27 +123,19 @@
                   <span v-if="bill.id === chosenGuest.id && bill.status == 'unpaid'">
                     <thead>
                       <tr>
-                        <th class="text-left pa-0 pl-10">Payment Details</th>
-                        <th class="text-left pl-0 pr-0">Amount to Pay</th>
+                        <th class="text-left pa-0 pl-15 pr-5">Payment Details</th>
+                        <th class="text-right pa-0 pr-15 pl-5">Pending Amount to Pay</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
-                        <span v-if="billDetails.billId === chosenGuest.id">
-                          <span v-for="serviceName in guestService" :key="serviceName.id">
-                            <span v-if="serviceName.id == billDetails.serviceId && billDetails.status == 'unpaid' ">
-                              <td class="pa-0 pt-5"> 
-                                <li>Service: {{ serviceName.name }}</li> 
-                                <li>Quantity: {{ billDetails.quantity }}</li>
-                              </td>
-                              <td class="text-right pr-0 pl-15">Php {{ billDetails.pending }}</td>
-                            </span>
-                          </span>
-                        </span>
+                      <tr v-for="service in guestPayService" :key="service.id">
+                        <td class="text-left pa-0 pl-10 pt-2"><li>Service: {{service.name}}</li></td>
+                        <td class="text-left pa-0 pl-15 pt-2">Php{{service.pending}}</td>
                       </tr>
                     </tbody>
                   </span>
                 </span>
+
               </template>
             </v-simple-table>
 
@@ -226,27 +218,57 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr class="pb-10" v-for="billDetails in guestBillDetails" :key="billDetails.id">
-                    <span v-if="billDetails.billId === chosenGuest.id"> 
-                      <span v-for="service in guestService" :key="service.id">
-                        <span v-if="service.id == billDetails.serviceId">
-                          <td class="pa-0 ma-0">
-                            <v-btn icon small v-if="service.add" class="pt-0 mt-0" v-on:click="removeFromList(service)">
-                              <v-icon small color="red lighten-2">mdi-minus-circle</v-icon>
-                            </v-btn>
-                          </td>
-                          <td class="pl-1">{{ service.name }}</td>
-                          <td>{{ service.rate }}</td>
-                          <td>{{ service.quantity }}</td>
-                          <td>
-                            <v-btn icon small v-if="!service.add">
-                              <v-icon color="green lighten-3">mdi-checkbox-marked</v-icon>
-                            </v-btn>
-                          </td>
-                        </span>
-                      </span>
-                    </span>
-                  </tr>
+                  <tr v-for="service in specificGuestServices" :key="service.id">
+                      <td class="pa-0 ma-0">
+                        <v-btn
+                          icon
+                          small
+                          v-if="service.add == 'true'"
+                          class="pt-0 mt-0"
+                          v-on:click="removeFromList(service)"
+                        >
+                          <v-icon small color="red lighten-2"
+                            >mdi-minus-circle</v-icon
+                          >
+                        </v-btn>
+                      </td>
+                      <td class="pl-1">{{ service.name }}</td>
+                      <td>{{ service.rate }}</td>
+                      <td>{{ service.quantity }}</td>
+                      <td>
+                        <v-btn icon small v-if="service.status == 'paid'">
+                          <v-icon color="green lighten-3"
+                            >mdi-checkbox-marked</v-icon
+                          >
+                        </v-btn>
+                      </td>
+                    </tr>
+                    <tr v-for="service in createNewBD" :key="service.serviceId">
+                      <td class="pa-0 ma-0">
+                        <v-btn
+                          icon
+                          small
+                          v-if="service.add == 'true'"
+                          class="pt-0 mt-0"
+                          v-on:click="removeFromList(service)"
+                        >
+                          <v-icon small color="red lighten-2"
+                            >mdi-minus-circle</v-icon
+                          >
+                        </v-btn>
+                      </td>
+                      <td class="pl-1">{{ service.name }}</td>
+                      <td>{{ service.rate }}</td>
+                      <td>{{ service.quantity }}</td>
+                      <td>
+                        <v-btn icon small v-if="service.status == 'paid'">
+                          <v-icon color="green lighten-3"
+                            >mdi-checkbox-marked</v-icon
+                          >
+                        </v-btn>
+                      </td>
+                    </tr>
+
                 </tbody>
               </template>
             </v-simple-table>
@@ -274,6 +296,7 @@
                   dense
                   outlined
                   type="number"
+                  min = 0
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -294,7 +317,7 @@
 <script>
 import axios from "axios";
 export default {
-  name: "Floor-1",
+  name: "Floor-3",
   components: {},
   data() {
     return {
@@ -319,7 +342,6 @@ export default {
 
       // check out details modal
       guestBillDetails: [],
-      guestPendingBal: [], //to delete?
       guestBill: [], //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
       pendingMessage: "",
       keyDeposit: "",
@@ -328,14 +350,17 @@ export default {
       cancel: { keyDeposit: "", total: ""}, 
 
       // payment modal
-      guestService: [], //all available services
-      guestPayService: [], //items of the model
+      guestService: [], //all available services of the hotel
+      guestPayService: [], //unpaid services of a guest; items of the model
       payService: { id: 0, name: ""}, //model for the select
       payment: 0,
       guestNewBill: {}, //when paying a certain service
       guestNewBillDetail: {},
 
       // service modal
+      specificGuestServices: [],
+      addedGuestServices: [],
+
       addToService: { id: 0, qty: 0},
       serviceAmount: 0,
       flag: {},
@@ -384,13 +409,6 @@ export default {
           align: "center",
         },
       ],
-
-      // rules
-      numberRules: [
-        v => v.length > 0 || 'This field may not be empty',
-        v => Number.isFloat(v) || 'The value must be an float number',
-        v => v > 0 || 'The value must be greater than zero'
-      ],
     };
   },
   methods: {
@@ -405,7 +423,7 @@ export default {
       });
 
     },
-    // checkout
+    // checkout modal + dialog
     addKeyDeposit: function() {
       for(var i = 0; i < this.guestBill.length; i++) {
         if(this.guestBill[i].roomId == this.currentDialogItem.id){
@@ -497,10 +515,11 @@ export default {
         console.log(err.response.data.message);
       });
     },
-    // payment
+    // payment modal + dialog
     showPaymentDialog(item) {
       this.showPayment = true
       this.currentDialogItem = item
+      console.log(this.guestBill)
       
       let bill = "http://localhost:3000/bill"
       const requestBill = axios.get(bill);
@@ -537,20 +556,26 @@ export default {
               if(this.chosenGuest.id == requestBillDetails[j].billId && requestBillDetails[j].serviceId == requestService[i].id && requestBillDetails[j].status == "unpaid") {
                 const addService = {
                   id: requestService[i].id,
-                  name: requestService[i].name
+                  name: requestService[i].name,
+                  rate: requestService[i].rate,
+                  quantity: requestBillDetails[j].quantity,
+                  pending: requestBillDetails[j].pending,
+                  total: requestBillDetails[j].total
                 }
                 this.guestPayService.push(addService)
               }
             }
           }
+          console.log(this.guestPayService)
       })).catch(err => {
           console.log(err.response.data.message);
       })
     },
     paymentClose: function () {
+      this.guestPayService = []
       this.showPayment = false
     },
-    paid() {
+    paid: function () {
       // console.log(this.payment) //amount to pay
       // console.log(this.payService) // selected service id
       // console.log(this.chosenGuest.id) //bill.id 
@@ -560,32 +585,28 @@ export default {
           if(this.guestBill[x].id == this.chosenGuest.id && this.guestBillDetails[y].billId == this.chosenGuest.id) {
             if(this.payService == this.guestBillDetails[y].serviceId){
               this.guestNewBill = this.guestBill[x]
-              this.guestNewBill.pending = this.guestBill[x].pending - this.payment
-              this.guestNewBill.updatedAt = this.date
               
-              this.guestNewBillDetail = this.guestBillDetails[y]
-              this.guestNewBillDetail.pending -= this.payment
-              this.guestNewBillDetail.updatedAt = this.date
-              if(this.payment == this.guestBillDetails[y].total) {
-                this.guestBillDetails[y].status = "paid"
-                this.guestNewBillDetail.status = "paid"
-              }
+              this.guestNewBill.updatedAt = this.date
+              this.guestNewBill.pending = this.guestBill[x].pending - this.payment
               if(this.guestNewBill.pending == 0) {
                 this.guestNewBill.status = "paid"
               }
+              
+              if(this.payment == this.guestBillDetails[y].pending) {
+                this.guestBillDetails[y].status = "paid"
+                this.guestNewBillDetail.status = "paid"
+              }
+              this.guestNewBillDetail = this.guestBillDetails[y]
+              this.guestNewBillDetail.pending -= this.payment
+              this.guestNewBillDetail.updatedAt = this.date
+              
             }
           }
         }
       }
+      console.log(this.guestNewBillDetail)
+      console.log(this.guestNewBill)
       
-      axios
-      .patch('http://localhost:3000/bill/"'+this.chosenGuest.id+'"', this.guestNewBill)
-      .then((response) => {
-        console.log(response.data.message);
-      }).catch(err => {
-        console.log(err.response.data.message);
-      });
-
       axios
       .patch('http://localhost:3000/bill-details/"'+this.chosenGuest.id+'"/"'+this.payService+'"', this.guestNewBillDetail)
       .then((response) => {
@@ -593,50 +614,50 @@ export default {
       }).catch(err => {
         console.log(err.response.data.message);
       });
-     
-      this.showPayment = false
-    },
-    // add service
-    showAddServiceDialog(item) {
-      this.showAddService = true
-      this.currentDialogItem = item
-      // console.log("current room + guest:")
-      // console.log(this.currentDialogItem)
-      // console.log("addToService:")
-      // console.log(this.addToService)
-      
-      let bill = "http://localhost:3000/bill"
-      const requestBill = axios.get(bill);
-      let billDetails = "http://localhost:3000/bill-details"
-      const requestBillDetails = axios.get(billDetails);
 
       axios
-      .all([requestBill, requestBillDetails])
-      .then(axios.spread((...responses) => {
-          const requestBill = responses[0].data.result
-          const requestBillDetails = responses[1].data.result
-          
-          for(var x = 0; x < requestBill.length; x++){
-            for(var y = 0; y < requestBillDetails.length; y++){
-              if(requestBill[x].id == requestBillDetails[y].billId && requestBill[x].roomId == this.currentDialogItem.id) {
-                this.chosenGuest.id = requestBill[x].id
+      .patch('http://localhost:3000/bill/"'+this.chosenGuest.id+'"', this.guestNewBill)
+      .then((response) => {
+        console.log(response.data.message);
+      }).catch(err => {
+        console.log(err.response.data.message);
+      });
+      
+      // location.reload();
+      this.showPayment = false
+    },
+    // add service modal + dialog
+    showAddServiceDialog(item) {
+      this.showAddService = true
+      this.chosenGuest.id = item.billId
+      this.servicesTableContent()
+    },
+    servicesTableContent: function () {
+      for (var i = 0; i < this.guestService.length; i++){
+        for(var j = 0; j < this.guestBillDetails.length; j++) {
+          if(this.chosenGuest.id == this.guestBillDetails[j].billId && this.guestBillDetails[j].serviceId == this.guestService[i].id) {
+            const addService = {
+              add: "false",
+              billId: this.guestBillDetails[j].billId,
+              serviceId: this.guestService[i].id,
+              name: this.guestService[i].name,
+              rate: this.guestService[i].rate,
+              quantity: this.guestBillDetails[j].quantity,
+              status: this.guestBillDetails[j].status,
+              pending: this.guestBillDetails[j].pending,
+              total: this.guestBillDetails[j].total,
               }
+              this.specificGuestServices.push(addService)
             }
           }
-      })).catch(err => {
-          console.log(err.response.data.message);
-      })
+        }
+        console.log(this.specificGuestServices)
     },
-    addServiceClose() {
-      this.createNewBD = {}
-      this.updateBD = {}
+    addServiceClose: function () {
+      location.reload();
       this.showAddService = false
     },
-    addService(){
-      // console.log(this.chosenGuest.id) //current bill id
-      // console.log(this.createNewBD)
-      // console.log(this.updateBD)
-
+    addService: function (){
       if(this.createNewBD.length !== 0){
         //create new bill-detail
         for(var i=0; i < this.createNewBD.length; i++){
@@ -727,6 +748,7 @@ export default {
           });
         }else{
           console.log("create new bill-detail and no update bill-detail") 
+          console.log(this.guestNewBill)
           axios
           .patch('http://localhost:3000/bill/"'+this.chosenGuest.id+'"', this.guestNewBill)
           .then((response) => {
@@ -736,75 +758,66 @@ export default {
           });
         }
       }
-      // console.log(this.guestBill)
+      // location.reload();
       this.showAddService = false
     },
-    addToList: function(input) {
-      // console.log("addToList function")
-      // console.log(input); //service id + qty
-      // console.log(this.chosenGuest.id) //current bill id
+    addToList(input) {
+      console.log("addToList function")
       
       for(var i = 0; i < this.guestService.length; i++){
         if(input.id == this.guestService[i].id){
           this.serviceAmount = this.guestService[i].rate * input.qty
         }
       }
-
-      this.flag = this.guestBillDetails.find(x => x.billId == this.chosenGuest.id && x.serviceId == input.id);
+      
+      this.flag = this.specificGuestServices.find(x => x.billId == this.chosenGuest.id && x.serviceId == input.id);
       this.service = this.guestService.find(y => y.id == input.id);
-      console.log(this.serviceName)
       if(this.flag === undefined){
         //create new bill detail
         console.log("create new bill detail")
         const addService = {
+          add: "true",
+          billId: this.chosenGuest.id, 
+          serviceId: input.id,
           name: this.service.name,
           rate: this.service.rate,
-          billId: this.chosenGuest.id, 
-          serviceId: input.id, 
-          quantity: input.qty,
-          status: "unpaid",
-        }
-        this.guestBillDetails.push(addService)
-        const createService = {
-          billId: this.chosenGuest.id, 
-          serviceId: input.id, 
           quantity: input.qty, 
           pending: this.serviceAmount, 
           total: this.serviceAmount, 
           status: "unpaid",
           createdAt: this.date
         }
-        this.createNewBD.push(createService)
-      }else{
+        this.createNewBD.push(addService)
+      }
+      else{
         //update bill detail
         console.log("update bill detail")
-        for(var j = 0; j < this.guestBillDetails.length; j++){
-          if(this.chosenGuest.id == this.guestBillDetails[j].billId && input.id == this.guestBillDetails[j].serviceId){
-            this.guestBillDetails[j].status = "unpaid"
-            this.guestBillDetails[j].pending += this.serviceAmount
-            this.guestBillDetails[j].total += this.serviceAmount
-            this.guestBillDetails[j].quantity += input.qty
+        for(var j = 0; j < this.specificGuestServices.length; j++){
+          if(input.id == this.specificGuestServices[j].serviceId){
+            this.specificGuestServices[j].status = "unpaid"
+            this.specificGuestServices[j].pending += this.serviceAmount
+            this.specificGuestServices[j].total += this.serviceAmount
+            this.specificGuestServices[j].quantity += input.qty
             
             const updateService = {
               billId: this.chosenGuest.id, 
               serviceId: input.id, 
-              quantity: this.guestBillDetails[j].quantity, 
-              pending: this.guestBillDetails[j].pending, 
-              total: this.guestBillDetails[j].total, 
-              status: this.guestBillDetails[j].status,
+              quantity: this.specificGuestServices[j].quantity, 
+              pending: this.specificGuestServices[j].pending, 
+              total: this.specificGuestServices[j].total, 
+              status: this.specificGuestServices[j].status,
               updatedAt: this.date
             }
             this.updateBD.push(updateService)
           }
         }
       }
+      
     },
-    removeFromList: function(input) {
+    removeFromList(input) {
       console.log("removeFromList function:")
-      console.log(this.guestService)
-      console.log(input)
-      var index = this.guestBillDetails.findIndex(x => x.billId === this.chosenGuest.id && x.serviceId === input.id);
-      this.guestBillDetails.splice(index, 1);
+      var index = this.createNewBD.findIndex(x => x.billId === this.chosenGuest.id && x.serviceId === input.serviceId);
+      this.createNewBD.splice(index, 1);
     }
   },
   mounted(){
@@ -816,18 +829,28 @@ export default {
   },
   beforeMount(){
     var date = new Date().toISOString().slice(0,10);
+
     let room = "http://localhost:3000/room/3"
     let guest = "http://localhost:3000/guest"
     const requestRoom = axios.get(room);
     const requestGuest = axios.get(guest);
     const requestCheckin = axios.get('http://localhost:3000/checkin/"'+date+'"');
+
+    let bill = "http://localhost:3000/bill"
+    let billDetails = "http://localhost:3000/bill-details"
+    const requestBill = axios.get(bill);
+    const requestBillDetails = axios.get(billDetails);
     
+    // rooms array
     axios
-    .all([requestRoom, requestGuest, requestCheckin])
+    .all([requestRoom, requestGuest, requestCheckin, requestBill, requestBillDetails])
     .then(axios.spread((...responses) => {
       const requestRoom = responses[0].data.result
       const requestGuest = responses[1].data.result
       const requestCheckin = responses[2].data.result
+      const requestBill = responses[3].data.result
+      const requestBillDetails = responses[4].data.result
+
       for(var i = 0; i < requestRoom.length; i++){
         const addRooms = {
           id: requestRoom[i].id,
@@ -845,7 +868,10 @@ export default {
           address: "",
           validId: "",
           validIdType: "",
-          phoneNo: ""
+          phoneNo: "",
+          
+          billId: "",
+          serviceId: []
         }
 
         this.rooms.push(addRooms)
@@ -866,14 +892,25 @@ export default {
             }
           }
         }
+         
+        for(var j = 0; j < requestRoom.length; j++){
+          for(var k = 0; k < requestBill.length; k++){
+            if(requestRoom[j].id == requestBill[k].roomId){
+              this.rooms[j].billId = requestBill[k].id
+              for(var l = 0; l < requestBillDetails.length; l++){
+                if(requestBill[k].id == requestBillDetails[l].billId){
+                  this.rooms[j].serviceId.push(requestBillDetails[l].serviceId)
+                }
+              }
+            }
+          }
+        }
+
     })).catch(err => {
       console.log(err.response.data.message);
     })
 
-    let bill = "http://localhost:3000/bill"
-    let billDetails = "http://localhost:3000/bill-details"
-    const requestBill = axios.get(bill);
-    const requestBillDetails = axios.get(billDetails);
+    // bill and bill-details arrays
     axios
     .all([requestRoom, requestBill, requestBillDetails])
     .then(axios.spread((...responses) => {
@@ -919,7 +956,7 @@ export default {
       console.log(err.response.data.message);
     })
     
-
+    // services array
     axios
     .get("http://localhost:3000/service-mgmt")
     .then((res) => {

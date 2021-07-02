@@ -43,46 +43,26 @@ app.post("/login", urlEncodedParser, (req, res) => {
     connection.query('SELECT id, username, password FROM account WHERE username ="'+req.body.username+'"', (err, results)=> {
         if (err){
             console.log(err)
-            res.json({message: "Account was not retrieved."})
+            res.json({message: "Account not found."})
         }
         console.log(results)
         if(!(results.length>0)){
-            res.json({message:"Account does not exist"});
+            res.status(404).json({message:"Account does not exist"});
         }else if(req.body.password != results[0].password){
             res.status(400).json({message:"Incorrect Password"});
         }else if(req.body.password == results[0].password){
             req.session.loggedin = true;
             if(req.body.username === "admin"){
                 console.log("admin")
-                res.json({userid: results[0].id, message: "Account retrieved."})
+                res.status(200).json({userid: results[0].id, message: "Welcome Admin."})
             }else{
                 console.log("frontdesk")
-                res.json({userid: results[0].id, message: "Account retrieved."})
+                res.status(200).json({userid: results[0].id, message: "Welcome Front Desk."})
             }
             console.log("LOGIN SUCCESS")
         }
     })
 })
-
-/*****************************************       LANDING/AUTH      ************************************************/
-// app.get("/", (req,res)=>{
-//     if(req.session.loggedin){
-//         // res.redirect("/noteslist");
-//         console.log("LANDING")
-//     }else{
-//         res.render("App");
-//     }
-// })
-
-// /*****************************************       LOGOUT      ************************************************/
-// app.get("/logout", (req,res)=>{
-//     if(req.session.loggedin){
-//         req.session.destroy();
-//         res.redirect('/');
-//     }else{
-//         // res.render("App");
-//     }
-// })
 
 /*****************************************       R O O M ( C R U )      ************************************************/
 
