@@ -59,6 +59,7 @@ CREATE TABLE `bill` (
   `roomId` int(255) NOT NULL,
   `status` varchar(255) NOT NULL,
   `keyDeposit` tinyint(1) NOT NULL,
+  `pending` int(255) NOT NULL,
   `total` int(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date NOT NULL
@@ -74,6 +75,7 @@ CREATE TABLE `bill_detail` (
   `billId` int(255) NOT NULL,
   `serviceId` int(255) NOT NULL,
   `quantity` int(3) NOT NULL,
+  `pending` int(255) NOT NULL,
   `total` int(255) NOT NULL,
   `status` varchar(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
