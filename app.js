@@ -541,6 +541,7 @@ app.post('/reservation', urlEncodedParser, (req, res) => {
             } else {
                 res.json({
                     message: "Reservation Success",
+                    id: reservation_result.insertId,
                     status: 201,
                 })
             }
@@ -634,7 +635,7 @@ app.patch('/reservation/:id', urlEncodedParser, (req, res) => {
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=' + req.body.confirmationNo + ', R.reservationFee=' + req.body.reservationFee + ', R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=COALESCE("' + req.body.confirmationNo + '", R.confirmationNo), R.reservationFee=COALESCE(' + req.body.reservationFee + ', R.reservationFee), R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
         if (err) {
             console.log(err);
             res.json({
@@ -801,13 +802,28 @@ app.post('/room-reserve', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                id: result.insertId,
                 message: "Room Reservation Successully Added",
                 status: 201,
             })
         }
     });
 });
-
+app.delete('/room-reserve/:id', urlEncodedParser, (req, res) => {
+    connection.query('DELETE FROM reserve_room WHERE id='+ req.params.id +'', (err, result) => {
+        if (err) {
+            res.json({
+                message: "Delete Room Reservation Failed",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Room Reservation Successully Deleted",
+                status: 201,
+            })
+        }
+    });
+});
 app.post('/room-reserve/:id', urlEncodedParser, (req, res) => {
     connection.query('UPDATE reserve_room SET reservationId=' + req.body.reservationId + ', roomType="' + req.body.roomType + '", noOfRoom = ' + req.body.noOfRoom + ' WHERE id=' + req.params.id + '', (err, result) => {
         if (err) {

@@ -888,9 +888,6 @@ export default {
     },
     checkInGuest: function (input, totalBill, checkIn, roomNum) {
       this.checkInDialog = false;
-      console.log(input);
-      console.log(checkIn);
-      console.log(totalBill);
       var services = checkIn.service;
 
       for (var i = 0; i < services.length; i++) {
