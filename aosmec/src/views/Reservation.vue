@@ -874,8 +874,7 @@ export default {
       } else {
         axios
         .patch("http://localhost:3000/reservation/"+input.id, input)
-        .then((resv) => {
-          console.log(resv.data.message);
+        .then(() => {
           const resDate = this.reservations[input.index].reservedDate;
           this.$set(this.reservations, input.index, {
             reservationId: input.id,
