@@ -9,6 +9,7 @@
     prepend-icon="mdi-earth"
     outlined
     dense
+    required
     color="green"
   ></v-autocomplete>
 </template>

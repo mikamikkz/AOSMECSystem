@@ -1,9 +1,9 @@
 <template>
   <v-app>
     <Login v-if="this.$store.state.status == 0"></Login>
-    <Navigation v-if="this.$store.state.status == 1 || this.$store.state.status == 2"></Navigation>
+    <Navigation v-if="this.$store.state.status > 0"></Navigation>
     <v-main style="background: #f9fcfb">
-      <router-view v-if="this.$store.state.status == 1 || this.$store.state.status == 2"></router-view>
+      <router-view v-if="this.$store.state.status > 0"></router-view>
     </v-main>
   </v-app>
 </template>

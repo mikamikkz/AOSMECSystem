@@ -1,5 +1,12 @@
 <template>
-  <v-container class="px-10">
+  <v-container id="checkInContainer" class="px-10">
+    <v-overlay :value="loader">
+      <v-progress-circular
+        indeterminate
+        :size="70"
+        :width="7"
+      ></v-progress-circular>
+    </v-overlay>
     <v-alert
       color="red"
       dismissible
@@ -54,15 +61,17 @@
               </v-row>
                 <v-row v-for="rooms in input.roomDetails" :key="rooms.key">
                   <v-col class="pa-0" lg="8" md="8" xs="12">
-                    <v-text-field
+                    <v-select
+                      :items="roomTypes"
                       v-model="rooms.roomType"
                       label="Room Type"
                       prepend-icon="mdi-bed"
                       outlined
                       dense
                       color="green"
-                      disabled
-                    ></v-text-field>
+                      v-on:change="addBill(rooms.roomType)"
+                      :disabled="input.id !== null"
+                    ></v-select>
                   </v-col>
                   <v-col class="pa-0 pl-3" lg="4" md="4" xs="12">
                     <v-select
@@ -88,6 +97,7 @@
                     prepend-icon="mdi-calendar-edit"
                     outlined
                     dense
+                    disabled
                     color="green"
                   ></v-text-field>
                 </v-col>
@@ -272,26 +282,26 @@
               <v-card-title class="py-2 green--text">Room {{ rooms.roomNum }}</v-card-title>
             </v-card>
             </v-col>
-            <v-col lg="2" md="2" sm="12" class="pt-5"> 
-            <v-btn
-              v-on:click="removeGuestInRoom(rooms.roomNum)"
-              icon
-              outlined
-              elevation="3"
-              color="red"
-              class="mr-2 pa-2"
-            >
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-            <v-btn
-              v-on:click="addGuestInRoom(rooms.roomNum)"
-              icon
-              elevation="3"
-              class="mr-0 white--text pa-2 float-end"
-              style="background: #13b150"
-            >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
+            <v-col lg="2" md="2" sm="12" class="pt-5" v-if="checkInRoom[rooms.roomNum].status == false"> 
+              <v-btn
+                v-on:click="removeGuestInRoom(rooms.roomNum)"
+                icon
+                outlined
+                elevation="3"
+                color="red"
+                class="mr-2 pa-2"
+              >
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
+              <v-btn
+                v-on:click="addGuestInRoom(rooms.roomNum)"
+                icon
+                elevation="3"
+                class="mr-0 white--text pa-2 float-end"
+                style="background: #13b150"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
             </v-col>
           </v-row>
           <v-data-table
@@ -308,6 +318,7 @@
                 rounded
                 outlined
                 class="white--text"
+                v-if="checkInRoom[rooms.roomNum].status == false"
                 v-on:click="editGuestBtn(guestInfo, rooms.roomNum)"
                 elevation="0"
               >
@@ -342,7 +353,7 @@
                         <v-btn
                           icon
                           small
-                          v-if="service.add"
+                          v-if="service.add && checkInRoom[rooms.roomNum].status == false"
                           class="pt-0 mt-0"
                           v-on:click="removeFromList(service, rooms.roomNum)"
                         >
@@ -430,7 +441,7 @@
           </v-card>
         </v-col>
         
-        <v-dialog v-model="checkInDialog" persistent width="450">
+        <v-dialog v-model="checkInDialog" :retain-focus="false" persistent width="450">
             <v-card>
               <v-card-title> </v-card-title>
               <v-card-text>
@@ -548,24 +559,19 @@ export default {
         roomDetails: [],
       },
       reservee: [],
-      roomType: [],
       roomNo: [],
+      roomTypes: [],
       services: [],
       addToService: {
         name: "",
         qty: "",
       },
       guestBillDetails: [],
-      guestBill: {
-        roomNo: "101",
-        total: "1000",
-        balance: "900",
-        received: "0",
-      },
+      guestBill: {},
       reservationType: [
         { text: "Booking.com", value: "Booking.com" },
         { text: "Agoda", value: "Agoda" },
-        { text: "Walk in", value: "Walk in" },
+        { text: "Walk In", value: "Walk In" },
         { text: "Airbnb", value: "Airbnb" },
         { text: "Expedia", value: "Expedia" },
       ],
@@ -617,6 +623,7 @@ export default {
       checkInRoomNumber: "",
       totalReserve: 0,
       noOfCheckIn: 0,
+      loader:false,
     };
   },
   methods: {
@@ -629,82 +636,124 @@ export default {
     },
     fillReserveeDetails: function (reserveeId) {
       this.guestBillDetails.splice(0, this.guestBillDetails.length);
-      axios
-        .get("http://localhost:3000/reservee/" + reserveeId)
-        .then((res) => {
-          var reserveeDetails = res.data.result.reservee[0];
-          var rooms = res.data.result.rooms;
-          this.input.id = reserveeDetails.id;
-          this.input.reservationType = reserveeDetails.type;
-          this.input.noOfHeads = reserveeDetails.noOfHead;
-          this.input.noOfDays = reserveeDetails.noOfDays;
-          this.input.checkOutDate = reserveeDetails.checkOutDate;
+      if(reserveeId === null){
+        this.input.id = null;
+        this.input.reservationType = "Walk In"
+        this.input.roomDetails = [{
+          key: 0,
+          roomType: "",
+          roomNum: ""
+        }]
+        this.totalReserve = 1;
+      } else {
+        axios
+          .get("http://localhost:3000/reservee/" + reserveeId)
+          .then((res) => {
+            var reserveeDetails = res.data.result.reservee[0];
+            var rooms = res.data.result.rooms;
+            this.input.id = reserveeDetails.id;
+            this.input.reservationType = reserveeDetails.type;
+            this.input.noOfHeads = reserveeDetails.noOfHead;
+            this.input.noOfDays = reserveeDetails.noOfDays;
+            this.input.checkOutDate = reserveeDetails.checkOutDate;
 
-          if(this.input.roomDetails.length != 0) {
-            this.input.roomDetails.splice(0, this.input.roomDetails.length);
-          }
-          var k = 0;
-          for(var r = 0; r < rooms.length; r++, k++){
-            var numRoom = rooms[r].noOfRoom;
-            var addRoom = {
-              key: k,
-              roomType: rooms[r].roomType,
-              roomNum: "",
+            if(this.input.roomDetails.length != 0) {
+              this.input.roomDetails.splice(0, this.input.roomDetails.length);
             }
-            if(numRoom > 1){
-              for(var num = 1; num <= numRoom; num++, k++){
-                var addRoom2 = {
-                  key: k,
-                  roomType: rooms[r].roomType,
-                  roomNum: "",
-                }
-                this.input.roomDetails.push(addRoom2);
+            var k = 0;
+            for(var r = 0; r < rooms.length; r++, k++){
+              var numRoom = rooms[r].noOfRoom;
+              var addRoom = {
+                key: k,
+                roomType: rooms[r].roomType,
+                roomNum: "",
               }
-              k--;
-            } else {
-              this.input.roomDetails.push(addRoom);
+              if(numRoom > 1){
+                for(var num = 1; num <= numRoom; num++, k++){
+                  var addRoom2 = {
+                    key: k,
+                    roomType: rooms[r].roomType,
+                    roomNum: "",
+                  }
+                  this.input.roomDetails.push(addRoom2);
+                }
+                k--;
+              } else {
+                this.input.roomDetails.push(addRoom);
+              }
+            }
+
+            this.totalReserve = k;
+
+            var totalRate, totalQty = 0;
+            for (var i = totalRate = 0, resType = reserveeDetails.type; i < rooms.length; i++ ) {
+              axios
+                .get("http://localhost:3000/room-rate/"+rooms[i].roomType +"/"+rooms[i].noOfRoom)
+                .then((response) => {
+                  var roomRate = response.data.rate;
+                  var qty = response.data.qty;
+                  var initialTotal = roomRate * qty * reserveeDetails.noOfDays;
+                  totalRate += initialTotal;
+                  totalQty += qty;
+                  var add = [
+                    {
+                      name: "Room",
+                      qty: totalQty,
+                      total: totalRate,
+                      status: "Paid",
+                    },
+                  ];
+                  if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walk In") == 0) {
+                    add[0].status = "unpaid";
+                  }
+                  this.guestBillDetails = add;
+                });
+            }
+          })
+      }
+
+      this.checkInRoom = {};
+      
+    },
+    addBill: function(roomType){
+      axios
+        .get("http://localhost:3000/room-rate/"+roomType+"/"+1)
+        .then((response) => {
+          if(this.input.id == null){
+            var roomRate = response.data.rate;
+            var total = roomRate * this.input.noOfDays;
+            
+            var add = [
+              {
+                name: "Room",
+                qty: 1,
+                total: total,
+                status: "Paid",
+              },
+            ];
+            if(this.input.reservationType.localeCompare("Booking.com") == 0 || this.input.reservationType.localeCompare("Walk In") == 0) {
+              add[0].status = "unpaid";
+            }
+            this.guestBillDetails = add;
+          } else {
+            var roomDet = this.input.roomDetails;
+            var totalRate = 0;
+            for(var i = 0; i < roomDet.length; i++) {
+              axios
+                .get("http://localhost:3000/room-rate/"+roomDet[i].roomType +"/"+1)
+                .then((response) => {
+                  var roomRate = response.data.rate;
+                  var initialTotal = roomRate * parseInt(this.input.noOfDays);
+                  totalRate +=  initialTotal;
+                  
+                  this.guestBillDetails[0].total = totalRate;
+                });
             }
           }
-
-          this.totalReserve = k;
-
-          var totalRate, totalQty = 0;
-          for (var i = totalRate = 0, resType = reserveeDetails.type; i < rooms.length; i++ ) {
-            axios
-              .get("http://localhost:3000/room-rate/"+rooms[i].roomType +"/"+rooms[i].noOfRoom)
-              .then((response) => {
-                var roomRate = response.data.rate;
-                var qty = response.data.qty;
-                var initialTotal = roomRate * qty * reserveeDetails.noOfDays;
-                totalRate += initialTotal;
-                totalQty += qty;
-                var add = [
-                  {
-                    name: "Room",
-                    qty: totalQty,
-                    total: totalRate,
-                    status: "Paid",
-                  },
-                ];
-                if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
-                  add[0].status = "Pending";
-                }
-                this.guestBillDetails = add;
-              });
-          }
-          this.checkInRoom = {};
-          axios
-          .get('http://localhost:3000/vacant-rooms')
-          .then((roomsDB) => {
-            var roomTypes = roomsDB.data.roomNo;
-            this.roomNo = roomTypes;
-          })
-          .catch((err) => {
-            console.log(err.response.data.message);
+          var key = Object.keys(this.checkInRoom)
+          key.forEach((key) => {
+            this.checkInRoom[key].service[0].total = this.checkInRoom[key].service[0].rate * this.input.noOfDays;
           });
-        })
-        .catch((err) => {
-          console.log(err.response.data.message);
         });
     },
     storeOldRoom: function(old){
@@ -741,11 +790,11 @@ export default {
                 name: "Room Rate",
                 rate: roomRate,
                 quantity: 1,
-                total: roomRate,
+                total: roomRate * this.input.noOfDays,
                 status: "Paid",
               };
               var resType = this.input.reservationType;
-              if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walkin") == 0) {
+              if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walk In") == 0) {
                 room.status = "Unpaid";
               }
               this.$set(this.checkInRoom[newKey].service, 0, room);
@@ -879,25 +928,66 @@ export default {
       this.checkInRoomNumber = roomNum;
     },
     checkInGuest: function (input, totalBill, checkIn, roomNum) {
-      this.checkInDialog = false;
-      console.log(input);
-      console.log(checkIn);
-      console.log(totalBill);
       var services = checkIn.service;
 
-      console.log(roomNum)
-      console.log(services);
       for (var i = 0; i < services.length; i++) {
         if (services[i].status == "Unpaid") {
           this.checkInRoom[roomNum].service[i].status = "Paid";
         }
       }
       this.noOfCheckIn++;
-
+      
       this.checkInRoom[roomNum].status = true;
-      if(this.totalReserve == this.noOfCheckIn){
-        location.reload();
-      }
+      
+      axios
+      .get("http://localhost:3000/roomId/"+roomNum)
+      .then((rId) => {
+        var toDB = {
+          checkIn: {
+            reservationId: input.id,
+            accountId: parseInt(this.$store.state.status),
+            roomId: rId.data.id,
+            checkInDate: input.checkInDate,
+            checkOutDate: input.checkOutDate,
+            noOfDays: input.noOfDays
+          },
+          guest: checkIn.guest,
+          bill: {
+            roomId: rId.data.id,
+            status: "paid",
+            keyDeposit: totalBill.keyDeposit,
+            total: totalBill.total,
+            pending: totalBill.balance - totalBill.received
+          },
+          details: [],
+        };
+        
+        for(var i = 1; i < checkIn.service.length; i++){
+          var add = {
+            serviceId: checkIn.service[i].id,
+            quantity: checkIn.service[i].quantity,
+            pending: 0,
+            total: checkIn.service[i].total,
+            status: "paid"
+          }
+          toDB.details.push(add);
+        }
+        this.loader = true;
+        console.log(toDB);
+
+        axios
+        .post("http://localhost:3000/checkin", toDB)
+        .then(() => {
+          this.checkInRoom[roomNum].status = true;
+          if(this.totalReserve == this.noOfCheckIn){
+            location.reload();
+          } else {
+            this.checkInDialog = false;
+            this.guestBill = {};
+            this.loader = false;
+          }
+        })
+      })
     },
     addKeyDeposit: function () {
       if (this.guestBill.keyDeposit) {
@@ -907,11 +997,26 @@ export default {
       }
     },
   },
+  watch: {
+    'input.checkOutDate': function() {
+      if(this.input.checkOutDate !== "" && this.input.checkInDate !== ""){
+        var checkOut = this.input.checkOutDate;
+        var scheckOut = checkOut.split('-');
+        checkOut = scheckOut[0]+scheckOut[1]+scheckOut[2];
+
+        var checkIn = this.input.checkInDate;
+        var scheckIn = checkIn.split('-');
+        checkIn = scheckIn[0]+scheckIn[1]+scheckIn[2];
+        this.input.noOfDays = checkOut-checkIn;
+
+        this.addBill(this.input.roomDetails[0].roomType);
+      }
+    }
+  },
   mounted() {
     if(localStorage.status){
       this.$store.state.status = localStorage.status
     }
-    console.log(localStorage.status)
   },
   beforeMount() {
     this.today = new Date().toISOString().slice(0, 10);
@@ -919,6 +1024,10 @@ export default {
       .get('http://localhost:3000/reservee/checkin/"' + this.today + '"')
       .then((res) => {
         var reservees = res.data.result;
+        this.reservee.push({
+          value: null,
+          reservee: "No Reservation"
+        })
         for (var x = 0; x < reservees.length; x++) {
           var add = {
             value: reservees[x].id,
@@ -946,6 +1055,20 @@ export default {
       .catch((err) => {
         console.log(err.response.data.message);
       });
+    axios
+    .get("http://localhost:3000/room-mgmt/all")
+    .then((res) => {
+      var rooms = res.data.result;
+      for(var x = 0; x < rooms.length; x++){
+        this.roomTypes.push(rooms[x].name)
+      }
+    })
+    axios
+    .get('http://localhost:3000/vacant-rooms')
+    .then((roomsDB) => {
+      var roomTypes = roomsDB.data.roomNo;
+      this.roomNo = roomTypes;
+    })
   },
 };
 </script>

@@ -10,6 +10,7 @@
     outlined
     dense
     color="green"
+    required
   ></v-autocomplete>
 </template>
 <script>

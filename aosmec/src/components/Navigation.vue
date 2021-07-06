@@ -19,7 +19,7 @@
     <v-list dense nav class="px-0 mx-0">
       <v-list-item-group>
         <!-- Admin and Front Desk-->
-        <router-link to="/dashboard" style="color: #c8f0f9" v-if="this.$store.state.status == 1 || 2">
+        <router-link to="/dashboard" style="color: #c8f0f9" v-if="this.$store.state.status >= 1">
           <v-list-item color="black">
             <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
               <v-icon small style="color: #e3fff6">mdi-view-dashboard</v-icon>
@@ -71,7 +71,7 @@
           </v-list-group>
 
           <!-- Front Desk -->
-          <router-link to="/reservation" style="color: #daf5fb" v-if="this.$store.state.status == 2">
+          <router-link to="/reservation" style="color: #daf5fb" v-if="this.$store.state.status > 1">
               <v-list-item color="black">
                 <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"
@@ -84,7 +84,7 @@
               </v-list-item>
             </router-link>
 
-            <router-link to="/checkin" style="color: #daf5fb" v-if="this.$store.state.status == 2">
+            <router-link to="/checkin" style="color: #daf5fb" v-if="this.$store.state.status > 1">
               <v-list-item color="black">
                 <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"
@@ -164,7 +164,7 @@
           </v-list-group>
 
         <!-- Front Desk -->
-            <router-link to="/room-mgmt/floor-1" style="color: #daf5fb" v-if="this.$store.state.status == 2">
+            <router-link to="/room-mgmt/floor-1" style="color: #daf5fb" v-if="this.$store.state.status > 1">
               <v-list-item color="black">
                 <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"
@@ -177,7 +177,7 @@
               </v-list-item>
             </router-link>
 
-            <router-link to="/room-mgmt/floor-2" style="color: #daf5fb" v-if="this.$store.state.status == 2">
+            <router-link to="/room-mgmt/floor-2" style="color: #daf5fb" v-if="this.$store.state.status > 1">
               <v-list-item color="black">
                 <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"
@@ -189,7 +189,7 @@
                 </v-list-item-content>
               </v-list-item>
             </router-link>
-            <router-link to="/room-mgmt/floor-3" style="color: #daf5fb" v-if="this.$store.state.status == 2">
+            <router-link to="/room-mgmt/floor-3" style="color: #daf5fb" v-if="this.$store.state.status > 1">
               <v-list-item color="black">
                 <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
                   <v-icon small style="color: #e3fff6"

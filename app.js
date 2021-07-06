@@ -237,6 +237,16 @@ app.get("/vacant-rooms", (req, res) => {
     });
 });
 
+app.get("/roomId/:num", (req, res) => {
+    connection.query("SELECT id FROM room WHERE roomNo=" + req.params.num + " ", (err, result) => {
+        res.json({
+            message: "Room Id",
+            status: 200,
+            id: result[0].id
+        })
+    });
+});
+
 //Update:
 app.get("/room/:id", (req, res) => {
     connection.query("SELECT roomTypeId, roomNo, status, occupied FROM room WHERE id=" + req.params.id + " ", (err, result) => {
@@ -542,6 +552,7 @@ app.post('/reservation', urlEncodedParser, (req, res) => {
             } else {
                 res.json({
                     message: "Reservation Success",
+                    id: reservation_result.insertId,
                     status: 201,
                 })
             }
@@ -635,7 +646,7 @@ app.patch('/reservation/:id', urlEncodedParser, (req, res) => {
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=' + req.body.confirmationNo + ', R.reservationFee=' + req.body.reservationFee + ', R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=COALESCE("' + req.body.confirmationNo + '", R.confirmationNo), R.reservationFee=COALESCE(' + req.body.reservationFee + ', R.reservationFee), R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
         if (err) {
             console.log(err);
             res.json({
@@ -802,13 +813,28 @@ app.post('/room-reserve', urlEncodedParser, (req, res) => {
             })
         } else {
             res.json({
+                id: result.insertId,
                 message: "Room Reservation Successully Added",
                 status: 201,
             })
         }
     });
 });
-
+app.delete('/room-reserve/:id', urlEncodedParser, (req, res) => {
+    connection.query('DELETE FROM reserve_room WHERE id='+ req.params.id +'', (err, result) => {
+        if (err) {
+            res.json({
+                message: "Delete Room Reservation Failed",
+                status: 400,
+            })
+        } else {
+            res.json({
+                message: "Room Reservation Successully Deleted",
+                status: 201,
+            })
+        }
+    });
+});
 app.post('/room-reserve/:id', urlEncodedParser, (req, res) => {
     connection.query('UPDATE reserve_room SET reservationId=' + req.body.reservationId + ', roomType="' + req.body.roomType + '", noOfRoom = ' + req.body.noOfRoom + ' WHERE id=' + req.params.id + '', (err, result) => {
         if (err) {
@@ -890,16 +916,50 @@ app.get('/checkin/id/:id', (req, res) => {
 });
 
 app.post('/checkin', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays) VALUES (' + req.body.reservationId + ',' + req.body.accountId + ',' + req.body.roomId + ',"' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ')', (err, result) => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = yyyy + '-' + mm + '-' + dd;
+
+    connection.query('UPDATE reservation SET updatedAt = "'+today+'", status = 2 WHERE id=' + req.body.checkIn.reservationId + ' ', (err, reservation) => {
         if (err) {
-            res.json({
-                message: "CheckIn Failed",
-                status: 400,
-            })
+            console.log("Reservation Update Failed");
+        }
+    });
+    connection.query('UPDATE room SET occupied = 1, status = "clean" WHERE id=' + req.body.checkIn.roomId + ' ', (err, room) => {
+        if (err) {
+            console.log("Update Room Failed")
+        }
+    });
+    connection.query('INSERT INTO checkin(reservationId, accountId, roomId, checkInDate, checkOutDate, noOfDays) VALUES (' + req.body.checkIn.reservationId + ',' + req.body.checkIn.accountId + ',' + req.body.checkIn.roomId + ',"' + req.body.checkIn.checkInDate + '","' + req.body.checkIn.checkOutDate + '", ' + req.body.checkIn.noOfDays + ')', (err, checkIn) => {
+        if (err) {
+            console.log("Check in Failed");
+            console.log(err);
         } else {
+            for(var i = 0; i < req.body.guest.length; i++){
+                connection.query('INSERT INTO guest (checkInId, fname, lname, gender, country, nationality, address, validId, validIdType, phoneNo) VALUES (' + checkIn.insertId + ',"' + req.body.guest[i].fname + '","' + req.body.guest[i].lname + '", "' + req.body.guest[i].gender + '","' + req.body.guest[i].country + '","' + req.body.guest[i].nationality + '", "' + req.body.guest[i].address + '", ' + req.body.guest[i].validId + ', "' + req.body.guest[i].validIdType + '", ' + req.body.guest[i].phoneNo + ')', (err, guest) => {
+                    if (err) {
+                        console.log("Guest Input Failed");
+                    }
+                });
+            }
+            connection.query('INSERT INTO bill (roomId, status, keyDeposit, pending, total) VALUES (' + req.body.bill.roomId + ', "' + req.body.bill.status + '", ' + req.body.bill.keyDeposit + ', 0, ' + req.body.bill.total + ')', (err, bill) => {
+                if (err) {
+                    console.log("Bill Failed");
+                } else {
+                    for(var j = 0; j < req.body.details.length; j++){
+                        connection.query('INSERT INTO bill_detail(billId, serviceId, quantity, pending, total, status, createdAt) VALUES ('+bill.insertId+', '+req.body.details[j].serviceId+', '+req.body.details[j].quantity+', 0, '+req.body.details[j].total+', "'+req.body.details[j].status+'", "'+req.body.details[j].createdAt+'")', (err, result) => {
+                            if(err){
+                                console.log("Bill Detail Failed");
+                            }
+                        });
+                    }
+                }
+            });
             res.json({
-                message: "Successfully Checked In",
-                status: 201,
+                message: "Checked In",
+                status: 200,
             })
         }
     });
