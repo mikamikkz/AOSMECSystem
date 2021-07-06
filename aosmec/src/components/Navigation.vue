@@ -97,6 +97,18 @@
               </v-list-item>
             </router-link>
 
+        <!-- Admin and Front Desk-->
+        <router-link to="/guests" style="color: #c8f0f9" v-if="this.$store.state.status == 1 || 2">
+          <v-list-item color="black">
+            <v-list-item-icon class="ml-4 ma-0 mt-2 mr-2">
+              <v-icon small style="color: #e3fff6">mdi-account-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-content style="color: #e3fff6">
+              Guests
+            </v-list-item-content>
+          </v-list-item>
+        </router-link>
+
         <!-- Admin -->
         <v-list-group color="black" v-if="this.$store.state.status == 1">
             <template v-slot:activator >

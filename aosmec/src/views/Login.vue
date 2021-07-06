@@ -82,7 +82,7 @@ export default {
           this.showAlert(response.data.message);
         }
         if(response.status == 400){
-          // this.$router.go(-1);
+          this.$router.go(-1);
           this.showAlert(response.data.message);
         }
       })
@@ -98,6 +98,7 @@ export default {
     if(localStorage.status){
       this.$store.state.status = localStorage.status
     }
+    console.log(this.$store.state.status)
     console.log(localStorage.status)
   }
 };

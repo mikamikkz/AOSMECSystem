@@ -99,10 +99,8 @@
                 v-for="item in checkOutGuests"
                 :key="item.name"
               >
-                <!-- <td v-if="item.checkOutDate == today()">{{ item.name }}</td>
-                <td v-if="item.checkOutDate == today()">{{ item.roomNo }}</td> -->
-                <td>{{ item.name }}</td>
-                <td>{{ item.roomNo }}</td>
+                <td v-if="item.roomId != null">{{ item.name }}</td>
+                <td v-if="item.roomId != null">{{ item.roomNo }}</td>
               </tr>
             </tbody>
           </template>
@@ -147,12 +145,6 @@ export default {
         {
           text: "Type of Room",
           value: "roomType",
-          class: "green lighten-1 | px-4 pt-4 pb-3 | text-uppercase",
-          sortable: false,
-        },
-        {
-          text: "Additional Service",
-          value: "service",
           class: "green lighten-1 | px-4 pt-4 pb-3 | text-uppercase",
           sortable: false,
         },
@@ -233,87 +225,59 @@ export default {
 
     //Guests arriving today
     var today = new Date().toISOString().slice(0,10);
-    let guest = "http://localhost:3000/guest"
-    let rooms = "http://localhost:3000/rooms"
-    let bill = "http://localhost:3000/bill"
-    let billDetails = "http://localhost:3000/bill-details"
-    let service = "http://localhost:3000/service-mgmt"
     
     const requestReservation = axios.get('http://localhost:3000/reservation/"'+today+'"');
-    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+today+'"');
-    const requestGuest = axios.get(guest);
-    const requestRooms = axios.get(rooms);
-    const requestBill = axios.get(bill);
-    const requestBillDetails = axios.get(billDetails);
-    const requestService = axios.get(service);
+    const requestReservee = axios.get('http://localhost:3000/reservee/checkin/"'+today+'"');
+    const requestRoomReserve = axios.get("http://localhost:3000/room-reserve");
+    const requestRoomType = axios.get('http://localhost:3000/room-type');
+    const requestRooms = axios.get("http://localhost:3000/rooms");
+    const requestBill = axios.get("http://localhost:3000/bill");
     
     axios
-    .all([requestReservation, requestCheckin, requestGuest, requestRooms, requestBill, requestBillDetails, requestService])
+    .all([requestReservation, requestReservee, requestRoomReserve, requestRoomType])
     .then(axios.spread((...responses) => {
       const requestReservation = responses[0].data.result
-      const requestCheckin = responses[1].data.result
-      const requestGuest = responses[2].data.result
-      const requestRooms = responses[3].data.result
-      const requestBill = responses[4].data.result
-      const requestBillDetails = responses[5].data.result
-      const requestService = responses[6].data.result
-
-      // console.log(responses)
+      const requestReservee = responses[1].data.result
+      const requestRoomReserve = responses[2].data.result
+      const requestRoomType = responses[3].data.result
 
       for(var i = 0; i < requestReservation.length; i++){
-        for(var j = 0; j < requestCheckin.length; j++) {
-          if(requestReservation[i].id == requestCheckin[j].reservationId) {
-            const addArrivingGuests = {
-              confNo :  requestReservation[i].confirmationNo,
-              resType : requestReservation[i].type,
-              days : requestReservation[i].noOfDays,
-              name: "",
-              roomType: "",
-              service: []
-            }
-            this.arrivingGuests.push(addArrivingGuests)
+        const addArrivingGuests = {
+          confNo :  requestReservation[i].confirmationNo,
+          resType : requestReservation[i].type,
+          days : requestReservation[i].noOfDays,
+          status : requestReservation[i].status,
+          name: "",
+          roomType: "",
+        }
+        this.arrivingGuests.push(addArrivingGuests)
+      }
+
+      for(var k = 0; k < requestReservation.length; k++) {
+        for(var l = 0; l < requestReservee.length; l++) {
+          if(requestReservation[k].reserveeId == requestReservee[l].id) {
+            this.arrivingGuests[k].name = requestReservee[l].name
           }
         }
       }
 
-      for(var k = 0; k < requestCheckin.length; k++) {
-        for(var l = 0; l < requestGuest.length; l++) {
-          if(requestCheckin[k].id == requestGuest[l].checkInId) {
-          this.arrivingGuests[k].name = requestGuest[l].fname + " " + requestGuest[l].lname
-          }
-        }
-      }
-
-      for(var m = 0; m < requestGuest.length; m++) {
-        for(var n = 0; n < requestRooms.length; n++) {
-          this.arrivingGuests[m].roomType = requestRooms[n].name
-          this.arrivingGuests[m].roomId = requestRooms[n].id
-        }
-      }
-
-      for(var s = 0; s < requestCheckin.length; s++) {
-        for(var o = 0; o < requestRooms.length; o++) {
-          for(var p = 0; p < requestBill.length; p++) {
-            if(requestCheckin[s].roomId == requestRooms[o].id && requestBill[p].roomId == requestRooms[o].id) {
-              for(var q = 0; q < requestBillDetails.length; q++) {
-                if(requestBill[p].id == requestBillDetails[q].billId) {
-                  for(var r = 0; r < requestService.length; r++) {
-                    if(requestService[r].id == requestBillDetails[q].serviceId) {
-                      this.arrivingGuests[o].service.push(requestService[r].name)
-                    }
-                  }
-                }
+      for(var m = 0; m < requestReservation.length; m++) {
+        for(var n = 0; n < requestRoomReserve.length; n++) {
+          if(requestReservation[m].id == requestRoomReserve[n].reservationId) {
+            for (var o = 0; o < requestRoomType.length; o++){
+              if(requestRoomReserve[n].roomType == requestRoomType[o].id) {
+                this.arrivingGuests[m].roomType = requestRoomType[o].name              
               }
             }
           }
         }
       }
-
     })).catch(err => {
       console.log(err.response.data.message);
     })
 
     //Guests checking out today
+    const requestGuest = axios.get("http://localhost:3000/guest");
     const requestCheckOut = axios.get('http://localhost:3000/checkout/"'+today+'"');
 
     axios
@@ -326,25 +290,26 @@ export default {
       for(var i = 0; i < requestCheckOut.length; i++){
         for(var j = 0; j < requestGuest.length; j++) {
           if(requestCheckOut[i].id == requestGuest[j].checkInId) {
-            const addCheckOutGuests = {
-              name: requestGuest[j].fname + " " + requestGuest[j].lname,
-              roomNo: ""
-            }
-            this.checkOutGuests.push(addCheckOutGuests)
             for(var k = 0; k < requestRooms.length; k++){
               if(requestCheckOut[i].roomId == requestRooms[k].id) {
-                this.checkOutGuests[i].roomNo = requestRooms[k].roomNo
+                const addCheckOutGuests = {
+                  name: requestGuest[j].fname + " " + requestGuest[j].lname,
+                  roomNo: requestRooms[k].roomNo,
+                  roomId: requestCheckOut[i].roomId
+                }
+                this.checkOutGuests.push(addCheckOutGuests)
               }
             }
           }
         }
       }
-
     })).catch(err => {
       console.log(err.response.data.message);
     })
 
     //Total Daily Revenue
+    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+today+'"');
+
     axios
     .all([requestBill, requestCheckin])
     .then(axios.spread((...responses) => {

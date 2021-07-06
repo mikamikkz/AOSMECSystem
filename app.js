@@ -266,6 +266,17 @@ app.patch("/room/:id", urlEncodedParser, (req, res) => {
     });
 });
 
+//Retrieve all room types:
+app.get("/room-type", (req, res) => {
+    connection.query('SELECT * FROM `room_type`', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "All Room Types",
+            status: 200,
+            result
+        })
+    });
+});
 
 /******************************************    G U E S T ( C R )     **********************************************/
 
