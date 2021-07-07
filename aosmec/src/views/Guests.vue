@@ -17,7 +17,7 @@
             <v-data-table
                 :headers="GuestsHeaders"
                 :items="rooms"
-                item-key="id"
+                item-key="name"
                 :search="search"
                 sort-by="roomNo"
                 :custom-filter="filter"
@@ -27,13 +27,6 @@
                     itemsPerPageOptions: [10, 30, 50, -1],
                 }"
             >
-                <template v-slot:item.occupancy="props">
-                    <span v-for="guest in guests" :key="guest.name" class="pt-2 pb-2">
-                      <span v-if="guest.roomId == props.item.roomId"> 
-                        {{ guest.name }},
-                      </span>
-                    </span>
-                </template>
             </v-data-table>
             </v-card>
     </v-container>
@@ -101,19 +94,22 @@ export default {
       const requestRoom = responses[0].data.result
       const requestGuest = responses[1].data.result
       const requestCheckin = responses[2].data.result
+      console.log(responses)
 
       for(var a = 0; a < requestRoom.length; a++){
         for(var b = 0; b < requestCheckin.length; b++){
-          if(requestCheckin[b].roomId == requestRoom[a].id){
-            const addRooms = {
-              id: requestRoom[a].id,
-              roomNo: requestRoom[a].roomNo,
-              roomType: requestRoom[a].name,
-              roomId: "",
-              checkOut: "",
-              occupancy: requestGuest[a].fname + " " + requestGuest[a].lname
+          for(var c = 0; c < requestGuest.length; c++){
+            if(requestCheckin[b].roomId == requestRoom[a].id && requestGuest[c].checkInId == requestCheckin[b].id){
+              const addRooms = {
+                id: requestRoom[a].id,
+                roomNo: requestRoom[a].roomNo,
+                roomType: requestRoom[a].name,
+                roomId: "",
+                checkOut: "",
+                occupancy: requestGuest[c].fname + " " + requestGuest[c].lname
+              }
+              this.rooms.push(addRooms)
             }
-            this.rooms.push(addRooms)
           }
         }
       }
@@ -121,31 +117,11 @@ export default {
         for(var y = 0; y < requestGuest.length; y++){
           for(var z = 0; z < requestRoom.length; z++){
             if(requestCheckin[x].roomId == requestRoom[z].id && requestGuest[y].checkInId == requestCheckin[x].id) {
-              var flag = this.rooms.findIndex(x => x.roomNo == requestRoom[z].roomNo);
+              var name = requestGuest[y].fname + " " + requestGuest[y].lname
+              var flag = this.rooms.findIndex(x => x.roomNo == requestRoom[z].roomNo && x.occupancy == name);
               this.rooms[flag].roomId = requestCheckin[x].roomId
               this.rooms[flag].checkOut = requestCheckin[x].checkOutDate
             }
-          }
-        }
-      }
-    })).catch(err => {
-      console.log(err.response.data.message);
-    })
-
-    axios
-    .all([requestGuest, requestCheckin])
-    .then(axios.spread((...responses) => {
-      const requestGuest = responses[0].data.result
-      const requestCheckin = responses[1].data.result
-
-      for(var j = 0; j < requestGuest.length; j++){
-        for(var k = 0; k < requestCheckin.length; k++){
-          if(requestGuest[j].checkInId == requestCheckin[k].id){
-            const addHeads = {
-              roomId: requestCheckin[k].roomId,
-              name: requestGuest[j].fname + " " + requestGuest[j].lname
-            }
-            this.guests.push(addHeads)
           }
         }
       }
