@@ -276,6 +276,22 @@ app.patch("/room/:id", urlEncodedParser, (req, res) => {
     });
 });
 
+app.patch("/room/checkout/:id", urlEncodedParser, (req, res) => {
+    connection.query('UPDATE checkin SET roomId=' + req.body.roomId + ' WHERE id=' + req.params.id + ' ', (err, response) => {
+        if (err) {
+            res.json({
+                message: "Checked in Room Not Updated",
+                status: 400
+            })
+        } else {
+            res.json({
+                message: "Check in Room Updated",
+                status: 200,
+            })
+        }
+    });
+});
+
 //Retrieve all room types:
 app.get("/room-type", (req, res) => {
     connection.query('SELECT * FROM `room_type`', (err, result) => {

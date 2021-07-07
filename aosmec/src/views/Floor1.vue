@@ -523,8 +523,11 @@ export default {
       this.showCheckOut = false;
       this.currentDialogItem.occupied = 0
       this.currentDialogItem.status = "dirty"
-      this.currentDialogItem.roomId = null
-      console.log(this.currentDialogItem)
+      const checkIn = {
+          id: this.currentDialogItem.checkInId,
+          roomId: null
+      };
+
       axios
       .patch('http://localhost:3000/room/"'+this.currentDialogItem.id+'"', this.currentDialogItem)
       .then((response) => {
@@ -532,6 +535,15 @@ export default {
       }).catch(err => {
         console.log(err.response.data.message);
       });
+
+      axios
+      .patch('http://localhost:3000/room/checkout/"'+this.currentDialogItem.checkInId+'"', checkIn)
+      .then((response) => {
+        console.log(response.data.message);
+      }).catch(err => {
+        console.log(err.response.data.message);
+      });
+
     },
     /***** payment modal + dialog *****/
     showPaymentDialog(item) {
@@ -873,6 +885,7 @@ export default {
           roomTypeId: requestRoom[i].roomTypeId,
           roomId: "",
           billId: "",
+          checkInId: "",
           serviceId: []
         }
 
@@ -882,7 +895,8 @@ export default {
         for(var y = 0; y < requestGuest.length; y++){
           for(var z = 0; z < requestRoom.length; z++){
             if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
-            this.rooms[z].roomId = requestCheckin[x].roomId
+              this.rooms[z].roomId = requestCheckin[x].roomId,
+              this.rooms[z].checkInId = requestCheckin[x].id
             }
           }
         }
