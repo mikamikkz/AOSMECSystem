@@ -862,7 +862,6 @@ export default {
       const requestCheckin = responses[2].data.result
       const requestBill = responses[3].data.result
       const requestBillDetails = responses[4].data.result
-      console.log(requestCheckin)
 
       for(var i = 0; i < requestRoom.length; i++){
         const addRooms = {
@@ -930,7 +929,6 @@ export default {
           }
         }
       }
-      console.log(this.guests)
     })).catch(err => {
       console.log(err.response.data.message);
     })
