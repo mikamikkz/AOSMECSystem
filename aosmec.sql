@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 07, 2021 at 10:06 AM
+-- Generation Time: Jul 07, 2021 at 10:45 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `aosmec`
+-- Database: `aosmec2`
 --
 
 -- --------------------------------------------------------
@@ -100,10 +100,6 @@ CREATE TABLE `checkin` (
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `checkin`
---
 
 -- --------------------------------------------------------
 
@@ -197,6 +193,22 @@ CREATE TABLE `room` (
 --
 -- Dumping data for table `room`
 --
+
+INSERT INTO `room` (`id`, `roomTypeId`, `roomNo`, `status`, `occupied`, `createdAt`) VALUES
+(13, 1, 101, 'clean', 0, '2021-07-07'),
+(14, 1, 102, 'clean', 0, '2021-07-07'),
+(15, 1, 103, 'clean', 0, '2021-07-07'),
+(16, 1, 104, 'clean', 0, '2021-07-07'),
+(17, 1, 105, 'clean', 0, '2021-07-07'),
+(18, 2, 106, 'clean', 0, '2021-07-07'),
+(19, 2, 206, 'clean', 0, '2021-07-07'),
+(20, 2, 301, 'clean', 0, '2021-07-07'),
+(21, 3, 201, 'clean', 0, '2021-07-07'),
+(22, 3, 202, 'clean', 0, '2021-07-07'),
+(23, 3, 203, 'clean', 0, '2021-07-07'),
+(24, 3, 204, 'clean', 0, '2021-07-07'),
+(25, 3, 205, 'clean', 0, '2021-07-07');
+
 -- --------------------------------------------------------
 
 --
@@ -217,6 +229,10 @@ CREATE TABLE `room_type` (
 -- Dumping data for table `room_type`
 --
 
+INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(1, 'Regular', 700, 5, '2021-07-07', NULL, NULL),
+(2, 'Family', 1200, 3, '2021-07-07', NULL, NULL),
+(3, 'Single', 500, 5, '2021-07-07', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -238,6 +254,9 @@ CREATE TABLE `service` (
 -- Dumping data for table `service`
 --
 
+INSERT INTO `service` (`id`, `name`, `rate`, `pricing`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(5, 'Breakfast', 200, 'per head', '2021-07-07', NULL, NULL),
+(6, 'Extra Bed', 150, 'per room', '2021-07-07', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -369,19 +388,19 @@ ALTER TABLE `reserve_room`
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `room_type`
 --
 ALTER TABLE `room_type`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
