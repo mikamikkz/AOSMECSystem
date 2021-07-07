@@ -27,13 +27,13 @@
                     itemsPerPageOptions: [10, 30, 50, -1],
                 }"
             >
-                <!-- <template v-slot:item.occupancy="props">
+                <template v-slot:item.occupancy="props">
                     <span v-for="guest in guests" :key="guest.name" class="pt-2 pb-2">
                       <span v-if="guest.roomId == props.item.roomId"> 
                         {{ guest.name }},
                       </span>
                     </span>
-                </template> -->
+                </template>
             </v-data-table>
             </v-card>
     </v-container>
@@ -101,11 +101,10 @@ export default {
       const requestRoom = responses[0].data.result
       const requestGuest = responses[1].data.result
       const requestCheckin = responses[2].data.result
-      console.log(requestCheckin)
 
       for(var a = 0; a < requestRoom.length; a++){
         for(var b = 0; b < requestCheckin.length; b++){
-          if(requestRoom[a].occupied == 1 && requestCheckin[b].roomId == requestRoom[a].id && requestCheckin[b].roomId != null){
+          if(requestRoom[a].occupied == 1 && requestCheckin[b].roomId == requestRoom[a].id){
             const addRooms = {
               id: requestRoom[a].id,
               roomNo: requestRoom[a].roomNo,
@@ -121,9 +120,9 @@ export default {
       for(var x = 0; x < requestCheckin.length; x++){
         for(var y = 0; y < requestGuest.length; y++){
           for(var z = 0; z < requestRoom.length; z++){
-            if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId && requestCheckin[x].roomId != null) {
-              this.rooms[x].roomId = requestCheckin[x].roomId
-              this.rooms[x].checkOut = requestCheckin[x].checkOutDate
+            if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
+              this.rooms[z].roomId = requestCheckin[x].roomId
+              this.rooms[z].checkOut = requestCheckin[x].checkOutDate
             }
           }
         }

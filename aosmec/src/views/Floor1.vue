@@ -543,7 +543,6 @@ export default {
       }).catch(err => {
         console.log(err.response.data.message);
       });
-
     },
     /***** payment modal + dialog *****/
     showPaymentDialog(item) {
