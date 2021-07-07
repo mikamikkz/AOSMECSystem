@@ -17,7 +17,7 @@
             <v-data-table
                 :headers="GuestsHeaders"
                 :items="rooms"
-                item-key="checkInId"
+                item-key="id"
                 :search="search"
                 sort-by="roomNo"
                 :custom-filter="filter"
@@ -101,10 +101,11 @@ export default {
       const requestRoom = responses[0].data.result
       const requestGuest = responses[1].data.result
       const requestCheckin = responses[2].data.result
+      console.log(responses)
 
       for(var a = 0; a < requestRoom.length; a++){
         for(var b = 0; b < requestCheckin.length; b++){
-          if(requestRoom[a].occupied == 1 && requestCheckin[b].roomId == requestRoom[a].id){
+          if(requestCheckin[b].roomId == requestRoom[a].id){
             const addRooms = {
               id: requestRoom[a].id,
               roomNo: requestRoom[a].roomNo,
@@ -120,13 +121,24 @@ export default {
       for(var x = 0; x < requestCheckin.length; x++){
         for(var y = 0; y < requestGuest.length; y++){
           for(var z = 0; z < requestRoom.length; z++){
-            if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
-              this.rooms[z].roomId = requestCheckin[x].roomId
-              this.rooms[z].checkOut = requestCheckin[x].checkOutDate
+            if(requestCheckin[x].roomId == requestRoom[z].id && requestGuest[y].checkInId == requestCheckin[x].id) {
+              var flag = this.rooms.findIndex(x => x.roomNo == requestRoom[z].roomNo);
+              this.rooms[flag].roomId = requestCheckin[x].roomId
+              this.rooms[flag].checkOut = requestCheckin[x].checkOutDate
             }
           }
         }
       }
+      // console.log(this.rooms)
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
+
+    axios
+    .all([requestGuest, requestCheckin])
+    .then(axios.spread((...responses) => {
+      const requestGuest = responses[0].data.result
+      const requestCheckin = responses[1].data.result
 
       for(var j = 0; j < requestGuest.length; j++){
         for(var k = 0; k < requestCheckin.length; k++){
@@ -139,6 +151,7 @@ export default {
           }
         }
       }
+      // console.log(this.guests)
     })).catch(err => {
       console.log(err.response.data.message);
     })
