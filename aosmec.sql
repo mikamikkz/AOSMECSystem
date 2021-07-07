@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 13, 2021 at 04:31 PM
+-- Generation Time: Jul 07, 2021 at 10:06 AM
 -- Server version: 10.4.14-MariaDB
 -- PHP Version: 7.4.11
 
@@ -46,7 +46,8 @@ CREATE TABLE `account` (
 --
 
 INSERT INTO `account` (`id`, `username`, `password`, `fname`, `mname`, `lname`, `birthdate`, `gender`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1, 'admin', 'admin', 'Vin Myca', 'Casanova', 'Sagarino', '1999-09-14', 'Female', '0000-00-00', NULL, NULL);
+(1, 'admin', 'admin', 'Admin', 'A', 'A', '1999-09-14', 'Female', '0000-00-00', NULL, NULL),
+(3, 'frontdesk', '123', 'FR', 'A', 'Desk', '2021-06-28', 'Female', '2021-06-28', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -59,7 +60,7 @@ CREATE TABLE `bill` (
   `roomId` int(255) NOT NULL,
   `status` varchar(255) NOT NULL,
   `keyDeposit` tinyint(1) NOT NULL,
-  `pending` int(255) NOT NULL,
+  `pending` int(11) NOT NULL,
   `total` int(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date NOT NULL
@@ -75,7 +76,7 @@ CREATE TABLE `bill_detail` (
   `billId` int(255) NOT NULL,
   `serviceId` int(255) NOT NULL,
   `quantity` int(3) NOT NULL,
-  `pending` int(255) NOT NULL,
+  `pending` int(11) DEFAULT NULL,
   `total` int(255) NOT NULL,
   `status` varchar(255) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
@@ -92,11 +93,10 @@ CREATE TABLE `checkin` (
   `id` int(255) NOT NULL,
   `reservationId` int(255) DEFAULT NULL,
   `accountId` int(255) NOT NULL,
-  `roomId` int(255) NOT NULL,
+  `roomId` int(255) DEFAULT NULL,
   `checkInDate` date NOT NULL DEFAULT current_timestamp(),
   `checkOutDate` date NOT NULL,
   `noOfDays` int(11) NOT NULL,
-  `noOfHead` int(3) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -104,9 +104,6 @@ CREATE TABLE `checkin` (
 --
 -- Dumping data for table `checkin`
 --
-
-INSERT INTO `checkin` (`id`, `reservationId`, `accountId`, `roomId`, `checkInDate`, `checkOutDate`, `noOfDays`, `noOfHead`, `createdAt`, `updatedAt`) VALUES
-(4, NULL, 1, 1, '2021-02-13', '2021-02-15', 2, 2, '2021-02-13', NULL);
 
 -- --------------------------------------------------------
 
@@ -148,7 +145,8 @@ CREATE TABLE `reservation` (
   `confirmationNo` varchar(255) DEFAULT NULL,
   `reservationFee` int(255) DEFAULT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
-  `updatedAt` date DEFAULT NULL
+  `updatedAt` date DEFAULT NULL,
+  `deletedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -163,8 +161,9 @@ CREATE TABLE `reservee` (
   `gender` varchar(255) NOT NULL,
   `country` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `phoneNo` int(255) NOT NULL,
-  `createdAt` date NOT NULL DEFAULT current_timestamp()
+  `phoneNo` varchar(255) NOT NULL,
+  `createdAt` date NOT NULL DEFAULT current_timestamp(),
+  `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -176,7 +175,7 @@ CREATE TABLE `reservee` (
 CREATE TABLE `reserve_room` (
   `id` int(11) NOT NULL,
   `reservationId` int(11) NOT NULL,
-  `roomType` int(11) NOT NULL,
+  `roomType` varchar(255) NOT NULL,
   `noOfRoom` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -198,10 +197,6 @@ CREATE TABLE `room` (
 --
 -- Dumping data for table `room`
 --
-
-INSERT INTO `room` (`id`, `roomTypeId`, `roomNo`, `status`, `occupied`, `createdAt`) VALUES
-(1, 1, 101, 'clean', 0, '2021-02-13');
-
 -- --------------------------------------------------------
 
 --
@@ -222,8 +217,6 @@ CREATE TABLE `room_type` (
 -- Dumping data for table `room_type`
 --
 
-INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1, 'Regular', 700, 20, '2021-02-13', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -232,7 +225,7 @@ INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `up
 --
 
 CREATE TABLE `service` (
-  `id` int(255) AUTO_INCREMENT,
+  `id` int(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `rate` int(255) NOT NULL,
   `pricing` varchar(255) NOT NULL,
@@ -245,10 +238,6 @@ CREATE TABLE `service` (
 -- Dumping data for table `service`
 --
 
-INSERT INTO `service` (`id`, `name`, `rate`, `pricing`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1, 'Extra Bed', 160, 'per head', '2021-01-21', NULL, NULL),
-(2, 'Airport Shuttle', 150, 'Per ride', '2021-01-21', NULL, NULL),
-(3, 'sample', 160, 'per head', '2021-02-13', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -308,6 +297,7 @@ ALTER TABLE `reservee`
 -- Indexes for table `reserve_room`
 --
 ALTER TABLE `reserve_room`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `reservationId` (`reservationId`);
 
 --
@@ -337,55 +327,61 @@ ALTER TABLE `service`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `bill`
 --
 ALTER TABLE `bill`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `checkin`
 --
 ALTER TABLE `checkin`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `guest`
 --
 ALTER TABLE `guest`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `reservee`
 --
 ALTER TABLE `reservee`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+
+--
+-- AUTO_INCREMENT for table `reserve_room`
+--
+ALTER TABLE `reserve_room`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `room_type`
 --
 ALTER TABLE `room_type`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
