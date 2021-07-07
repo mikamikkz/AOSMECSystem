@@ -276,6 +276,17 @@ app.patch("/room/:id", urlEncodedParser, (req, res) => {
     });
 });
 
+//Retrieve all room types:
+app.get("/room-type", (req, res) => {
+    connection.query('SELECT * FROM `room_type`', (err, result) => {
+        // console.log(result);
+        res.json({
+            message: "All Room Types",
+            status: 200,
+            result
+        })
+    });
+});
 
 /******************************************    G U E S T ( C R )     **********************************************/
 
@@ -859,6 +870,19 @@ app.get('/room-reserve/delete/:id', (req, res) => {
 });
 
 /***********************************************     C H E C K   I N     ****************************************************/
+app.get('/checkin', (req, res) => {
+    connection.query('SELECT * FROM checkIn WHERE roomId IS NOT NULL', (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+                result
+            });
+        }
+    })
+});
+
 app.get('/checkin/:date', (req, res) => {
     connection.query('SELECT * FROM checkIn WHERE checkInDate = ' + req.params.date + '', (err, result) => {
         if (err) {

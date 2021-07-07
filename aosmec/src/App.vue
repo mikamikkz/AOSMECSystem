@@ -1,10 +1,7 @@
 <template>
   <v-app>
-    <!-- <Login></Login> -->
     <Login v-if="this.$store.state.status == 0"></Login>
     <Navigation v-if="this.$store.state.status > 0"></Navigation>
-    <!-- <v-main style="background: #f9fcfb" v-if="this.$store.state.status == 1"> -->
-    <!-- <Navigation></Navigation> -->
     <v-main style="background: #f9fcfb">
       <router-view v-if="this.$store.state.status > 0"></router-view>
     </v-main>

@@ -18,24 +18,43 @@
             <v-dialog v-model="dialog[props.item.roomNo]" width="500">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn color="success" depressed dark v-bind="attrs" v-on="on" v-if="props.item.occupied === 1 ">
-                  {{ props.item.name }}
+                  <v-icon small dark>mdi-account-outline</v-icon>
                 </v-btn>
               </template>
 
               <v-card>
                 <v-card-title class="headline green lighten-2">
-                  {{ props.item.name }}
+                  Guest(s):
                 </v-card-title>
 
                 <v-card-text class="mt-3">
-                  <!-- Guest Details -->
-                  <p>Gender: {{ props.item.gender }}</p>
-                  <p>Country: {{ props.item.country }}</p>
-                  <p>Nationality: {{ props.item.nationality }}</p>
-                  <p>Address: {{ props.item.address }}</p>
-                  <p>Valid ID: {{ props.item.validId }}</p>
-                  <p>Valid ID Type: {{ props.item.validIdType }}</p>
-                  <p>Phone Number: {{ props.item.phoneNo }}</p>
+                <!-- Guest Details -->
+                <span v-for="guest in guests" :key="guest.name">
+                    <span v-if="guest.roomId == props.item.roomId">
+                      <v-list-group>
+                        <template v-slot:activator>
+                          <v-list-item-content>
+                            <h3>
+                              {{ guest.name }}
+                            </h3>
+                          </v-list-item-content>
+                        </template>
+                        <v-list-item color="black">
+                          <v-list-item-content>
+                            <div class="pl-5 pb-3">
+                              <p>Gender: {{ guest.gender }}</p>
+                              <p>Country: {{ guest.country }}</p>
+                              <p>Nationality: {{ guest.nationality }}</p>
+                              <p>Address: {{ guest.address }}</p>
+                              <p>Valid ID: {{ guest.validId }}</p>
+                              <p>Valid ID Type: {{ guest.validIdType }}</p>
+                              <p>Phone Number: {{ guest.phoneNo }}</p>
+                            </div>
+                          </v-list-item-content>
+                        </v-list-item>
+                      </v-list-group>
+                    </span>
+                  </span>
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -322,12 +341,18 @@ export default {
   data() {
     return {
       date: "",
+
       /***** dialogs *****/
       showCheckOut: false,
       showPayment: false,
       showAddService: false,
       closeDialog: false,
 
+      /***** arrays *****/
+      rooms: [],
+      guests: [],
+
+      /***** per row *****/
       currentDialogItem: {}, //current row
       chosenGuest: {id: ""}, //current bill
       status: [ "clean", "dirty", "out of order"],
@@ -335,12 +360,7 @@ export default {
       dialog: {},
       index: -1,
 
-      // Rooms
-      rooms: [],
-
-      /***** modals *****/
-
-      // check out details modal
+      /***** check out details modal *****/
       guestBillDetails: [],
       guestBill: [], //1 - deposit (minus 200 to pending); 0 - not (give money back to guest)
       pendingMessage: "",
@@ -349,7 +369,7 @@ export default {
       bill: {},
       cancel: { keyDeposit: "", total: ""}, 
 
-      // payment modal
+      /***** payment modal *****/
       guestService: [], //all available services of the hotel
       guestPayService: [], //unpaid services of a guest; items of the model
       payService: { id: 0, name: ""}, //model for the select
@@ -357,10 +377,8 @@ export default {
       guestNewBill: {}, //when paying a certain service
       guestNewBillDetail: {},
 
-      // service modal
+      /***** service modal *****/
       specificGuestServices: [],
-      addedGuestServices: [],
-
       addToService: { id: 0, qty: 0},
       serviceAmount: 0,
       flag: {},
@@ -423,7 +441,7 @@ export default {
       });
 
     },
-    // checkout modal + dialog
+    /***** checkout modal + dialog *****/
     addKeyDeposit: function() {
       for(var i = 0; i < this.guestBill.length; i++) {
         if(this.guestBill[i].roomId == this.currentDialogItem.id){
@@ -445,7 +463,6 @@ export default {
       });
     },
     showCheckOutDialog(item) {
-      /* note: item = rooms */
       this.currentDialogItem = item
       this.showCheckOut = true
 
@@ -500,13 +517,14 @@ export default {
       }).catch(err => {
         console.log(err.response.data.message);
       });
-
       this.showCheckOut = false
     },
     checkOut: function () {
       this.showCheckOut = false;
       this.currentDialogItem.occupied = 0
       this.currentDialogItem.status = "dirty"
+      this.currentDialogItem.roomId = null
+      console.log(this.currentDialogItem)
       axios
       .patch('http://localhost:3000/room/"'+this.currentDialogItem.id+'"', this.currentDialogItem)
       .then((response) => {
@@ -515,7 +533,7 @@ export default {
         console.log(err.response.data.message);
       });
     },
-    // payment modal + dialog
+    /***** payment modal + dialog *****/
     showPaymentDialog(item) {
       this.showPayment = true
       this.currentDialogItem = item
@@ -626,7 +644,7 @@ export default {
       // location.reload();
       this.showPayment = false
     },
-    // add service modal + dialog
+    /***** add service modal + dialog *****/
     showAddServiceDialog(item) {
       this.showAddService = true
       this.chosenGuest.id = item.billId
@@ -828,20 +846,14 @@ export default {
     console.log(localStorage.status)
   },
   beforeMount(){
-    var date = new Date().toISOString().slice(0,10);
+    const requestRoom = axios.get("http://localhost:3000/room/3");
+    const requestGuest = axios.get("http://localhost:3000/guest");
+    const requestCheckin = axios.get("http://localhost:3000/checkin");
 
-    let room = "http://localhost:3000/room/3"
-    let guest = "http://localhost:3000/guest"
-    const requestRoom = axios.get(room);
-    const requestGuest = axios.get(guest);
-    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+date+'"');
-
-    let bill = "http://localhost:3000/bill"
-    let billDetails = "http://localhost:3000/bill-details"
-    const requestBill = axios.get(bill);
-    const requestBillDetails = axios.get(billDetails);
+    const requestBill = axios.get("http://localhost:3000/bill");
+    const requestBillDetails = axios.get("http://localhost:3000/bill-details");
     
-    // rooms array
+    /***** ROOMS ARRAY *****/
     axios
     .all([requestRoom, requestGuest, requestCheckin, requestBill, requestBillDetails])
     .then(axios.spread((...responses) => {
@@ -858,18 +870,8 @@ export default {
           status: requestRoom[i].status,
           occupied: requestRoom[i].occupied,
           roomType: requestRoom[i].name,
-
           roomTypeId: requestRoom[i].roomTypeId,
-
-          name: "",
-          gender: "",
-          country: "",
-          nationality: "",
-          address: "",
-          validId: "",
-          validIdType: "",
-          phoneNo: "",
-          
+          roomId: "",
           billId: "",
           serviceId: []
         }
@@ -877,40 +879,61 @@ export default {
         this.rooms.push(addRooms)
       }
       for(var x = 0; x < requestCheckin.length; x++){
-          for(var y = 0; y < requestGuest.length; y++){
-            for(var z = 0; z < requestRoom.length; z++){
-              if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
-                this.rooms[z].name = requestGuest[y].fname + " " + requestGuest[y].lname,
-                this.rooms[z].gender = requestGuest[y].gender,
-                this.rooms[z].country = requestGuest[y].country,
-                this.rooms[z].nationality = requestGuest[y].nationality,
-                this.rooms[z].address = requestGuest[y].address,
-                this.rooms[z].validId = requestGuest[y].validId,
-                this.rooms[z].validIdType = requestGuest[y].validIdType,
-                this.rooms[z].phoneNo = requestGuest[y].phoneNo
-              }
+        for(var y = 0; y < requestGuest.length; y++){
+          for(var z = 0; z < requestRoom.length; z++){
+            if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
+            this.rooms[z].roomId = requestCheckin[x].roomId
             }
           }
         }
+      }
          
-        for(var j = 0; j < requestRoom.length; j++){
-          for(var k = 0; k < requestBill.length; k++){
-            if(requestRoom[j].id == requestBill[k].roomId){
-              this.rooms[j].billId = requestBill[k].id
-              for(var l = 0; l < requestBillDetails.length; l++){
-                if(requestBill[k].id == requestBillDetails[l].billId){
-                  this.rooms[j].serviceId.push(requestBillDetails[l].serviceId)
-                }
+      for(var j = 0; j < requestRoom.length; j++){
+        for(var k = 0; k < requestBill.length; k++){
+          if(requestRoom[j].id == requestBill[k].roomId){
+            this.rooms[j].billId = requestBill[k].id
+            for(var l = 0; l < requestBillDetails.length; l++){
+              if(requestBill[k].id == requestBillDetails[l].billId){
+                this.rooms[j].serviceId.push(requestBillDetails[l].serviceId)
               }
             }
           }
         }
-
+      }
     })).catch(err => {
       console.log(err.response.data.message);
     })
 
-    // bill and bill-details arrays
+    /***** GUESTS ARRAY *****/
+    axios
+    .all([requestGuest, requestCheckin])
+    .then(axios.spread((...responses) => {
+      const requestGuest = responses[0].data.result
+      const requestCheckin = responses[1].data.result
+
+      for(var i = 0; i < requestGuest.length; i++){
+        for(var j = 0; j < requestCheckin.length; j++){
+          if(requestGuest[i].checkInId == requestCheckin[j].id){
+            const addHeads = {
+              roomId: requestCheckin[j].roomId,
+              name: requestGuest[i].fname + " " + requestGuest[i].lname,
+              gender: requestGuest[i].gender,
+              country: requestGuest[i].country,
+              nationality: requestGuest[i].nationality,
+              address: requestGuest[i].address,
+              validId: requestGuest[i].validId,
+              validIdType: requestGuest[i].validIdType,
+              phoneNo: requestGuest[i].phoneNo,
+            }
+            this.guests.push(addHeads)
+          }
+        }
+      }
+    })).catch(err => {
+      console.log(err.response.data.message);
+    })
+
+    /***** BILL AND BILL-DETAILS ARRAYS *****/
     axios
     .all([requestRoom, requestBill, requestBillDetails])
     .then(axios.spread((...responses) => {
@@ -956,7 +979,7 @@ export default {
       console.log(err.response.data.message);
     })
     
-    // services array
+    /***** SERVICES ARRAY *****/
     axios
     .get("http://localhost:3000/service-mgmt")
     .then((res) => {
