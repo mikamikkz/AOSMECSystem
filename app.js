@@ -870,6 +870,19 @@ app.get('/room-reserve/delete/:id', (req, res) => {
 });
 
 /***********************************************     C H E C K   I N     ****************************************************/
+app.get('/checkin', (req, res) => {
+    connection.query('SELECT * FROM checkIn WHERE roomId IS NOT NULL', (err, result) => {
+        if (err) {
+            console.log(err);
+        } else {
+            res.json({
+                message: "Check in Retrieved",
+                result
+            });
+        }
+    })
+});
+
 app.get('/checkin/:date', (req, res) => {
     connection.query('SELECT * FROM checkIn WHERE checkInDate = ' + req.params.date + '', (err, result) => {
         if (err) {

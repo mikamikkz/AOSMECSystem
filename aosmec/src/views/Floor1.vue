@@ -55,23 +55,6 @@
                       </v-list-group>
                     </span>
                   </span>
-
-                  <!-- <span v-for="guest in guests" :key="guest.name">
-                    <span v-if="guest.roomId == props.item.roomId">
-                      <h3>
-                        Name: {{ guest.name }}
-                      </h3>
-                      <div class="pl-5 pt-5">
-                        <p>Gender: {{ guest.gender }}</p>
-                        <p>Country: {{ guest.country }}</p>
-                        <p>Nationality: {{ guest.nationality }}</p>
-                        <p>Address: {{ guest.address }}</p>
-                        <p>Valid ID: {{ guest.validId }}</p>
-                        <p>Valid ID Type: {{ guest.validIdType }}</p>
-                        <p>Phone Number: {{ guest.phoneNo }}</p>
-                      </div>
-                    </span>
-                  </span> -->
                 </v-card-text>
               </v-card>
             </v-dialog>
@@ -863,11 +846,9 @@ export default {
     console.log(localStorage.status)
   },
   beforeMount(){
-    var date = new Date().toISOString().slice(0,10);
-
     const requestRoom = axios.get("http://localhost:3000/room/1");
     const requestGuest = axios.get("http://localhost:3000/guest");
-    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+date+'"');
+    const requestCheckin = axios.get("http://localhost:3000/checkin");
 
     const requestBill = axios.get("http://localhost:3000/bill");
     const requestBillDetails = axios.get("http://localhost:3000/bill-details");
@@ -881,6 +862,7 @@ export default {
       const requestCheckin = responses[2].data.result
       const requestBill = responses[3].data.result
       const requestBillDetails = responses[4].data.result
+      console.log(requestCheckin)
 
       for(var i = 0; i < requestRoom.length; i++){
         const addRooms = {
@@ -948,6 +930,7 @@ export default {
           }
         }
       }
+      console.log(this.guests)
     })).catch(err => {
       console.log(err.response.data.message);
     })

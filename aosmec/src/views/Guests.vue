@@ -16,7 +16,7 @@
         <v-card class="mx-1">
             <v-data-table
                 :headers="GuestsHeaders"
-                :items="guests"
+                :items="rooms"
                 item-key="checkInId"
                 :search="search"
                 sort-by="roomNo"
@@ -28,14 +28,14 @@
                 }"
             >
                 <template v-slot:item.occupancy="props">
-                    <span v-for="guest in props.item.names" :key="guest"> 
-                        {{ guest }}
+                    <span v-for="guest in guests" :key="guest.name" class="pt-2 pb-2">
+                      <span v-if="guest.roomId == props.item.roomId"> 
+                        {{ guest.name }},
+                      </span>
                     </span>
                 </template>
             </v-data-table>
             </v-card>
-    
-
     </v-container>
   </div>
 </template>
@@ -71,34 +71,17 @@ export default {
           class: "green--text darken-4 title",
         }
       ],
+      rooms: [],
       guests: [],
     };
   },
   methods: {
-    filter(value, search) {
+    filter(value, search) { // value = from the table ; search = input
       return (
         value != null && search != null && typeof value === "string" &&
         value.toString().toLocaleUpperCase().indexOf(search.toLocaleUpperCase()) !== -1
       );
-    },
-    // filter(value, search) {
-    //   return this.guests.name.filter(guest => {
-    //     value != null && search != null
-    //     return guest.name.toLowerCase().includes(this.search.toLowerCase())
-    //  })
-    // }
-    //  filter(items, search, filter) {
-    //         search = search.toString().toLowerCase()
-    //         return items.filter(row => filter(row["name"], search));
-    //     }
-    // filter(search) {
-    //     // return this.guests.filter(guest => {
-    //     //     return guest.names.some(name => guest.name.includes(search));
-    //     // });
-    //     // var flag = this.guests.find(x => x.names.includes(search) );
-        
-    //     console.log(search)
-    // }
+    }
   },
   mounted() {
     if(localStorage.status){
@@ -107,43 +90,59 @@ export default {
     console.log(localStorage.status)
   },
   beforeMount(){
-    var date = new Date().toISOString().slice(0,10);
     const requestRoom = axios.get("http://localhost:3000/rooms");
     const requestGuest = axios.get("http://localhost:3000/guest");
-    const requestCheckin = axios.get('http://localhost:3000/checkin/"'+date+'"');
+    const requestCheckin = axios.get("http://localhost:3000/checkin");
 
+    /***** ROOMS and GUESTS ARRAY *****/
     axios
     .all([requestRoom, requestGuest, requestCheckin])
     .then(axios.spread((...responses) => {
-        const requestRoom = responses[0].data.result
-        const requestGuest = responses[1].data.result
-        const requestCheckin = responses[2].data.result
-        
-        for(var i = 0; i < requestRoom.length; i++){
-            for(var j = 0; j < requestCheckin.length; j++){
-                if(requestRoom[i].id == requestCheckin[j].roomId) {
-                    const addGuest = {
-                        checkInId: requestCheckin[j].id,
-                        roomNo: requestRoom[i].roomNo,
-                        names: [],
-                        roomType: requestRoom[i].name
-                    }
-                    this.guests.push(addGuest)
-                }
-              }
-        }
-        for(var x = 0; x < requestGuest.length; x++){
-            for(var y = 0; y < requestCheckin.length; y++){
-                if(requestGuest[x].checkInId == requestCheckin[y].id){
-                    var name = requestGuest[x].fname + " " + requestGuest[x].lname
-                    this.guests[y].names.push(name)
-                }
+      const requestRoom = responses[0].data.result
+      const requestGuest = responses[1].data.result
+      const requestCheckin = responses[2].data.result
+
+      for(var a = 0; a < requestRoom.length; a++){
+        for(var b = 0; b < requestCheckin.length; b++){
+          if(requestRoom[a].occupied == 1 && requestCheckin[b].roomId == requestRoom[a].id){
+            const addRooms = {
+              id: requestRoom[a].id,
+              roomNo: requestRoom[a].roomNo,
+              roomType: requestRoom[a].name,
+              roomId: "",
+              checkOut: "",
+              occupancy: requestGuest[a].fname + " " + requestGuest[a].lname
             }
+            this.rooms.push(addRooms)
+          }
         }
-        console.log(this.guests)
+      }
+      for(var x = 0; x < requestCheckin.length; x++){
+        for(var y = 0; y < requestGuest.length; y++){
+          for(var z = 0; z < requestRoom.length; z++){
+            if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
+              this.rooms[z].roomId = requestCheckin[x].roomId
+              this.rooms[z].checkOut = requestCheckin[x].checkOutDate
+            }
+          }
+        }
+      }
+
+      for(var j = 0; j < requestGuest.length; j++){
+        for(var k = 0; k < requestCheckin.length; k++){
+          if(requestGuest[j].checkInId == requestCheckin[k].id){
+            const addHeads = {
+              roomId: requestCheckin[k].roomId,
+              name: requestGuest[j].fname + " " + requestGuest[j].lname
+            }
+            this.guests.push(addHeads)
+          }
+        }
+      }
     })).catch(err => {
       console.log(err.response.data.message);
     })
+
   }
 };
 </script>
