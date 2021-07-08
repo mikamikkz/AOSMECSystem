@@ -465,6 +465,7 @@ export default {
     showCheckOutDialog(item) {
       this.currentDialogItem = item
       this.showCheckOut = true
+      console.log(this.currentDialogItem)
 
       let room = "http://localhost:3000/room/1"
       const requestRoom = axios.get(room);
@@ -617,6 +618,7 @@ export default {
               
               this.guestNewBill.updatedAt = this.date
               this.guestNewBill.pending = this.guestBill[x].pending - this.payment
+              this.guestNewBill.total = this.guestBill[x].total + this.payment
               if(this.guestNewBill.pending == 0) {
                 this.guestNewBill.status = "paid"
               }
@@ -633,8 +635,6 @@ export default {
           }
         }
       }
-      console.log(this.guestNewBillDetail)
-      console.log(this.guestNewBill)
       
       axios
       .patch('http://localhost:3000/bill-details/"'+this.chosenGuest.id+'"/"'+this.payService+'"', this.guestNewBillDetail)
@@ -652,7 +652,7 @@ export default {
         console.log(err.response.data.message);
       });
       
-      // location.reload();
+      location.reload();
       this.showPayment = false
     },
     /***** add service modal + dialog *****/

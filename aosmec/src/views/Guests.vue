@@ -94,7 +94,6 @@ export default {
       const requestRoom = responses[0].data.result
       const requestGuest = responses[1].data.result
       const requestCheckin = responses[2].data.result
-      console.log(responses)
 
       for(var a = 0; a < requestRoom.length; a++){
         for(var b = 0; b < requestCheckin.length; b++){
