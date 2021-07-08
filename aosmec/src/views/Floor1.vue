@@ -606,10 +606,6 @@ export default {
       this.showPayment = false
     },
     paid: function () {
-      // console.log(this.payment) //amount to pay
-      // console.log(this.payService) // selected service id
-      // console.log(this.chosenGuest.id) //bill.id 
-
       for(var x = 0; x < this.guestBill.length; x++){
         for(var y = 0; y < this.guestBillDetails.length; y++){
           if(this.guestBill[x].id == this.chosenGuest.id && this.guestBillDetails[y].billId == this.chosenGuest.id) {
