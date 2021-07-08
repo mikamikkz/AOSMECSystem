@@ -721,8 +721,13 @@ export default {
         .then((response) => {
           if(this.input.id == null){
             var roomRate = response.data.rate;
-            var total = roomRate * this.input.noOfDays;
-            
+            var total;
+            if(this.input.noOfDays == 0){
+              total = 500;
+            } else {
+              total = roomRate * this.input.noOfDays;
+            }
+
             var add = [
               {
                 name: "Room",
@@ -749,11 +754,17 @@ export default {
                   this.guestBillDetails[0].total = totalRate;
                 });
             }
+            if(this.input.noOfDays == 0){
+              this.guestBillDetails[0].total = 500;
+            }
           }
           var key = Object.keys(this.checkInRoom)
           key.forEach((key) => {
             this.checkInRoom[key].service[0].total = this.checkInRoom[key].service[0].rate * this.input.noOfDays;
           });
+          if(this.input.noOfDays == 0){
+            this.checkInRoom[key].service[0].total = 500;
+          }
         });
     },
     storeOldRoom: function(old){
