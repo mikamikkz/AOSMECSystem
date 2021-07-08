@@ -950,6 +950,9 @@ export default {
       
       this.checkInRoom[roomNum].status = true;
       
+      if(totalBill.keyDeposit == undefined){
+        totalBill.keyDeposit = false;
+      }
       axios
       .get("http://localhost:3000/roomId/"+roomNum)
       .then((rId) => {
