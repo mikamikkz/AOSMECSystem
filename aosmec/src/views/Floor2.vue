@@ -465,6 +465,7 @@ export default {
     showCheckOutDialog(item) {
       this.currentDialogItem = item
       this.showCheckOut = true
+      console.log(this.currentDialogItem)
 
       let room = "http://localhost:3000/room/2"
       const requestRoom = axios.get(room);
@@ -523,10 +524,21 @@ export default {
       this.showCheckOut = false;
       this.currentDialogItem.occupied = 0
       this.currentDialogItem.status = "dirty"
-      this.currentDialogItem.roomId = null
-      console.log(this.currentDialogItem)
+      const checkIn = {
+          id: this.currentDialogItem.checkInId,
+          roomId: null
+      };
+
       axios
       .patch('http://localhost:3000/room/"'+this.currentDialogItem.id+'"', this.currentDialogItem)
+      .then((response) => {
+        console.log(response.data.message);
+      }).catch(err => {
+        console.log(err.response.data.message);
+      });
+
+      axios
+      .patch('http://localhost:3000/room/checkout/"'+this.currentDialogItem.checkInId+'"', checkIn)
       .then((response) => {
         console.log(response.data.message);
       }).catch(err => {
@@ -594,10 +606,6 @@ export default {
       this.showPayment = false
     },
     paid: function () {
-      // console.log(this.payment) //amount to pay
-      // console.log(this.payService) // selected service id
-      // console.log(this.chosenGuest.id) //bill.id 
-
       for(var x = 0; x < this.guestBill.length; x++){
         for(var y = 0; y < this.guestBillDetails.length; y++){
           if(this.guestBill[x].id == this.chosenGuest.id && this.guestBillDetails[y].billId == this.chosenGuest.id) {
@@ -622,8 +630,6 @@ export default {
           }
         }
       }
-      console.log(this.guestNewBillDetail)
-      console.log(this.guestNewBill)
       
       axios
       .patch('http://localhost:3000/bill-details/"'+this.chosenGuest.id+'"/"'+this.payService+'"', this.guestNewBillDetail)
@@ -641,7 +647,7 @@ export default {
         console.log(err.response.data.message);
       });
       
-      // location.reload();
+      location.reload();
       this.showPayment = false
     },
     /***** add service modal + dialog *****/
@@ -679,6 +685,7 @@ export default {
       if(this.createNewBD.length !== 0){
         //create new bill-detail
         for(var i=0; i < this.createNewBD.length; i++){
+          console.log(this.createNewBD[i])
           axios
           .post("http://localhost:3000/bill-details", this.createNewBD[i])
           .then((response) => {
@@ -703,23 +710,24 @@ export default {
           }).catch(err => {
             console.log(err.response.data.message);
           });
+          console.log(this.updateBD[k])
         }
 
         for(var l=0; l < this.updateBD.length; l++){
           this.updateServiceAmount.pending += this.updateBD[l].pending
-          this.updateServiceAmount.total += this.updateBD[l].total
         }
         if(this.createNewBD.length == 0){
           for(var m = 0; m < this.guestBill.length; m++){
             if(this.guestBill[m].id == this.chosenGuest.id) {
               this.guestNewBill = this.guestBill[m]
               this.guestNewBill.pending = this.updateServiceAmount.pending 
-              this.guestNewBill.total = this.updateServiceAmount.total
+              this.guestNewBill.total = this.guestBill[m].total + this.updateServiceAmount.pending
               this.guestNewBill.status = "unpaid"
               this.guestNewBill.updatedAt = this.date
             }
           }
           console.log("update new bill-detail and no create new bill detail")
+          console.log(this.guestNewBill)
           axios
           .patch('http://localhost:3000/bill/"'+this.chosenGuest.id+'"', this.guestNewBill)
           .then((response) => {
@@ -735,12 +743,9 @@ export default {
         for(var j = 0; j < this.guestBill.length; j++){
           if(this.guestBill[j].id == this.chosenGuest.id) {
             this.guestNewBill = this.guestBill[j]
-            if(this.updateBD.length !== 0) {
-              this.guestNewBill.pending = this.createServiceAmount.pending 
-              this.guestNewBill.total = this.createServiceAmount.total
-            }else{
-              this.guestNewBill.pending += this.createServiceAmount.pending 
-              this.guestNewBill.total += this.createServiceAmount.total
+            if(this.updateBD.length === 0) {
+              this.guestNewBill.pending = this.guestBill[j].pending + this.createServiceAmount.pending 
+              this.guestNewBill.total = this.guestBill[j].total + this.createServiceAmount.total
             }
             this.guestNewBill.status = "unpaid"
             this.guestNewBill.updatedAt = this.date
@@ -751,12 +756,13 @@ export default {
           for(var y = 0; y < this.guestBill.length; y++){
             if(this.guestBill[y].id == this.chosenGuest.id) {
               this.guestNewBill = this.guestBill[y]
-              this.guestNewBill.pending += this.updateServiceAmount.pending 
-              this.guestNewBill.total += this.updateServiceAmount.total
+              this.guestNewBill.pending = this.guestBill[y].pending + this.updateServiceAmount.pending + this.createServiceAmount.pending 
+              this.guestNewBill.total = this.guestBill[y].total + this.updateServiceAmount.pending + this.createServiceAmount.pending
               this.guestNewBill.status = "unpaid"
               this.guestNewBill.updatedAt = this.date
             }
           }
+          console.log(this.guestNewBill)
           axios
           .patch('http://localhost:3000/bill/"'+this.chosenGuest.id+'"', this.guestNewBill)
           .then((response) => {
@@ -776,7 +782,7 @@ export default {
           });
         }
       }
-      // location.reload();
+      location.reload();
       this.showAddService = false
     },
     addToList(input) {
@@ -873,6 +879,7 @@ export default {
           roomTypeId: requestRoom[i].roomTypeId,
           roomId: "",
           billId: "",
+          checkInId: "",
           serviceId: []
         }
 
@@ -882,7 +889,8 @@ export default {
         for(var y = 0; y < requestGuest.length; y++){
           for(var z = 0; z < requestRoom.length; z++){
             if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
-            this.rooms[z].roomId = requestCheckin[x].roomId
+              this.rooms[z].roomId = requestCheckin[x].roomId,
+              this.rooms[z].checkInId = requestCheckin[x].id
             }
           }
         }
