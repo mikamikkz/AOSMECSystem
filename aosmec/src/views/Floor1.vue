@@ -618,7 +618,6 @@ export default {
               
               this.guestNewBill.updatedAt = this.date
               this.guestNewBill.pending = this.guestBill[x].pending - this.payment
-              this.guestNewBill.total = this.guestBill[x].total + this.payment //??? need inig update but inig create?
               if(this.guestNewBill.pending == 0) {
                 this.guestNewBill.status = "paid"
               }
