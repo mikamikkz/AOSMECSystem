@@ -18,7 +18,7 @@
             <v-dialog v-model="dialog[props.item.roomNo]" width="500">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn color="success" depressed dark v-bind="attrs" v-on="on" v-if="props.item.occupied === 1 ">
-                  <v-icon small dark>mdi-account-outline</v-icon>
+                  {{ props.item.name }}
                 </v-btn>
               </template>
 
@@ -604,6 +604,7 @@ export default {
     paymentClose: function () {
       this.guestPayService = []
       this.showPayment = false
+      location.reload();
     },
     paid: function () {
       for(var x = 0; x < this.guestBill.length; x++){
@@ -880,7 +881,8 @@ export default {
           roomId: "",
           billId: "",
           checkInId: "",
-          serviceId: []
+          serviceId: [],
+          name: ""
         }
 
         this.rooms.push(addRooms)
@@ -890,7 +892,8 @@ export default {
           for(var z = 0; z < requestRoom.length; z++){
             if(requestGuest[y].checkInId == requestCheckin[x].id && requestRoom[z].id == requestCheckin[x].roomId) {
               this.rooms[z].roomId = requestCheckin[x].roomId,
-              this.rooms[z].checkInId = requestCheckin[x].id
+              this.rooms[z].checkInId = requestCheckin[x].id,
+              this.rooms[z].name = requestGuest[y].fname + " " + requestGuest[y].lname
             }
           }
         }
