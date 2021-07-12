@@ -51,6 +51,10 @@
                   <v-icon left color="success" style="margin-bottom: 12px">mdi-tools</v-icon>
                   <span class="roomStatusData">Out-of-Order: <span>{{ outOfOrder }}</span></span>
                 </v-col>
+                <v-col class="roomStatusCol">
+                  <v-icon left color="success" style="margin-bottom: 12px">mdi-bed</v-icon>
+                  <span class="roomStatusData">Total Rooms: <span>{{ totalRooms }}</span></span>
+                </v-col>
               </v-row>
             </v-card-text>
           </v-card>
@@ -121,7 +125,7 @@ export default {
       date: "",
       totalRevenue: 0,
       // room status
-      clean: "0", dirty: "0", outOfOrder: "0", occupied: "0", vacant: "0",
+      totalRooms: "0", clean: "0", dirty: "0", outOfOrder: "0", occupied: "0", vacant: "0",
       // tables
       headers: [
         {
@@ -179,6 +183,15 @@ export default {
   beforeMount(){
     //Room Status
     axios
+    .get("http://localhost:3000/rooms")
+    .then((res) => {
+      var requestRooms = res.data.result.length
+      this.totalRooms = requestRooms
+    }).catch((err) => {
+      console.log(err.response.data.message);
+    });
+
+    axios
     .get("http://localhost:3000/room/clean")
     .then((res) => {
       var requestCleanRooms = res.data.result.length
@@ -229,46 +242,40 @@ export default {
     const requestReservation = axios.get('http://localhost:3000/reservation/"'+today+'"');
     const requestReservee = axios.get('http://localhost:3000/reservee/checkin/"'+today+'"');
     const requestRoomReserve = axios.get("http://localhost:3000/room-reserve");
-    const requestRoomType = axios.get('http://localhost:3000/room-type');
     const requestRooms = axios.get("http://localhost:3000/rooms");
     const requestBill = axios.get("http://localhost:3000/bill");
     
     axios
-    .all([requestReservation, requestReservee, requestRoomReserve, requestRoomType])
+    .all([requestReservation, requestReservee, requestRoomReserve])
     .then(axios.spread((...responses) => {
       const requestReservation = responses[0].data.result
       const requestReservee = responses[1].data.result
       const requestRoomReserve = responses[2].data.result
-      const requestRoomType = responses[3].data.result
 
       for(var i = 0; i < requestReservation.length; i++){
-        const addArrivingGuests = {
-          confNo :  requestReservation[i].confirmationNo,
-          resType : requestReservation[i].type,
-          days : requestReservation[i].noOfDays,
-          status : requestReservation[i].status,
-          name: "",
-          roomType: "",
+        if(requestReservation[i].status == 1) {
+          const addArrivingGuests = {
+            id: requestReservation[i].id,
+            confNo :  requestReservation[i].confirmationNo,
+            resType : requestReservation[i].type,
+            days : requestReservation[i].noOfDays,
+            status : requestReservation[i].status,
+            name: "",
+            roomType: "",
+          }
+          this.arrivingGuests.push(addArrivingGuests)
         }
-        this.arrivingGuests.push(addArrivingGuests)
       }
 
       for(var k = 0; k < requestReservation.length; k++) {
         for(var l = 0; l < requestReservee.length; l++) {
           if(requestReservation[k].reserveeId == requestReservee[l].id) {
-            this.arrivingGuests[k].name = requestReservee[l].name
-          }
-        }
-      }
-
-      for(var m = 0; m < requestReservation.length; m++) {
-        for(var n = 0; n < requestRoomReserve.length; n++) {
-          if(requestReservation[m].id == requestRoomReserve[n].reservationId) {
-            for (var o = 0; o < requestRoomType.length; o++){
-              if(requestRoomReserve[n].roomType == requestRoomType[o].id) {
-                this.arrivingGuests[m].roomType = requestRoomType[o].name              
+            this.arrivingGuests[l].name = requestReservee[l].name
+              for(var m = 0; m < requestRoomReserve.length; m++) {
+                if(requestReservation[k].id == requestRoomReserve[m].reservationId) {
+                  this.arrivingGuests[l].roomType = requestRoomReserve[m].roomType
+                }
               }
-            }
           }
         }
       }
