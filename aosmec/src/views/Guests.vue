@@ -5,7 +5,7 @@
         <v-card class="my-6 mx-1">
         <v-text-field
             v-model="search"
-            label="Search Name of Guest"
+            label="Search Guest"
             prepend-inner-icon="mdi-magnify"
             color="green"
             outlined
