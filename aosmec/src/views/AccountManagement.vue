@@ -64,31 +64,7 @@
                   </v-row>
 
                   <v-row>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.username"
-                        label="Username"
-                        outlined
-                        required
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    >
-                      <v-text-field
-                        v-model="editedItem.password"
-                        label="Password"
-                        outlined
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
+                    
                     <v-col
                       cols="12"
                       sm="6"
@@ -107,20 +83,6 @@
                       sm="6"
                       md="4"
                     >
-
-                    <v-text-field
-                        v-model="editedItem.mname"
-                        label="Middle Name"
-                        outlined
-                        color="green"
-                      ></v-text-field>
-                    </v-col>
-                    <v-col
-                      cols="12"
-                      sm="6"
-                      md="4"
-                    > 
-
                     <v-text-field
                         v-model="editedItem.lname"
                         label="Last Name"
@@ -159,12 +121,49 @@
                           ref="picker"
                           color="green"
                           v-model="editedItem.birthdate"
-                          :max="new Date().toISOString().substr(0, 10)"
-                          min="1950-01-01"
+                          :max="DATE.toISOString().substr(0,10)"
+                          min="1980-01-01"
                           v-on:click="close"
                         ></v-date-picker>
                       </v-menu>
 
+                    </v-col>
+
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                      <v-text-field
+                        v-model="editedItem.username"
+                        label="Username"
+                        outlined
+                        required
+                        color="green"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="4"
+                    >
+                    <div v-if="editedItem.password==null">
+                      <v-text-field
+                        v-model="editedItem.password"
+                        label="Password"
+                        outlined
+                        color="green"
+                      ></v-text-field>
+                    </div>
+                    <div v-else>
+                      <v-text-field
+                        v-model="editedItem.password"
+                        label="Password"
+                        outlined
+                        readonly
+                        color="green"
+                      ></v-text-field>
+                    </div>
                     </v-col>
                      
                     <v-col
@@ -266,9 +265,12 @@
 <script>
 
   import axios from "axios";
-
+  var DATE = new Date();
+  DATE.setFullYear( DATE.getFullYear() - 18 );
+  
   export default {
     data: () => ({
+      DATE: DATE,
       date: null,
       menu: false,
       addAccountDialog: false,
@@ -277,7 +279,6 @@
         { text: 'Username', value: 'username', sortable: false },
         { text: 'Password', value: 'password', sortable: false },
         { text: 'First Name', value: 'fname', sortable: false },
-        { text: 'Middle Name', value: 'mname', sortable: false },
         { text: 'Last Name', value: 'lname', sortable: false },
         { text: 'Birthday', value: 'birthdate', sortable: false },
         { text: 'Gender', value: 'gender', sortable: false },
@@ -290,7 +291,6 @@
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
-        { text: "Prefer Not to Say", value: "Prefer Not to Say" },
       ],
 
       editedIndex: -1,
@@ -367,7 +367,6 @@
           username: this.editedItem.username,
           password: this.editedItem.password,
           fname: this.editedItem.fname,
-          mname: this.editedItem.mname,
           lname: this.editedItem.lname,
           birthdate: this.editedItem.birthdate,
           gender: this.editedItem.gender
@@ -375,17 +374,34 @@
         axios.post("http://localhost:3000/account-mgmt", addedAccount)
       },
 
+      checkIfUsernameIsValid () {
+        let isTaken = false;
+        for(var x = 0; x < this.acc_mgmt.length; x++){
+          if(this.editedItem.username == this.acc_mgmt[x].username){
+            isTaken = true;
+            break;
+          } else {
+            isTaken = false;
+          }
+        }
+        return isTaken;
+      },
+
       save (date) {
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
           this.close()
-        } else if (this.editedItem.username != null && this.editedItem.password != null && this.editedItem.fname != null && this.editedItem.lname != null && this.editedItem.mname != null && this.editedItem.birthdate != null && this.editedItem.gender != null) {
-          this.addAnAccount()
-          this.acc_mgmt.push(this.editedItem)
-          this.$refs.menu.save(date)
-          this.close()
-        } else if (this.editedItem == null || this.editedItem.username == null || this.editedItem.password == null || this.editedItem.fname == null || this.editedItem.lname == null || this.editedItem.mname == null || this.editedItem.birthdate == null || this.editedItem.gender == null) {
+        } else if (this.editedItem.username != null && this.editedItem.password != null && this.editedItem.fname != null && this.editedItem.lname != null && this.editedItem.birthdate != null && this.editedItem.gender != null) {
+          if(this.checkIfUsernameIsValid() == true){
+            alert("This username has already been taken. Please input a different one.");
+          } else {
+            this.addAnAccount();
+            this.acc_mgmt.push(this.editedItem);
+            this.$refs.menu.save(date);
+            this.close();
+          }
+        } else if (this.editedItem == null || this.editedItem.username == null || this.editedItem.password == null || this.editedItem.fname == null || this.editedItem.lname == null || this.editedItem.birthdate == null || this.editedItem.gender == null) {
           alert("Please fill all of the fields before saving.")
         }     
       },
@@ -402,7 +418,6 @@
             username: account[x].username,
             password: account[x].password,
             fname: account[x].fname,
-            mname: account[x].mname,
             lname: account[x].lname,
             birthdate: account[x].birthdate,
             gender: account[x].gender

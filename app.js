@@ -5,7 +5,7 @@ const session = require("express-session");
 const urlEncodedParser = bodyParser.urlencoded({ extended: true });
 const app = express();
 const ejs = require("ejs");
-const bcrpyt = require("bcrypt");
+const bcrypt = require("bcrypt");
 const { response } = require("express");
 const saltRounds = 10;
 const flash = require("connect-flash");
@@ -1244,7 +1244,14 @@ app.get('/account-mgmt/:id', (req, res) => {
 
 //create
 app.post('/account-mgmt', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO account (username, password, fname, mname, lname, birthdate, gender) VALUES ("' + req.body.username + '","' + req.body.password + '","' + req.body.fname + '","' + req.body.mname + '","' + req.body.lname + '","' + req.body.birthdate + '","' + req.body.gender + '")', (err, result) => {
+
+    let encryptedPassword = req.body.password;
+
+    let salt = bcrypt.genSaltSync(saltRounds);
+    let hash = bcrypt.hashSync(encryptedPassword,salt);
+    console.log(hash);
+
+    connection.query('INSERT INTO account (username, password, fname, lname, birthdate, gender) VALUES ("' + req.body.username + '","' + hash + '","' + req.body.fname + '", "' + req.body.lname + '","' + req.body.birthdate + '","' + req.body.gender + '")', (err, result) => {
         if (err) {
             res.json({
                 message: "Insertion of Account has failed.",
@@ -1280,7 +1287,7 @@ app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
 
 //update
 app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
-    connection.query('UPDATE account SET username = "' + req.body.username + '", password = "' + req.body.password + '", fname = "' + req.body.fname + '", mname = "' + req.body.mname + '", lname = "' + req.body.lname + '", birthdate = "' + req.body.birthdate + '", gender = "' + req.body.gender + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE account SET username = "' + req.body.username + '", password = "' + req.body.password + '", fname = "' + req.body.fname + '", lname = "' + req.body.lname + '", birthdate = "' + req.body.birthdate + '", gender = "' + req.body.gender + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
         if (err) {
             res.json({
                 message: "Update of Account has failed.",
