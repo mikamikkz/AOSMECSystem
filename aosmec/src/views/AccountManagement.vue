@@ -30,7 +30,6 @@
             <template v-slot:activator="{ on, attrs }">
               <v-btn
                 color="white"
-                dark
                 rounded
                 class="black--text py-3"
                 v-bind="attrs"
@@ -147,20 +146,20 @@
                       sm="6"
                       md="4"
                     >
-                    <div v-if="editedItem.password==null">
-                      <v-text-field
-                        v-model="editedItem.password"
-                        label="Password"
-                        outlined
-                        color="green"
-                      ></v-text-field>
-                    </div>
-                    <div v-else>
+                    <div v-if="editedItem.password!=null">
                       <v-text-field
                         v-model="editedItem.password"
                         label="Password"
                         outlined
                         readonly
+                        color="green"
+                      ></v-text-field>
+                    </div>
+                    <div v-else>
+                      <v-text-field
+                        v-model="temp.password"
+                        label="Password"
+                        outlined
                         color="green"
                       ></v-text-field>
                     </div>
@@ -171,7 +170,6 @@
                       sm="6"
                       md="4"
                     >
-                    
                     <v-select
                       v-bind:items="gender"
                       v-model="editedItem.gender"
@@ -303,6 +301,11 @@
         birthdate: null,
         gender: null
       },
+
+      temp: {
+        password: null
+      },
+
     }),
 
     computed: {
@@ -362,6 +365,7 @@
       },
 
       addAnAccount () {
+        
         var addedAccount = {
           id: this.editedItem.id,
           username: this.editedItem.username,
@@ -388,6 +392,9 @@
       },
 
       save (date) {
+        if(this.editedItem.password == null){
+          this.editedItem.password = this.temp.password;
+        }
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
           axios.patch("http://localhost:3000/account-mgmt/update/" + this.acc_mgmt[this.editedIndex].id, this.editedItem)
@@ -401,7 +408,7 @@
             this.$refs.menu.save(date);
             this.close();
           }
-        } else if (this.editedItem == null || this.editedItem.username == null || this.editedItem.password == null || this.editedItem.fname == null || this.editedItem.lname == null || this.editedItem.birthdate == null || this.editedItem.gender == null) {
+        } else if (this.editedItem.username == null || this.editedItem.password == null || this.editedItem.fname == null || this.editedItem.lname == null || this.editedItem.birthdate == null || this.editedItem.gender == null) {
           alert("Please fill all of the fields before saving.")
         }     
       },
