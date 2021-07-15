@@ -381,7 +381,7 @@
       checkIfUsernameIsValid () {
         let isTaken = false;
         for(var x = 0; x < this.acc_mgmt.length; x++){
-          if(this.editedItem.username == this.acc_mgmt[x].username){
+          if((this.editedItem.username == this.acc_mgmt[x].username) || (this.editedItem.fname == this.acc_mgmt[x].fname && this.editedItem.lname == this.acc_mgmt[x].lname)){
             isTaken = true;
             break;
           } else {
@@ -394,6 +394,7 @@
       save (date) {
         if(this.editedItem.password == null){
           this.editedItem.password = this.temp.password;
+          this.temp.password = null;
         }
         if (this.editedIndex > -1) {
           Object.assign(this.acc_mgmt[this.editedIndex], this.editedItem)
@@ -401,7 +402,7 @@
           this.close()
         } else if (this.editedItem.username != null && this.editedItem.password != null && this.editedItem.fname != null && this.editedItem.lname != null && this.editedItem.birthdate != null && this.editedItem.gender != null) {
           if(this.checkIfUsernameIsValid() == true){
-            alert("This username has already been taken. Please input a different one.");
+            alert("An account with the same names and/or password already exists. Please input a different one.");
           } else {
             this.addAnAccount();
             this.acc_mgmt.push(this.editedItem);

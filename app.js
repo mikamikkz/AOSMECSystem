@@ -40,22 +40,28 @@ connection.connect((err) => {
 
 /*****************************************       LOGIN      ************************************************/
 app.post("/login", urlEncodedParser, (req, res) => {
+
+    let encryptedPassword = req.body.password;  
+
     connection.query('SELECT id, username, password FROM account WHERE username ="'+req.body.username+'"', (err, results)=> {
+        
+        let check = bcrypt.compareSync(encryptedPassword,results[0].password);
+        console.log(check);
         if (err){
             console.log(err)
             res.json({message: "Account not found."})
         }
-        console.log(results)
+        
         if(!(results.length>0)){
             res.status(404).json({message:"Account does not exist"});
-        }else if(req.body.password != results[0].password){
+        }else if(check === false){
             res.status(400).json({message:"Incorrect Password"});
-        }else if(req.body.password == results[0].password){
+        }else if(check === true){
             req.session.loggedin = true;
             if(req.body.username === "admin"){
                 console.log("admin")
                 res.status(200).json({userid: results[0].id, message: "Welcome Admin."})
-            }else{
+            }else if (req.body.username === "frontdesk"){
                 console.log("frontdesk")
                 res.status(200).json({userid: results[0].id, message: "Welcome Front Desk."})
             }
@@ -1063,7 +1069,7 @@ app.get("/room-rate/:room/:num", (req, res) => {
 
 //create
 app.post("/room-mgmt/all", (req, res) => {
-    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom) VALUES ("' + req.body.name + '","' + req.body.rate + '","' + req.body.totalNoOfRoom + '") ', (err, result) => {
+    connection.query('INSERT INTO room_type (name,rate,totalNoOfRoom,floor_number) VALUES ("' + req.body.name + '","' + req.body.rate + '","' + req.body.totalNoOfRoom + '", "' + req.body.floor_number + '") ', (err, result) => {
         if (err) {
             res.json({
                 message: "Room was not added.",
@@ -1081,7 +1087,7 @@ app.post("/room-mgmt/all", (req, res) => {
 
 //update
 app.patch("/room-mgmt/all/update/:id", (req, res) => {
-    connection.query('UPDATE room_type SET name = "' + req.body.name + '", rate = "' + req.body.rate + '", totalNoOfRoom = "' + req.body.totalNoOfRoom + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE room_type SET name = "' + req.body.name + '", rate = "' + req.body.rate + '", totalNoOfRoom = "' + req.body.totalNoOfRoom + '", floor_number = "' + req.body.floor_number + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
         if (err) {
             res.json({
                 message: "Room was not added.",
@@ -1287,6 +1293,7 @@ app.delete("/account-mgmt/delete/:id", urlEncodedParser, (req, res) => {
 
 //update
 app.patch("/account-mgmt/update/:id", urlEncodedParser, (req, res) => {
+    
     connection.query('UPDATE account SET username = "' + req.body.username + '", password = "' + req.body.password + '", fname = "' + req.body.fname + '", lname = "' + req.body.lname + '", birthdate = "' + req.body.birthdate + '", gender = "' + req.body.gender + '" WHERE id = ' + req.params.id + ' ', (err, result) => {
         if (err) {
             res.json({

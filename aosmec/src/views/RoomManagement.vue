@@ -104,6 +104,22 @@
                         color="green"
                       ></v-text-field>
                     </v-col>
+
+                    <v-col
+                      cols="12"
+                      sm="6"
+                      md="6"
+                    >
+                      <v-select
+                        v-bind:items="floors"
+                        v-model="editedItem.floor_number"
+                        item-text="text"
+                        item-value="value"
+                        label="Floor Number"
+                        outlined
+                        color="green"
+                      ></v-select>
+                    </v-col>
                     
                   </v-row>
                 </v-container>
@@ -195,10 +211,17 @@
         { text: 'Room Name', value: 'name' ,align: 'start', sortable: false },
         { text: 'Rate', value: 'rate', sortable: false},
         { text: 'Total Number of Rooms', value: 'totalNoOfRoom', sortable: false},
+        { text: 'Floor Number', value: 'floor_number', sortable: false},
         { text: 'Actions', value: 'actions', sortable: false },
       ],
       room_mgmt: [
 
+      ],
+
+      floors: [
+        {text: "Floor 1", value: 1},
+        {text: "Floor 2", value: 2},
+        {text: "Floor 3", value: 3},
       ],
 
       editedIndex: -1,
@@ -206,6 +229,7 @@
         name: null,
         rate: null,
         totalNoOfRoom: null,
+        floor_number: null
       },
     }),
 
@@ -269,7 +293,8 @@
           id: this.editedItem.id,
           name: this.editedItem.name,
           rate: this.editedItem.rate,
-          totalNoOfRoom: this.editedItem.totalNoOfRoom
+          totalNoOfRoom: this.editedItem.totalNoOfRoom,
+          floor_number: this.editedItem.floor_number
         }
         axios.post("http://localhost:3000/room-mgmt/all", addedRoom)
       },
@@ -299,7 +324,8 @@
               id: room[x].id,
               name: room[x].name,
               rate: room[x].rate,
-              totalNoOfRoom: room[x].totalNoOfRoom
+              totalNoOfRoom: room[x].totalNoOfRoom,
+              floor_number: room[x].floor_number
             }
             this.room_mgmt.push(addData);
           }
