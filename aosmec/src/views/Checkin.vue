@@ -82,7 +82,7 @@
                       item-value="room"
                       outlined
                       dense
-                      v-on:click="storeOldRoom(rooms.roomNum)"
+                      v-on:click="storeOldRoom(rooms.roomNum, rooms.roomType)"
                       v-on:change="renameKey(rooms.roomNum, rooms.roomType)"
                       color="green"
                     ></v-select>
@@ -258,6 +258,12 @@
               </template>
             </v-simple-table>
           </v-card-text>
+          <v-card-actions class="d-flex px-5 pb-5 mb-0">
+            <v-chip color="d-flex align-center px-5 light-green white--text">
+              Total:
+            </v-chip>
+            <p class="d-flex align-center text-button my-0 ml-5"> Php {{ guestBillDetailsTotal }}.00 </p>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -384,55 +390,63 @@
                 </template>
               </v-simple-table>
 
-
-              <v-row v-if="addServiceForm" class="mt-2">
-                <v-col lg="6" md="6" sm="12" class="pr-1">
-                  <v-select
-                    :items="services"
-                    v-model="addToService.id"
-                    label="Service Name"
-                    item-text="text"
-                    item-value="value"
-                    dense
-                    height="10"
-                    outlined
-                    color="green"
-                    class="ml-2"
-                    small
-                  ></v-select>
-                </v-col>
-                <v-col lg="2" md="2" sm="12" class="pl-1 pr-2">
-                  <v-text-field
-                    v-model="addToService.qty"
-                    label="Qty"
-                    dense
-                    outlined
-                    type="number"
-                    min="1"
-                    color="green"
-                  ></v-text-field>
-                </v-col>
-                <v-col lg="4" md="4" sm="12" class="ma-0 px-0">
+              <span v-if="addServiceForm">
+                <v-row class="d-flex mt-2 mb-0 pb-0">
+                  <v-col lg="6" md="6" sm="12" class="d-flex justify-center pb-0">
+                    <v-select
+                      :items="services"
+                      v-model="addToService.id"
+                      label="Service Name"
+                      item-text="text"
+                      item-value="value"
+                      dense
+                      height="10"
+                      outlined
+                      color="green"
+                      class="ml-2 pb-0 mb-0"
+                      small
+                      hide-details
+                    ></v-select>
+                  </v-col>
+                  <v-col lg="2" md="2" sm="12" class="d-flex px-1 justify-center">
+                    <v-text-field
+                      v-model="addToService.qty"
+                      label="Qty"
+                      dense
+                      outlined
+                      type="number"
+                      min="1"
+                      color="green"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                  <v-col lg="4" md="4" sm="12" class="pr-5">
+                    <v-btn
+                      class="white--text"
+                      color="green"
+                      dense
+                      outlined
+                      block
+                      v-on:click="addToList(addToService, rooms.roomNum)"
+                    >
+                      Add
+                    </v-btn>
+                  </v-col>
+                </v-row>
+                <v-row class="pa-0 px-2">
+                  <v-col>
                   <v-btn
-                    class="white--text"
-                    color="green"
-                    dense
-                    outlined
-                    v-on:click="addToList(addToService, rooms.roomNum)"
-                  >
-                    Add
-                  </v-btn>
-                  <v-btn
-                    class="ml-1 pa-0"
-                    dense
-                    outlined
-                    v-on:click="addServiceForm = false"
-                  >
-                    Back
-                  </v-btn>
-                </v-col>
-              </v-row>
-
+                      dense
+                      depressed
+                      small
+                      block
+                      v-on:click="addServiceForm = false"
+                    >
+                      Back
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </span>
               <v-card-actions v-else-if="checkInRoom[rooms.roomNum].status == false" class="d-flex justify-center">
                 <v-btn color="success" outlined small v-on:click="addServiceForm = true">Add Service</v-btn>
                 <v-btn color="success" outlined small v-on:click="checkInModal(checkInRoom[rooms.roomNum].service, rooms.roomNum)">Check In</v-btn>
@@ -566,6 +580,7 @@ export default {
         name: "",
         qty: "",
       },
+      guestBillDetailsTotal: 0,
       guestBillDetails: [],
       guestBill: {},
       reservationType: [
@@ -635,7 +650,15 @@ export default {
       }, 5000)
     },
     fillReserveeDetails: function (reserveeId) {
+      this.guestBillDetailsTotal = 0;
       this.guestBillDetails.splice(0, this.guestBillDetails.length);
+      axios
+      .get('http://localhost:3000/vacant-rooms')
+      .then((roomsDB) => {
+        var roomTypes = roomsDB.data.roomNo;
+        this.roomNo = roomTypes;
+      })
+
       if(reserveeId === null){
         this.input.id = null;
         this.input.reservationType = "Walk In"
@@ -645,6 +668,7 @@ export default {
           roomNum: ""
         }]
         this.totalReserve = 1;
+        this.input.checkOutDate = "";
       } else {
         axios
           .get("http://localhost:3000/reservee/" + reserveeId)
@@ -707,6 +731,7 @@ export default {
                     add[0].status = "unpaid";
                   }
                   this.guestBillDetails = add;
+                  this.guestBillDetailsTotal = totalRate;
                 });
             }
           })
@@ -740,6 +765,7 @@ export default {
               add[0].status = "unpaid";
             }
             this.guestBillDetails = add;
+            this.guestBillDetailsTotal = total;
           } else {
             var roomDet = this.input.roomDetails;
             var totalRate = 0;
@@ -752,10 +778,12 @@ export default {
                   totalRate +=  initialTotal;
                   
                   this.guestBillDetails[0].total = totalRate;
+                  this.guestBillDetailsTotal = totalRate;
                 });
             }
             if(this.input.noOfDays == 0){
               this.guestBillDetails[0].total = 500;
+              this.guestBillDetailsTotal = 500;
             }
           }
           var key = Object.keys(this.checkInRoom)
@@ -767,50 +795,52 @@ export default {
           }
         });
     },
-    storeOldRoom: function(old){
-      if(old !== undefined){
-        this.oldRoomKey = old;
+    storeOldRoom: function(old, roomType){
+      if(old !== ""){
+        var index;
+        var rmObj = this.roomNo[roomType];
+        for(index = 0; index < rmObj.length && rmObj[index].room != old; index++);
+        this.roomNo[roomType][index].disabled = false;
       }
     },
     renameKey: function(newKey, roomType){
       newKey = newKey.toString();
-      if(Object.prototype.hasOwnProperty.call(this.checkInRoom, newKey)){
-        this.showAlert("Warning! Room is already taken");
-      } else {
-        if(this.oldRoomKey){
-          this.$set(this.checkInRoom, newKey, this.checkInRoom[this.oldRoomKey])
-          delete this.checkInRoom[this.oldRoomKey];
+      var rmObj = this.roomNo[roomType];
+      var index;
+      for(index = 0; index < rmObj.length && rmObj[index].room != newKey; index++);
+      this.roomNo[roomType][index].disabled = true;
 
-          this.oldRoomKey = undefined;
-          // var temp1 = this.checkInRoom;
-          // this.$set(this.checkInRoom, temp1)
-          console.log(this.checkInRoom)
-        } else {
-          var temp = {
-            guest: [],
-            service: [],
-            status: false,
-          };
-          this.$set(this.checkInRoom, newKey, temp);
-          axios
-            .get("http://localhost:3000/room-rate/"+roomType+"/"+1)
-            .then((response) => {
-              var roomRate = response.data.rate;
-              var room = {
-                add: false,
-                name: "Room Rate",
-                rate: roomRate,
-                quantity: 1,
-                total: roomRate * this.input.noOfDays,
-                status: "Paid",
-              };
-              var resType = this.input.reservationType;
-              if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walk In") == 0) {
-                room.status = "Unpaid";
-              }
-              this.$set(this.checkInRoom[newKey].service, 0, room);
-            });
-        }
+      if(this.oldRoomKey){
+        this.$set(this.checkInRoom, newKey, this.checkInRoom[this.oldRoomKey])
+        delete this.checkInRoom[this.oldRoomKey];
+
+        this.oldRoomKey = undefined;
+      } else {
+        var temp = {
+          guest: [],
+          service: [],
+          status: false,
+        };
+        this.$set(this.checkInRoom, newKey, temp);
+        axios
+          .get("http://localhost:3000/room-rate/"+roomType+"/"+1)
+          .then((response) => {
+            var roomRate = response.data.rate;
+            var room = {
+              add: false,
+              name: "Room Rate",
+              rate: roomRate,
+              quantity: 1,
+              total: roomRate * this.input.noOfDays,
+              status: "Paid",
+            };
+
+            var resType = this.input.reservationType;
+            if(resType.localeCompare("Booking.com") == 0 || resType.localeCompare("Walk In") == 0) {
+              room.status = "Unpaid";
+            }
+            this.$set(this.checkInRoom[newKey].service, 0, room);
+          });
       }
     },
     addGuestInRoom: function(roomNum) {
@@ -875,11 +905,14 @@ export default {
         .get("http://localhost:3000/service/" + input.id)
         .then((res) => {
           var service = res.data.result[0];
-          
           var servId = this.checkInRoom[key].service.findIndex(service => service.id === input.id);
+          var qty;
           if(servId > 0){
-            this.checkInRoom[key].service[servId].quantity += parseInt(input.qty);
-            this.checkInRoom[key].service[servId].total += service.rate * input.qty;
+            qty = this.checkInRoom[key].service[servId].quantity;
+            if(qty < this.checkInRoom[key].guest.length || this.checkInRoom[key].service[servId].name != "Breakfast"){
+              this.checkInRoom[key].service[servId].quantity += parseInt(input.qty);
+              this.checkInRoom[key].service[servId].total += service.rate * input.qty;
+            }
           } else {
             var addData = {
               add: true,
@@ -891,12 +924,16 @@ export default {
               status: "Unpaid",
             };
             this.checkInRoom[key].service.push(addData);
+            qty = addData.quantity;
           }
         
           var serviceId = this.guestBillDetails.findIndex(guestBill => guestBill.id === input.id);
           if(serviceId > 0){
-            this.guestBillDetails[serviceId].qty += parseInt(input.qty);
-            this.guestBillDetails[serviceId].total += service.rate * input.qty;
+            if(qty < this.checkInRoom[key].guest.length || this.checkInRoom[key].service[servId].name != "Breakfast"){
+              this.guestBillDetails[serviceId].qty += parseInt(input.qty);
+              this.guestBillDetails[serviceId].total += service.rate * input.qty;
+              this.guestBillDetailsTotal += service.rate;
+            }
           } else {
             var addBill = {
               id: input.id,
@@ -905,6 +942,7 @@ export default {
               total: service.rate * input.qty,
               status: "Unpaid",
             };
+            this.guestBillDetailsTotal += addBill.total;
             this.guestBillDetails.push(addBill);
           }
         })
@@ -924,19 +962,23 @@ export default {
       }
     },
     checkInModal: function (bill, roomNum) {
-      this.checkInDialog = true;
-      var totalBill = 0;
-      var balance = 0;
-      this.guestBill.roomNo = roomNum;
-      for (var i = 0; i < bill.length; i++) {
-        totalBill += parseInt(bill[i].total);
-        if (bill[i].status == "Unpaid") {
-          balance += parseInt(bill[i].total);
+      if(this.checkInRoom[roomNum].guest.length < 0){
+        this.checkInDialog = true;
+        var totalBill = 0;
+        var balance = 0;
+        this.guestBill.roomNo = roomNum;
+        for (var i = 0; i < bill.length; i++) {
+          totalBill += parseInt(bill[i].total);
+          if (bill[i].status == "Unpaid") {
+            balance += parseInt(bill[i].total);
+          }
         }
+        this.guestBill.total = totalBill;
+        this.guestBill.balance = balance;
+        this.checkInRoomNumber = roomNum;
+      } else {
+        this.showAlert("Please input guest details in Room " + roomNum);
       }
-      this.guestBill.total = totalBill;
-      this.guestBill.balance = balance;
-      this.checkInRoomNumber = roomNum;
     },
     checkInGuest: function (input, totalBill, checkIn, roomNum) {
       var services = checkIn.service;
