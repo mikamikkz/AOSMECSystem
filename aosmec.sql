@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.3
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 07, 2021 at 10:45 AM
--- Server version: 10.4.14-MariaDB
--- PHP Version: 7.4.11
+-- Generation Time: Jul 15, 2021 at 09:23 AM
+-- Server version: 10.4.11-MariaDB
+-- PHP Version: 7.4.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `aosmec2`
+-- Database: `aosmec`
 --
 
 -- --------------------------------------------------------
@@ -32,7 +32,6 @@ CREATE TABLE `account` (
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `fname` varchar(255) NOT NULL,
-  `mname` varchar(255) NOT NULL,
   `lname` varchar(255) NOT NULL,
   `birthdate` date NOT NULL,
   `gender` varchar(255) NOT NULL,
@@ -45,9 +44,10 @@ CREATE TABLE `account` (
 -- Dumping data for table `account`
 --
 
-INSERT INTO `account` (`id`, `username`, `password`, `fname`, `mname`, `lname`, `birthdate`, `gender`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1, 'admin', 'admin', 'Admin', 'A', 'A', '1999-09-14', 'Female', '0000-00-00', NULL, NULL),
-(3, 'frontdesk', '123', 'FR', 'A', 'Desk', '2021-06-28', 'Female', '2021-06-28', NULL, NULL);
+INSERT INTO `account` (`id`, `username`, `password`, `fname`, `lname`, `birthdate`, `gender`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(1, 'admin', '$2b$10$ISPjfORnCJEBZkLxxA8DSO6djN4A3KSUk8xz7/Iu.gtwlr3Kkc/Ca', 'Admin', 'A', '1999-09-14', 'Female', '0000-00-00', NULL, NULL),
+(3, 'frontdesk', '$2b$10$1Oz9w66gG1p62HA1Sdi3kOqQYD7RFoHbMnbeQ8r1I3xLQdiDvDZ5q', 'FR', 'Desk', '1994-06-28', 'Female', '2021-06-28', NULL, NULL),
+(27, 'test', '$2b$10$CaNdYfSAI3aUl0Uwh958v.ZsuntOlJ6JqaWlGfUnP/WzBifUeko9m', 'test', 'test', '1993-05-13', 'Male', '2021-07-15', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -145,6 +145,14 @@ CREATE TABLE `reservation` (
   `deletedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `reservation`
+--
+
+INSERT INTO `reservation` (`id`, `reserveeId`, `accountId`, `type`, `status`, `checkInDate`, `checkOutDate`, `noOfDays`, `noOfHead`, `confirmationNo`, `reservationFee`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
+(33, 67, 1, 'Booking.com', 1, '2021-07-07', '2021-07-09', 2, 2, '1232', NULL, '2021-07-07', '2021-07-07', NULL),
+(34, 68, 1, 'Booking.com', 1, '2021-07-15', '2021-07-16', 1, 2, '324213', NULL, '2021-07-15', NULL, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -162,6 +170,14 @@ CREATE TABLE `reservee` (
   `updatedAt` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `reservee`
+--
+
+INSERT INTO `reservee` (`id`, `name`, `gender`, `country`, `email`, `phoneNo`, `createdAt`, `updatedAt`) VALUES
+(67, 'fwefw', 'Male', 'Afghanistan', 'wF@ewfwf', '32412343421', '2021-07-07', '2021-07-07'),
+(68, 'weqfqew', 'Female', 'Afghanistan', 'weqfwe@weqewf', '341323', '2021-07-15', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -174,6 +190,14 @@ CREATE TABLE `reserve_room` (
   `roomType` varchar(255) NOT NULL,
   `noOfRoom` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `reserve_room`
+--
+
+INSERT INTO `reserve_room` (`id`, `reservationId`, `roomType`, `noOfRoom`) VALUES
+(30, 33, 'single', 1),
+(32, 34, 'single', 1);
 
 -- --------------------------------------------------------
 
@@ -190,25 +214,6 @@ CREATE TABLE `room` (
   `createdAt` date NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `room`
---
-
-INSERT INTO `room` (`id`, `roomTypeId`, `roomNo`, `status`, `occupied`, `createdAt`) VALUES
-(13, 1, 101, 'clean', 0, '2021-07-07'),
-(14, 1, 102, 'clean', 0, '2021-07-07'),
-(15, 1, 103, 'clean', 0, '2021-07-07'),
-(16, 1, 104, 'clean', 0, '2021-07-07'),
-(17, 1, 105, 'clean', 0, '2021-07-07'),
-(18, 2, 106, 'clean', 0, '2021-07-07'),
-(19, 2, 206, 'clean', 0, '2021-07-07'),
-(20, 2, 301, 'clean', 0, '2021-07-07'),
-(21, 3, 201, 'clean', 0, '2021-07-07'),
-(22, 3, 202, 'clean', 0, '2021-07-07'),
-(23, 3, 203, 'clean', 0, '2021-07-07'),
-(24, 3, 204, 'clean', 0, '2021-07-07'),
-(25, 3, 205, 'clean', 0, '2021-07-07');
-
 -- --------------------------------------------------------
 
 --
@@ -222,17 +227,16 @@ CREATE TABLE `room_type` (
   `totalNoOfRoom` int(10) NOT NULL,
   `createdAt` date NOT NULL DEFAULT current_timestamp(),
   `updatedAt` date DEFAULT NULL,
-  `deletedAt` date DEFAULT NULL
+  `deletedAt` date DEFAULT NULL,
+  `floor_number` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `room_type`
 --
 
-INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(1, 'Regular', 700, 5, '2021-07-07', NULL, NULL),
-(2, 'Family', 1200, 3, '2021-07-07', NULL, NULL),
-(3, 'Single', 500, 5, '2021-07-07', NULL, NULL);
+INSERT INTO `room_type` (`id`, `name`, `rate`, `totalNoOfRoom`, `createdAt`, `updatedAt`, `deletedAt`, `floor_number`) VALUES
+(8, 'singl', 324, 324, '2021-07-15', NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -255,8 +259,9 @@ CREATE TABLE `service` (
 --
 
 INSERT INTO `service` (`id`, `name`, `rate`, `pricing`, `createdAt`, `updatedAt`, `deletedAt`) VALUES
-(5, 'Breakfast', 200, 'per head', '2021-07-07', NULL, NULL),
-(6, 'Extra Bed', 150, 'per room', '2021-07-07', NULL, NULL);
+(5, 'shuttle', 100, 'per ride', '2021-07-14', NULL, NULL),
+(6, 'bed', 200, 'per head', '2021-07-14', NULL, NULL),
+(7, 'clean room', 2009, 'per room', '2021-07-14', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -346,7 +351,7 @@ ALTER TABLE `service`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `bill`
@@ -370,37 +375,37 @@ ALTER TABLE `guest`
 -- AUTO_INCREMENT for table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `reservee`
 --
 ALTER TABLE `reservee`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `reserve_room`
 --
 ALTER TABLE `reserve_room`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `room`
 --
 ALTER TABLE `room`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `room_type`
 --
 ALTER TABLE `room_type`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `service`
 --
 ALTER TABLE `service`
-  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables

@@ -64,6 +64,9 @@ app.post("/login", urlEncodedParser, (req, res) => {
             }else if (req.body.username === "frontdesk"){
                 console.log("frontdesk")
                 res.status(200).json({userid: results[0].id, message: "Welcome Front Desk."})
+            }else{
+                //this is for any new account that's been created by the admin, it leads to the frontdesk UI
+                res.status(200).json({userid: results[0].id, message: "Welcome!."})
             }
             console.log("LOGIN SUCCESS")
         }
