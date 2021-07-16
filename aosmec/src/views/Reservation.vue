@@ -24,7 +24,7 @@
     <v-dialog v-model="reservationDialog" persistent width="1100">
       <v-card>
         <v-card-title class="green white--text" fixed-header>
-          Add Reservation</v-card-title>
+          {{ reservationModalHeader }} Reservation</v-card-title>
         <v-card-text class="mt-5">
           <v-row>
             <v-col cols="6">
@@ -36,13 +36,22 @@
               </v-chip>
               <v-card outlined class="mt-3 px-7 py-3">
                 <v-row class="mt-1">
-                  <v-col cols="8" class="pa-0 pr-2">
+                  <v-col cols="4" class="pa-0 pr-2">
                     <v-text-field
-                      label="Name"
-                      v-model="reservationDetails.name"
+                      label="First Name"
+                      v-model="reservationDetails.fname"
                       color="green"
                       dense
                       prepend-icon="mdi-account"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="4" class="pa-0 pr-2">
+                    <v-text-field
+                      label="Last Name"
+                      v-model="reservationDetails.lname"
+                      color="green"
+                      dense
                       outlined
                     ></v-text-field>
                   </v-col>
@@ -325,7 +334,7 @@
             class="px-5"
             v-on:click="saveReservation(reservationDetails)"
           >
-            Reserve
+            {{ reservationModalButton }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -488,7 +497,7 @@
                   <v-row class="pl-3">
                     <v-col cols="4" class="py-2"> Name </v-col>
                     <v-col cols="8" class="py-2"
-                      >: {{ item.reserveeName }}
+                      >: {{ item.reserveeFname + " " + item.reserveeLname  }}
                     </v-col>
                   </v-row>
                   <v-row class="pl-3">
@@ -623,6 +632,8 @@ export default {
       deleteReservationDialog: false,
       cancelReservationDialog: false,
       activeReservationDialog: false,
+      reservationModalHeader: "",
+      reservationModalButton: "",
       gender: [
         { text: "Male", value: "Male" },
         { text: "Female", value: "Female" },
@@ -655,8 +666,13 @@ export default {
           class: "green--text darken-4 title",
         },
         {
-          text: "Reservee Name",
-          value: "reserveeName",
+          text: "First Name",
+          value: "reserveeFname",
+          class: "green--text darken-4 title",
+        },
+        {
+          text: "Last Name",
+          value: "reserveeLname",
           class: "green--text darken-4 title",
         },
         {
@@ -736,6 +752,8 @@ export default {
       }
     },
     addReservationBtn: function(){
+      this.reservationModalHeader = "Add";
+      this.reservationModalButton = "Reserve";
       this.reservationDialog = true;
       this.reservationDetails = {
         name: "",
@@ -756,11 +774,14 @@ export default {
     },
     editReservationBtn: function (input) {
       this.reservationDialog = true;
+      this.reservationModalHeader = "Edit";
+      this.reservationModalButton = "Save";
       const index = this.reservations.indexOf(input);
       this.reservationDetails = {
         index: index,
         id: input.reservationId,
-        name: input.reserveeName,
+        fname: input.reserveeFname,
+        lname: input.reserveeLname,
         gender: input.reserveeGender,
         country: input.reserveeCountry,
         email: input.reserveeEmail,
@@ -852,7 +873,8 @@ export default {
         .then((res) => {
           const addData = {
             reservationId: res.data.id,
-            reserveeName: input.name,
+            reserveeFname: input.fname,
+            reserveeLname: input.lname,
             reserveeGender: input.gender,
             reserveeCountry: input.country,
             reserveeEmail: input.email,
@@ -878,7 +900,8 @@ export default {
           const resDate = this.reservations[input.index].reservedDate;
           this.$set(this.reservations, input.index, {
             reservationId: input.id,
-            reserveeName: input.name,
+            reserveeFname: input.fname,
+            reserveeLname: input.lname,
             reserveeGender: input.gender,
             reserveeCountry: input.country,
             reserveeEmail: input.email,
@@ -938,7 +961,8 @@ export default {
               checkIn: reservation[i].reserve.checkInDate,
               checkOut: reservation[i].reserve.checkOutDate,
               reservationStatus: reservation[i].reserve.status,
-              reserveeName: reservation[i].reserve.name,
+              reserveeFname: reservation[i].reserve.fname,
+              reserveeLname: reservation[i].reserve.lname,
               reserveeGender: reservation[i].reserve.gender,
               reserveeCountry: reservation[i].reserve.country,
               reserveeEmail: reservation[i].reserve.email,

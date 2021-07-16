@@ -64,9 +64,6 @@ app.post("/login", urlEncodedParser, (req, res) => {
             }else if (req.body.username === "frontdesk"){
                 console.log("frontdesk")
                 res.status(200).json({userid: results[0].id, message: "Welcome Front Desk."})
-            }else{
-                //this is for any new account that's been created by the admin, it leads to the frontdesk UI
-                res.status(200).json({userid: results[0].id, message: "Welcome!."})
             }
             console.log("LOGIN SUCCESS")
         }
@@ -467,24 +464,9 @@ app.patch("/bill-details/:id/:ip", urlEncodedParser, (req, res) => {
 
 /********************************************     R E S E R V A T I O N     *************************************************/
 /*RESERVEE TABLE*/
-app.post('/reservee', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("' + req.body.name + '", "' + req.body.gender + '", "' + req.body.gender + '","' + req.body.email + '",' + req.body.phoneNo + ')', (err, result) => {
-        if (err) {
-            res.json({
-                message: "Reservee Failed",
-                status: 400,
-            })
-        } else {
-            res.json({
-                message: "Reservee Added",
-                status: 201,
-            })
-        }
-    });
-})
 
 app.get('/reservee/:id', (req, res) => {
-    connection.query('SELECT R.id, E.name, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = ' + req.params.id + '', (err, result1) => {
+    connection.query('SELECT R.id, E.fname, E.lname, R.type, R.noOfDays, R.noOfHead, R.checkOutDate FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE E.id = ' + req.params.id + '', (err, result1) => {
         if (err) {
             console.log(err);
             res.json({
@@ -507,7 +489,7 @@ app.get('/reservee/:id', (req, res) => {
 })
 
 app.get('/reservee/checkin/:date', (req, res) => {
-    connection.query('SELECT E.id, E.name FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status = 1 AND R.deletedAt IS NULL', (err, result) => {
+    connection.query('SELECT E.id, E.fname, E.lname FROM reservee E JOIN reservation R ON E.id = R.reserveeId WHERE R.checkInDate =' + req.params.date + ' AND R.status = 1 AND R.deletedAt IS NULL', (err, result) => {
         if (err) {
             res.json({
                 message: "Checkin Date Required"
@@ -528,7 +510,7 @@ app.patch('/reservee/:id', urlEncodedParser, (req, res) => {
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE reservee SET name="' + req.body.name + '", gender="' + req.body.gender + '", country="' + req.body.country + '", email="' + req.body.email + '", phoneNo="' + req.body.phoneNo + '", updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE reservee SET fname="' + req.body.fname + '", lname="' + req.body.lname + '", gender="' + req.body.gender + '", country="' + req.body.country + '", email="' + req.body.email + '", phoneNo="' + req.body.phoneNo + '", updatedAt="' + today + '" WHERE id=' + req.params.id + ' ', (err, result) => {
         if (err) {
             res.json({
                 message: "Reservee Update Failed",
@@ -562,7 +544,7 @@ app.delete('/reservee/:id', (req, res) => {
 /*RESERVATION TABLE*/
 
 app.post('/reservation', urlEncodedParser, (req, res) => {
-    connection.query('INSERT INTO reservee(name, gender, country, email, phoneNo) VALUES ("' + req.body.name + '","' + req.body.gender + '","' + req.body.country + '","' + req.body.email + '","' + req.body.phone + '")', (err, result1) => {
+    connection.query('INSERT INTO reservee(fname, lname, gender, country, email, phoneNo) VALUES ("' + req.body.fname + '","' + req.body.lname + '","' + req.body.gender + '","' + req.body.country + '","' + req.body.email + '","' + req.body.phone + '")', (err, result1) => {
         connection.query('INSERT INTO reservation(reserveeId, accountId, type, status, checkInDate, checkOutDate, noOfDays, noOfHead, confirmationNo, reservationFee) VALUES (' + result1.insertId + ',' + req.body.accountId + ',"' + req.body.reservationType + '", ' + req.body.status + ', "' + req.body.checkInDate + '","' + req.body.checkOutDate + '", ' + req.body.noOfDays + ',' + req.body.noOfHeads + ',"' + req.body.confirmationNo + '",' + req.body.reservationFee + ')', (error, reservation_result) => {
             console.log(reservation_result.insertId);
             for (var i = 0; i < req.body.roomDetails.length; i++) {
@@ -616,7 +598,7 @@ app.get('/reservation/id/:id', (req, res) => {
 });
 
 app.get('/reservation', urlEncodedParser, (req, res) => {
-    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.name, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate DESC', function (err, result) {
+    connection.query('SELECT R.id, R.accountId, R.type, R.status, R.checkInDate, R.checkOutDate, R.noOfHead, R.noOfDays, R.confirmationNo, R.reservationFee, R.createdAt, E.fname, E.lname, E.gender, E.country, E.email, E.phoneNo FROM reservation R JOIN reservee E ON R.reserveeId = E.id WHERE R.deletedAt IS NULL AND R.status != 2 ORDER BY checkInDate DESC', function (err, result) {
         if (err) {
             console.log(err);
             res.json({
@@ -671,7 +653,7 @@ app.patch('/reservation/:id', urlEncodedParser, (req, res) => {
     var yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
 
-    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=COALESCE("' + req.body.confirmationNo + '", R.confirmationNo), R.reservationFee=COALESCE(' + req.body.reservationFee + ', R.reservationFee), R.updatedAt="' + today + '", E.name="' + req.body.name + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
+    connection.query('UPDATE reservation R JOIN reservee E ON E.id = R.reserveeId SET R.type="' + req.body.reservationType + '", R.status=' + req.body.status + ', R.checkInDate="' + req.body.checkInDate + '", R.checkOutDate="' + req.body.checkOutDate + '", R.noOfDays=' + req.body.noOfDays + ', R.noOfHead=' + req.body.noOfHeads + ', R.confirmationNo=COALESCE("' + req.body.confirmationNo + '", R.confirmationNo), R.reservationFee=COALESCE(' + req.body.reservationFee + ', R.reservationFee), R.updatedAt="' + today + '", E.fname="' + req.body.fname + '", E.lname="' + req.body.lname + '", E.gender="' + req.body.gender + '", E.country="' + req.body.country + '", E.email="' + req.body.email + '", E.phoneNo="' + req.body.phone + '", E.updatedAt="' + today + '" WHERE R.id=' + req.params.id + ' ', (err, result) => {
         if (err) {
             console.log(err);
             res.json({

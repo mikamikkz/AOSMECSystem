@@ -1087,7 +1087,7 @@ export default {
         for (var x = 0; x < reservees.length; x++) {
           var add = {
             value: reservees[x].id,
-            reservee: reservees[x].name,
+            reservee: reservees[x].fname + " " + reservees[x].lname,
           };
           this.reservee.push(add);
         }
