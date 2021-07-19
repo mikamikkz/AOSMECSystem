@@ -612,11 +612,6 @@ export default {
           class: "green--text darken-4 title",
         },
         {
-          text: "Contact",
-          value: "phoneNo",
-          class: "green--text darken-4 title",
-        },
-        {
           text: "",
           value: "controls",
           sortable: false,
@@ -962,7 +957,7 @@ export default {
       }
     },
     checkInModal: function (bill, roomNum) {
-      if(this.checkInRoom[roomNum].guest.length < 0){
+      if(this.checkInRoom[roomNum].guest.length > 0){
         this.checkInDialog = true;
         var totalBill = 0;
         var balance = 0;

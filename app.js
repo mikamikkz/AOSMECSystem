@@ -961,6 +961,7 @@ app.post('/checkin', urlEncodedParser, (req, res) => {
                 connection.query('INSERT INTO guest (checkInId, fname, lname, gender, country, nationality, address, validId, validIdType, phoneNo) VALUES (' + checkIn.insertId + ',"' + req.body.guest[i].fname + '","' + req.body.guest[i].lname + '", "' + req.body.guest[i].gender + '","' + req.body.guest[i].country + '","' + req.body.guest[i].nationality + '", "' + req.body.guest[i].address + '", ' + req.body.guest[i].validId + ', "' + req.body.guest[i].validIdType + '", ' + req.body.guest[i].phoneNo + ')', (err, guest) => {
                     if (err) {
                         console.log("Guest Input Failed");
+                        console.log(err);
                     }
                 });
             }
