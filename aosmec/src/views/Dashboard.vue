@@ -270,7 +270,7 @@ export default {
       for(var k = 0; k < requestReservation.length; k++) {
         for(var l = 0; l < requestReservee.length; l++) {
           if(requestReservation[k].reserveeId == requestReservee[l].id) {
-            this.arrivingGuests[l].name = requestReservee[l].name
+            this.arrivingGuests[l].name = requestReservee[l].fname + " " + requestReservee[l].lname
               for(var m = 0; m < requestRoomReserve.length; m++) {
                 if(requestReservation[k].id == requestRoomReserve[m].reservationId) {
                   this.arrivingGuests[l].roomType = requestRoomReserve[m].roomType
